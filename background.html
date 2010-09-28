@@ -1,0 +1,64 @@
+<script>
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+  //sendResponse({url: 'aaskdlfjwaoefkjlkasdf'});
+  if(request.type.indexOf('image/') == 0){
+    console.log(request.data)
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://api.imgur.com/2/upload.json");  
+    xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+    xhr.send('key=390230bc94c4cc1354bcdb2dae0b9afd' /*should i invent a meaningless means of obfuscating this? no.*/
+      + '&type=base64&name='+encodeURIComponent(request.name)+'&image='+encodeURIComponent(request.data.replace(/^data.+base64,/i,''))
+    );
+
+    
+    xhr.onreadystatechange = function () {
+      if(this.readyState == 4) {
+        if(this.status == 200) {
+          var stuff = JSON.parse(xhr.responseText);
+          sendResponse({url: stuff.upload.links.original});
+          
+        } else {
+          sendResponse({url: 'upload error ('+request.name+')'});
+        }
+      }
+    };
+  }
+  //http://stackoverflow.com/questions/1614520/what-are-common-file-extensions-for-web-programming-languages
+  var weblang = 'css,cfm,yaws,html,htm,xhtml,js,pl,php,php4,php3,phtml,py,rb,rhtml,xml,rss,svg,cgi'.split(',');
+  var istext = false;
+  if(weblang.indexOf(request.name.replace(/^.*\.(\w+?)$/,'$1')) != -1)
+    istext = true;
+  if(!istext){
+    var txt = atob(request.data.replace(/^data.+base64,/i,'').substr(0,512));
+    var isAscii = true;
+    for(var i = 0; i < 128; i++){
+      var cc = txt.charCodeAt(i);
+      if(cc > 128) isAscii = false;
+    }
+  }
+  if(isAscii) istext = true;
+
+  if(istext){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://gist.github.com/api/v1/json/new");  
+    xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+    xhr.send('files['+encodeURIComponent(request.name)+']='+encodeURIComponent(atob(request.data.replace(/^data.+base64,/i,'')))
+    );
+
+    
+    xhr.onreadystatechange = function () {
+      if(this.readyState == 4) {
+        if(this.status == 200) {
+          var stuff = JSON.parse(xhr.responseText);
+          sendResponse({url: "http://gist.github.com/"+stuff.gists[0].repo});
+        } else {
+          sendResponse({url: 'upload error ('+request.name+')'});
+        }
+      }
+    };
+  }
+
+  
+});
+
+</script>

@@ -1,0 +1,25 @@
+{
+  "name": "drag2up",
+  "version": "1.0",
+  "description": "Drag an image onto any text field to upload an image and paste the URL.",
+	"background_page": "background.html",
+  "permissions": [
+    "https://api.imgur.com/",
+    "http://gist.github.com/"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["dragupload.js"],
+      "all_frames": true
+    }
+  ],
+  "icons": {
+    "16": "icon/16.png",
+    "32": "icon/32.png",
+    "48": "icon/48.png",
+    "64": "icon/64.png",
+    "128": "icon/128.png",
+    "512": "icon/512.png"
+  }
+}
