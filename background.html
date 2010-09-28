@@ -40,10 +40,10 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
   if(istext){
     var xhr = new XMLHttpRequest();
+    //http://gist.github.com/4277
     xhr.open("POST", "http://gist.github.com/api/v1/json/new");  
     xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-    xhr.send('files['+encodeURIComponent(request.name)+']='+encodeURIComponent(atob(request.data.replace(/^data.+base64,/i,'')))
-    );
+    xhr.send('files['+encodeURIComponent(request.name)+']='+encodeURIComponent(atob(request.data.replace(/^data.+base64,/i,''))));
 
     
     xhr.onreadystatechange = function () {
