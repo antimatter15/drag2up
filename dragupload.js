@@ -1,3 +1,6 @@
+if(document.documentElement.getAttribute('data-checkDrag2UpContentScript') != 'true'){
+document.documentElement.setAttribute('data-checkDrag2UpContentScript','true');
+
 function isDroppable(el){
   var tag = el.tagName.toLowerCase();
   if((tag == 'input' && el.type.toLowerCase() == 'text') || tag == 'textarea'){
@@ -95,7 +98,8 @@ function renderTarget(el){
               //try{el.select();}catch(err){};
               setTimeout(function(){
                 if(elt == 1){ //input
-                  el.value += ' '+data.url+' ' //nice and simple
+                  if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
+                  el.value = data.url + ' ';
                 }else if(elt == 2){ //contentEditable
                   var a = document.createElement('a');
                   a.href = data.url;
@@ -160,3 +164,5 @@ document.documentElement.addEventListener('drop', function(e){
 document.documentElement.addEventListener('click', function(e){
   clearTargets();
 }, false);
+
+}
