@@ -85,7 +85,6 @@ function renderTarget(el){
     mask.style.backgroundColor = '#007fff';
     mask.style.fontSize = 'large';
 
-    mask.innerHTML = 'Uploading '+files.length+' file(s)';
 
 		//so apparently, Apple synces the blinky power light with human breathing which is more emotionally awesome
 		//so logically, this is totally what I'm going to do. It's going to blinky blinky with the pattern of breathing
@@ -107,11 +106,15 @@ function renderTarget(el){
 		setTimeout(breathe, 0);
 		
 		var indicators = [];
+		var files_left = 0;
+		
     for(var i = 0; i < files.length; i++){
 			
       if(files[i].size > 1024 * 1024 * 5) {
-        if(!confirm('The file "'+files[i].name+'" is over 5MB. Are you sure you want to upload it?')) break;
+        if(!confirm('The file "'+files[i].name+'" is over 5MB. Are you sure you want to upload it?')) continue;
       }
+			files_left++;
+			mask.innerHTML = 'Uploading '+files_left+' file(s)';
       var reader = new FileReader();  
       reader.onerror = function(e){
         console.log(e)
@@ -128,28 +131,32 @@ function renderTarget(el){
             }, function(data){
               console.log('Done uploading file');
               var elt = isDroppable(el);
-              try{
-	  						mask.style.webkitTransition = 'opacity 0.6s ease'
-								mask.style.opacity = '0';
-								setTimeout(function(){
-									mask.parentNode.removeChild(mask);	
-								},700);
-							}catch(err){};
+							files_left--;
+    					mask.innerHTML = 'Uploading '+files_left+' file(s)';
 
-              try{el.focus();}catch(err){};
-              //try{el.select();}catch(err){};
-              setTimeout(function(){
-                if(elt == 1){ //input
-                  if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
-                  el.value += data.url + ' ';
-                }else if(elt == 2){ //contentEditable
-                  var a = doc.createElement('a');
-                  a.href = data.url;
-                  a.innerText = data.url;
-                  el.appendChild(a);
-                }
-              },100);
+							if(files_left == 0){
+	              try{
+		  						mask.style.webkitTransition = 'opacity 0.6s ease'
+									mask.style.opacity = '0';
+									setTimeout(function(){
+										mask.parentNode.removeChild(mask);	
+									},700);
+								}catch(err){};
 
+	              try{el.focus();}catch(err){};
+	              //try{el.select();}catch(err){};
+	              setTimeout(function(){
+	                if(elt == 1){ //input
+	                  if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
+	                  el.value += data.url + ' ';
+	                }else if(elt == 2){ //contentEditable
+	                  var a = doc.createElement('a');
+	                  a.href = data.url;
+	                  a.innerText = data.url;
+	                  el.appendChild(a);
+	                }
+	              },100);
+							}
             });
         }
       })(el, files[i], i);
