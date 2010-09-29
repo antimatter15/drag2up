@@ -65,11 +65,13 @@ function renderTarget(el){
   mask.hasDropped = false;
   
   mask.addEventListener('drop', function(e){
+    if(files.length == 0) return;
+    
     mask.hasDropped = true;
     mask.style.backgroundColor = '#007fff';
     mask.style.fontSize = 'large';
     var files = e.dataTransfer.files;
-    
+
     mask.innerHTML = 'Uploading '+files.length+' file(s)';
 
     for(var i = 0; i < files.length; i++){
@@ -143,6 +145,7 @@ doc.documentElement.addEventListener('dragenter', function(e){
   e.preventDefault();
 
   if(dropTargets.length == 0){
+    console.log(e.dataTransfer);
     getTargets();
   }
 }, false);
