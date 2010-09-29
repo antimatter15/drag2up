@@ -46,6 +46,7 @@ function renderTarget(el){
 
   var mask = doc.createElement('div');
 	var opacity = "0.84";
+	var opacity2 = "0.42"
   mask.style.opacity = opacity;
   mask.style.backgroundColor = "rgb(50,150,50)";
   mask.dropTarget = el;
@@ -69,13 +70,13 @@ function renderTarget(el){
   mask.innerHTML = 'Drop file here';
   mask.hasDropped = false;
   mask.addEventListener('dragenter', function(e){
-		mask.style.opacity = '0.42'; //so long and thanks for all the fish
+		mask.style.opacity = opacity2; //so long and thanks for all the fish
 	}) 
 	mask.addEventListener('dragleave', function(e){
 		mask.style.opacity = opacity;
 	}) 
   mask.addEventListener('drop', function(e){
-		mask.style.opacity = '0.42';
+		mask.style.opacity = opacity2;
     var files = e.dataTransfer.files;
 
     if(files.length == 0) return;
@@ -85,6 +86,25 @@ function renderTarget(el){
     mask.style.fontSize = 'large';
 
     mask.innerHTML = 'Uploading '+files.length+' file(s)';
+
+		//so apparently, Apple synces the blinky power light with human breathing which is more emotionally awesome
+		//so logically, this is totally what I'm going to do. It's going to blinky blinky with the pattern of breathing
+		//so you aren't annoyed by how slow imgur is at uploading a two megabyte image that you took in paris that
+		//totally looks like that scene from Inception.
+		
+		//http://en.wikipedia.org/wiki/Respiratory_rate says that the human breathing rate is 12/60 hertz
+		//that means that you breathe once every five seconds on average
+		//and that means each half-breath is 2.5 seconds
+		var rate = 2.5;
+  	mask.style.webkitTransition = 'opacity '+rate+'s ease';
+		var breathe = function(){
+			if(mask && mask.parentNode){
+				mask.style.opacity = mask.style.opacity == opacity ? opacity2: opacity;
+				//toggle the opacity
+				setTimeout(breathe, rate * 1000)
+			}
+		};
+		setTimeout(breathe, 0);
 		
 		var indicators = [];
     for(var i = 0; i < files.length; i++){
@@ -108,7 +128,14 @@ function renderTarget(el){
             }, function(data){
               console.log('Done uploading file');
               var elt = isDroppable(el);
-              try{mask.parentNode.removeChild(mask);}catch(err){};
+              try{
+	  						mask.style.webkitTransition = 'opacity 0.6s ease'
+								mask.style.opacity = '0';
+								setTimeout(function(){
+									mask.parentNode.removeChild(mask);	
+								},700);
+							}catch(err){};
+
               try{el.focus();}catch(err){};
               //try{el.select();}catch(err){};
               setTimeout(function(){
@@ -130,6 +157,8 @@ function renderTarget(el){
     }
   },false);
   
+
+
   doc.body.appendChild(mask);
 
   dropTargets.push(mask);
