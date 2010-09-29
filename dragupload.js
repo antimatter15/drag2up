@@ -60,17 +60,20 @@ function renderTarget(el){
   mask.style.textAlign = 'center';
   mask.style.fontSize = 'x-large';
   mask.style.color = 'white';
+	mask.style.borderRadius = pad+'px';
+	mask.style.webkitBorderRadius = pad+'px';
   mask.style.fontFamily = 'sans-serif, arial, helvetica'
   mask.innerHTML = 'Drop file here';
   mask.hasDropped = false;
   
   mask.addEventListener('drop', function(e){
+    var files = e.dataTransfer.files;
+
     if(files.length == 0) return;
     
     mask.hasDropped = true;
     mask.style.backgroundColor = '#007fff';
     mask.style.fontSize = 'large';
-    var files = e.dataTransfer.files;
 
     mask.innerHTML = 'Uploading '+files.length+' file(s)';
 
