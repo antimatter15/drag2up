@@ -226,31 +226,26 @@ doc.documentElement.addEventListener('drop', function(e){
 }, false);
 
 doc.documentElement.addEventListener('dragleave', function(e){
-	//clear targets when leaving body
-	console.log(e.target)
-	//if(e.target == document.body){
-		//clearTargets();
-		var lastBodyLeave = +new Date;
-		setTimeout(function(){
-			if(lastDrag < lastBodyLeave){
-				//go ahead and leave me.
-				//i think i prefer
-				//to stay
-				//inside
-				//...even though
-				//you broke my heart
-				//and killed me
-				//aperture science
-				//we do what we must
-				//because
-				//we can
-				//maybe you'll find someone else
-				//to help you
-				
-				clearTargets();
-			}
-		},50)
-	//}
+	var lastBodyLeave = +new Date;
+	setTimeout(function(){
+		if(lastDrag < lastBodyLeave){
+			//go ahead and leave me.
+			//i think i prefer
+			//to stay
+			//inside
+			//...even though
+			//you broke my heart
+			//and killed me
+			//aperture science
+			//we do what we must
+			//because
+			//we can
+			//maybe you'll find someone else
+			//to help you
+			
+			clearTargets();
+		}
+	},50)
 }, false);
 
 
