@@ -45,8 +45,9 @@ function renderTarget(el){
   if(!pos[0] && !pos[1] && !width && !height) return;
 
   var mask = doc.createElement('div');
-  mask.style.opacity = "0.6";
-  mask.style.backgroundColor = "green";
+	var opacity = "0.84";
+  mask.style.opacity = opacity;
+  mask.style.backgroundColor = "rgb(50,150,50)";
   mask.dropTarget = el;
 
   mask.style.position = 'absolute';
@@ -58,17 +59,23 @@ function renderTarget(el){
   mask.style.height = height+'px';
   mask.style.padding = pad+'px';
   mask.style.zIndex = 9007199254740991;
-  
+  mask.style.webkitTransition = 'opacity 0.5s ease'
   mask.style.textAlign = 'center';
-  mask.style.fontSize = 'x-large';
+  mask.style.fontSize = 'large';
   mask.style.color = 'white';
 	mask.style.borderRadius = pad+'px';
 	mask.style.webkitBorderRadius = pad+'px';
   mask.style.fontFamily = 'sans-serif, arial, helvetica'
   mask.innerHTML = 'Drop file here';
   mask.hasDropped = false;
-  
+  mask.addEventListener('dragenter', function(e){
+		mask.style.opacity = '0.42'; //so long and thanks for all the fish
+	}) 
+	mask.addEventListener('dragleave', function(e){
+		mask.style.opacity = opacity;
+	}) 
   mask.addEventListener('drop', function(e){
+		mask.style.opacity = '0.42';
     var files = e.dataTransfer.files;
 
     if(files.length == 0) return;
@@ -77,9 +84,21 @@ function renderTarget(el){
     mask.style.backgroundColor = '#007fff';
     mask.style.fontSize = 'large';
 
-    mask.innerHTML = 'Uploading '+files.length+' file(s)';
-
+    mask.innerHTML = ''//'Uploading '+files.length+' file(s)';
+		
+		var indicators = [];
     for(var i = 0; i < files.length; i++){
+			var indicator = document.createElement('div');
+			var ih = Math.floor(height/files.length);
+			indicator.style.height = ih + 'px';
+			indicator.style.width = '23px';
+			indicator.style.position = 'absolute';
+			indicator.style.top = ih*i + 'px';
+			indicator.style.backgroundColor = 'orange';
+			indicator.style.left = '0';
+			mask.appendChild(indicator);
+			indicators.push(indicator);
+			
       if(files[i].size > 1024 * 1024 * 5) {
         if(!confirm('The file "'+files[i].name+'" is over 5MB. Are you sure you want to upload it?')) break;
       }
@@ -87,7 +106,7 @@ function renderTarget(el){
       reader.onerror = function(e){
         console.log(e)
       }
-      reader.onload = (function(el, file){
+      reader.onload = (function(el, file, index){
         return function(e){
           console.log('Read file.');
           sendRequest({
@@ -97,6 +116,9 @@ function renderTarget(el){
             'name': file.name,
             'data': e.target.result
             }, function(data){
+							var progress = Math.floor(0.3523423 * 100) * width;
+							indicators[index].style.width = progress + 'px'
+							
               console.log('Done uploading file');
               var elt = isDroppable(el);
               try{mask.parentNode.removeChild(mask);}catch(err){};
@@ -113,9 +135,10 @@ function renderTarget(el){
                   el.appendChild(a);
                 }
               },100);
+
             });
         }
-      })(el, files[i]);
+      })(el, files[i], i);
       reader.readAsDataURL(files[i]);
     }
   },false);
@@ -146,12 +169,16 @@ function clearTargets(){
 }
 
 doc.documentElement.addEventListener('dragenter', function(e){
-  e.stopPropagation();  
-  e.preventDefault();
-
+ 
   if(dropTargets.length == 0 && e.dataTransfer.types.indexOf('Files') != -1){
     getTargets();
   }
+
+  if(dropTargets.length != 0){
+		e.stopPropagation();  
+  	e.preventDefault();
+	}
+
 }, false);
 
 var lastDrag = 0;
@@ -199,7 +226,6 @@ doc.documentElement.addEventListener('dragleave', function(e){
 			}
 		},0)
 	}
-	console.log(e.target)
 }, false);
 
 
