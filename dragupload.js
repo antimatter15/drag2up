@@ -155,19 +155,25 @@ doc.documentElement.addEventListener('dragenter', function(e){
 }, false);
 
 doc.documentElement.addEventListener('dragover', function(e){
-  e.stopPropagation();  
-  e.preventDefault();
-  
+	//allow default to happen for normal drag/drops
+  if(dropTargets.length != 0){
+		e.stopPropagation();  
+  	e.preventDefault();
+	}
 }, false);
 
 doc.documentElement.addEventListener('drop', function(e){
-  e.stopPropagation();  
-  e.preventDefault();  
-  clearTargets();
+	//dont do anything if theres nowhere to drag to
+	if(dropTargets.length != 0){
+  	e.stopPropagation();  
+  	e.preventDefault();  
+  	clearTargets();
+	}
 }, false);
 
 
 doc.documentElement.addEventListener('click', function(e){
+	//hi.
   clearTargets();
 }, false);
 }
