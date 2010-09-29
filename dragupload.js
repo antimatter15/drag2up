@@ -141,7 +141,7 @@ function renderTarget(el){
               setTimeout(function(){
                 if(elt == 1){ //input
                   if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
-                  el.value = data.url + ' ';
+                  el.value += data.url + ' ';
                 }else if(elt == 2){ //contentEditable
                   var a = doc.createElement('a');
                   a.href = data.url;
