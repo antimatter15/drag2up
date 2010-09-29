@@ -142,21 +142,20 @@ function renderTarget(el){
 										mask.parentNode.removeChild(mask);	
 									},700);
 								}catch(err){};
-
-	              try{el.focus();}catch(err){};
-	              //try{el.select();}catch(err){};
-	              setTimeout(function(){
-	                if(elt == 1){ //input
-	                  if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
-	                  el.value += data.url + ' ';
-	                }else if(elt == 2){ //contentEditable
-	                  var a = doc.createElement('a');
-	                  a.href = data.url;
-	                  a.innerText = data.url;
-	                  el.appendChild(a);
-	                }
-	              },100);
 							}
+							try{el.focus();}catch(err){};
+              //try{el.select();}catch(err){};
+              setTimeout(function(){
+                if(elt == 1){ //input
+                  if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
+                  el.value += data.url + ' ';
+                }else if(elt == 2){ //contentEditable
+                  var a = doc.createElement('a');
+                  a.href = data.url;
+                  a.innerText = data.url;
+                  el.appendChild(a);
+                }
+              },100);
             });
         }
       })(el, files[i], i);
