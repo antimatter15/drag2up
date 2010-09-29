@@ -201,16 +201,6 @@ doc.documentElement.addEventListener('dragenter', function(e){
   if(dropTargets.length != 0){
 		e.stopPropagation();
   	e.preventDefault();
-
-		setTimeout(function(){
-			if(dropTargets.length != 0){
-				if(+new Date - lastDrag > 2000){
-					clearTargets();
-					return;
-				}
-				setTimeout(arguments.callee, 100)
-			}
-		},100)
 	}
 
 }, false);
