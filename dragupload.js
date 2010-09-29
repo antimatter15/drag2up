@@ -94,19 +94,21 @@ function renderTarget(el){
 		//http://en.wikipedia.org/wiki/Respiratory_rate says that the human breathing rate is 12/60 hertz
 		//that means that you breathe once every five seconds on average
 		//and that means each half-breath is 2.5 seconds
+		
+		var indicators = [];
+		var files_left = 0;
+		
+		
 		var rate = 2.5;
   	mask.style.webkitTransition = 'opacity '+rate+'s ease';
 		var breathe = function(){
-			if(mask && mask.parentNode){
+			if(mask && mask.parentNode && files_left > 0){
 				mask.style.opacity = mask.style.opacity == opacity ? opacity2: opacity;
 				//toggle the opacity
 				setTimeout(breathe, rate * 1000)
 			}
 		};
 		setTimeout(breathe, 0);
-		
-		var indicators = [];
-		var files_left = 0;
 		
     for(var i = 0; i < files.length; i++){
 			
