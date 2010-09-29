@@ -84,20 +84,10 @@ function renderTarget(el){
     mask.style.backgroundColor = '#007fff';
     mask.style.fontSize = 'large';
 
-    mask.innerHTML = ''//'Uploading '+files.length+' file(s)';
+    mask.innerHTML = 'Uploading '+files.length+' file(s)';
 		
 		var indicators = [];
     for(var i = 0; i < files.length; i++){
-			var indicator = document.createElement('div');
-			var ih = Math.floor(height/files.length);
-			indicator.style.height = ih + 'px';
-			indicator.style.width = '23px';
-			indicator.style.position = 'absolute';
-			indicator.style.top = ih*i + 'px';
-			indicator.style.backgroundColor = 'orange';
-			indicator.style.left = '0';
-			mask.appendChild(indicator);
-			indicators.push(indicator);
 			
       if(files[i].size > 1024 * 1024 * 5) {
         if(!confirm('The file "'+files[i].name+'" is over 5MB. Are you sure you want to upload it?')) break;
@@ -116,9 +106,6 @@ function renderTarget(el){
             'name': file.name,
             'data': e.target.result
             }, function(data){
-							var progress = Math.floor(0.3523423 * 100) * width;
-							indicators[index].style.width = progress + 'px'
-							
               console.log('Done uploading file');
               var elt = isDroppable(el);
               try{mask.parentNode.removeChild(mask);}catch(err){};

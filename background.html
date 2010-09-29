@@ -3,22 +3,9 @@ function postJSON(url, data, callback){
   var xhr = new XMLHttpRequest();
   xhr.open("POST", url);  
   xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-con
   xhr.send(Object.keys(data).map(function(i){
     return i+'='+encodeURIComponent(data[i]);
   }).join('&'));
-	xhr.upload.onprogress = function(e){
-		console.log('up',e)
-		if(e.lengthComputable){
-			var loaded = e.loaded / e.total;
-			if(loaded < 1){
-				console.log(loaded)
-			}
-		}
-	}
-	xhr.onprogress = function(e){
-		console.log('download progress',e)
-	}
   xhr.onreadystatechange = function () {
     if(this.readyState == 4) {
       if(this.status == 200) {
@@ -30,10 +17,6 @@ con
     }
   };
 }
-chrome.extension.onConnect.addListener(function(port) {
-	port.onMessage.addListener(function(msg) {
-  })
-})
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   if(request.action == 'upload'){
     if(request.type.indexOf('image/') == 0){
