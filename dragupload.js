@@ -149,8 +149,7 @@ doc.documentElement.addEventListener('dragenter', function(e){
   e.stopPropagation();  
   e.preventDefault();
 
-  if(dropTargets.length == 0){
-    console.log(e.dataTransfer.types.indexOf('Files'));
+  if(dropTargets.length == 0 && e.dataTransfer.types.indexOf('Files') != -1){
     getTargets();
   }
 }, false);
