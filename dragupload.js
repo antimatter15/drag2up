@@ -193,14 +193,24 @@ function clearTargets(){
 }
 
 doc.documentElement.addEventListener('dragenter', function(e){
- 
+	lastDrag = +new Date; 
   if(dropTargets.length == 0 && e.dataTransfer.types.indexOf('Files') != -1){
     getTargets();
   }
 
   if(dropTargets.length != 0){
-		e.stopPropagation();  
+		e.stopPropagation();
   	e.preventDefault();
+
+		setTimeout(function(){
+			if(dropTargets.length != 0){
+				if(+new Date - lastDrag > 2000){
+					clearTargets();
+					return;
+				}
+				setTimeout(arguments.callee, 100)
+			}
+		},100)
 	}
 
 }, false);
@@ -209,7 +219,7 @@ var lastDrag = 0;
 
 doc.documentElement.addEventListener('dragover', function(e){
 	//allow default to happen for normal drag/drops
-	lastDrag = +new Date;
+	lastDrag = +new Date; 
   if(dropTargets.length != 0){
 		e.stopPropagation();  
   	e.preventDefault();
@@ -227,7 +237,8 @@ doc.documentElement.addEventListener('drop', function(e){
 
 doc.documentElement.addEventListener('dragleave', function(e){
 	//clear targets when leaving body
-	if(e.target == document.body){
+	console.log(e.target)
+	//if(e.target == document.body){
 		//clearTargets();
 		var lastBodyLeave = +new Date;
 		setTimeout(function(){
@@ -248,8 +259,8 @@ doc.documentElement.addEventListener('dragleave', function(e){
 				
 				clearTargets();
 			}
-		},0)
-	}
+		},50)
+	//}
 }, false);
 
 
