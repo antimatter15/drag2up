@@ -154,8 +154,11 @@ doc.documentElement.addEventListener('dragenter', function(e){
   }
 }, false);
 
+var lastDrag = 0;
+
 doc.documentElement.addEventListener('dragover', function(e){
 	//allow default to happen for normal drag/drops
+	lastDrag = +new Date;
   if(dropTargets.length != 0){
 		e.stopPropagation();  
   	e.preventDefault();
@@ -171,12 +174,32 @@ doc.documentElement.addEventListener('drop', function(e){
 	}
 }, false);
 
-
 doc.documentElement.addEventListener('dragleave', function(e){
 	//clear targets when leaving body
 	if(e.target == document.body){
-		clearTargets();
+		//clearTargets();
+		var lastBodyLeave = +new Date;
+		setTimeout(function(){
+			if(lastDrag < lastBodyLeave){
+				//go ahead and leave me.
+				//i think i prefer
+				//to stay
+				//inside
+				//...even though
+				//you broke my heart
+				//and killed me
+				//aperture science
+				//we do what we must
+				//because
+				//we can
+				//maybe you'll find someone else
+				//to help you
+				
+				clearTargets();
+			}
+		},0)
 	}
+	console.log(e.target)
 }, false);
 
 
