@@ -1,6 +1,4 @@
-if(document.documentElement.getAttribute('data-checkDrag2UpContentScript') != 'true'){
-document.documentElement.setAttribute('data-checkDrag2UpContentScript','true');
-
+function initialize(doc){
 function isDroppable(el){
   var tag = el.tagName.toLowerCase();
   if((tag == 'input' && el.type.toLowerCase() == 'text') || tag == 'textarea'){
@@ -19,9 +17,10 @@ function sendRequest(data, callback){
   if(typeof chrome != 'undefined'){
     chrome.extension.sendRequest(data, callback);
   }else{
-    setTimeout(function(){
-      calback({url: 'http://blahblah.com/'+Math.random().toString(36)});
-    },500 + Math.random() * 1337);
+    var customEvent = document.createEvent('Event');
+    customEvent.initEvent('drag2upbubble', true, true);
+    customEvent.xeventdata = data;
+    document.documentElement.dispatchEvent(customEvent);
   }
 }
 
@@ -43,7 +42,7 @@ function renderTarget(el){
 
   if(!pos[0] && !pos[1] && !width && !height) return;
 
-  var mask = document.createElement('div');
+  var mask = doc.createElement('div');
   mask.style.opacity = "0.6";
   mask.style.backgroundColor = "green";
   mask.dropTarget = el;
@@ -101,7 +100,7 @@ function renderTarget(el){
                   if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
                   el.value = data.url + ' ';
                 }else if(elt == 2){ //contentEditable
-                  var a = document.createElement('a');
+                  var a = doc.createElement('a');
                   a.href = data.url;
                   a.innerText = data.url;
                   el.appendChild(a);
@@ -114,14 +113,14 @@ function renderTarget(el){
     }
   },false);
   
-  document.body.appendChild(mask);
+  doc.body.appendChild(mask);
 
   dropTargets.push(mask);
 }
 
 
 function getTargets(){
-  var all = document.getElementsByTagName('*');
+  var all = doc.getElementsByTagName('*');
   for(var l = all.length; l--;){
     if(isDroppable(all[l])){
       renderTarget(all[l]);
@@ -139,7 +138,7 @@ function clearTargets(){
   dropTargets = [];
 }
 
-document.documentElement.addEventListener('dragenter', function(e){
+doc.documentElement.addEventListener('dragenter', function(e){
   e.stopPropagation();  
   e.preventDefault();
 
@@ -148,21 +147,30 @@ document.documentElement.addEventListener('dragenter', function(e){
   }
 }, false);
 
-document.documentElement.addEventListener('dragover', function(e){
+doc.documentElement.addEventListener('dragover', function(e){
   e.stopPropagation();  
   e.preventDefault();
   
 }, false);
 
-document.documentElement.addEventListener('drop', function(e){
+doc.documentElement.addEventListener('drop', function(e){
   e.stopPropagation();  
   e.preventDefault();  
   clearTargets();
 }, false);
 
 
-document.documentElement.addEventListener('click', function(e){
+doc.documentElement.addEventListener('click', function(e){
   clearTargets();
 }, false);
-
 }
+
+initialize(document);
+
+var script = document.createElement('script');
+script.innerHTML = '(function(){'+initialize.toString()+';})()';
+document.documentElement.appendChild(script);
+
+document.documentElement.addEventListener('drag2upbubble', function(e){
+  console.log(e.blahblah);
+})
