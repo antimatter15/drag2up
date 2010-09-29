@@ -2,10 +2,12 @@ function initialize(doc){
 function isDroppable(el){
   var tag = el.tagName.toLowerCase();
   if((tag == 'input' && el.type.toLowerCase() == 'text') || tag == 'textarea'){
-    return 1
+		if(el.disabled == false && el.readOnly == false){
+    	return 1
+		}
   }
   if(el.isContentEditable){ //two differnt modes of insertion
-    return 2;
+    return 2; //content editable divs are a bit hard
   }
 
   return false;
@@ -148,7 +150,7 @@ doc.documentElement.addEventListener('dragenter', function(e){
   e.preventDefault();
 
   if(dropTargets.length == 0){
-    console.log(e.dataTransfer);
+    console.log(e.dataTransfer.types.indexOf('Files'));
     getTargets();
   }
 }, false);
