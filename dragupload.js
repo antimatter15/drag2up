@@ -172,6 +172,14 @@ doc.documentElement.addEventListener('drop', function(e){
 }, false);
 
 
+doc.documentElement.addEventListener('dragleave', function(e){
+	//clear targets when leaving body
+	if(e.target == document.body){
+		clearTargets();
+	}
+}, false);
+
+
 doc.documentElement.addEventListener('click', function(e){
 	//hi.
   clearTargets();
