@@ -169,9 +169,8 @@ function renderTarget(el){
           if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
           
 
-          if(document.body.innerHTML.indexOf('[img]') != -1 && file.type.indexOf('image/') == 0){
+          if(/\[img\]/i.test(document.body.innerHTML) && file.type.indexOf('image/') == 0){
             el.value += '[img]'+url+'[/img]' + ' ';
-            
           }else{
             el.value += url + ' ';
           }
