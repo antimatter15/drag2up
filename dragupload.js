@@ -160,14 +160,23 @@ function renderTarget(el){
 			}
     }
 
-    function insertLink(el, url){
+    function insertLink(el, url, file){
 			try{el.focus();}catch(err){};
       //try{el.select();}catch(err){};
       setTimeout(function(){
         var elt = isDroppable(el); //get the type of drop mode
         if(elt == 1){ //input
           if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
-          el.value += url + ' ';
+          
+
+          if(document.body.innerHTML.indexOf('[img]') != -1 && file.type.indexOf('image/') == 0){
+            el.value += '[img]'+url+'[/img]' + ' ';
+            
+          }else{
+            el.value += url + ' ';
+          }
+
+          
         }else if(elt == 2){ //contentEditable
           var a = doc.createElement('a');
           a.href = url;
@@ -212,7 +221,7 @@ function renderTarget(el){
               console.log('Done uploading file ',file.name);
   						files_left--;
 							checkFilesUploading();
-              insertLink(el, data.url);
+              insertLink(el, data.url, file);
             });
         }
       })(el, files[i], i);
