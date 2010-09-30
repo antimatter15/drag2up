@@ -80,13 +80,20 @@ function renderTarget(el){
   
   mask.style.left = pos[0]-pad+'px';
   mask.style.top = pos[1]-pad+'px';
+
+
+  var fontSize = Math.sqrt(Math.min(height,width)/50)*20;
+  var tpad = Math.max(0, height/2 - fontSize * 0.6);
+
+    
   mask.style.width = width+'px';
-  mask.style.height = height+'px';
+  mask.style.height = height-tpad+'px';
   mask.style.padding = pad+'px';
+  mask.style.paddingTop = (pad+tpad)+'px';
   mask.style.zIndex = 9007199254740991;
   mask.style.webkitTransition = 'opacity 0.5s ease'
   mask.style.textAlign = 'center';
-  mask.style.fontSize = Math.sqrt(Math.min(height,width)/50)*20+'px';
+  mask.style.fontSize = fontSize+'px';
   mask.style.color = 'white';
 	mask.style.borderRadius = pad+'px';
 	mask.style.webkitBorderRadius = pad+'px';
@@ -115,8 +122,6 @@ function renderTarget(el){
     
     mask.hasDropped = true;
     mask.style.backgroundColor = '#007fff';
-    mask.style.fontSize = 'large';
-
 
 		//so apparently, Apple synces the blinky power light with human breathing which is more emotionally awesome
 		//so logically, this is totally what I'm going to do. It's going to blinky blinky with the pattern of breathing
