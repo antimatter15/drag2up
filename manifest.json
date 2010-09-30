@@ -1,7 +1,7 @@
 {
   "name": "drag2up",
   "version": "1.0",
-  "description": "Drag an image onto any text field to upload an image and paste the URL.",
+  "description": "Drag any file from your Desktop onto any text field to upload and insert a link.",
 	"background_page": "background.html",
   "permissions": [
     "https://api.imgur.com/",
