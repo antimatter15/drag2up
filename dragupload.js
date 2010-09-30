@@ -131,20 +131,60 @@ function renderTarget(el){
 			}
 		};
 		setTimeout(breathe, 0);
+
+    function checkFilesUploading(){
+      mask.innerHTML = 'Uploading '+files_left+' file(s)';
+      if(files_left == 0){
+        try{
+					mask.style.webkitTransition = 'opacity 0.6s ease'
+					mask.style.opacity = '0';
+					setTimeout(function(){
+						mask.parentNode.removeChild(mask);	
+					},700);
+				}catch(err){};
+			}
+    }
+
+    function insertLink(el, url){
+			try{el.focus();}catch(err){};
+      //try{el.select();}catch(err){};
+      setTimeout(function(){
+        var elt = isDroppable(el); //get the type of drop mode
+        if(elt == 1){ //input
+          if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
+          el.value += url + ' ';
+        }else if(elt == 2){ //contentEditable
+          var a = doc.createElement('a');
+          a.href = url;
+          a.innerText = url;
+          el.appendChild(a);
+					//links dont tend to work as well
+					
+					//var span = doc.createElement('span');
+					//span.innerText = data.url;
+					//el.appendChild(span);
+        }
+      },100);
+    }
+
 		
     for(var i = 0; i < files.length; i++){
-			
       if(files[i].size > 1024 * 1024 * 5) {
         if(!confirm('The file "'+files[i].name+'" is over 5MB. Are you sure you want to upload it?')) continue;
       }
 			files_left++;
 			mask.innerHTML = 'Uploading '+files_left+' file(s)';
       var reader = new FileReader();  
-      reader.onerror = function(e){
-        console.log(e)
-      }
-      reader.onload = (function(el, file, index){
-        return function(e){
+      
+      ;(function(el, file, index){
+        reader.onerror = function(e){
+          console.log('INSANELY LARGE ERROR',e)
+				  files_left--;
+				  checkFilesUploading();
+          insertLink(el, 'error uploading '+file.name);
+        }
+        
+        reader.onload =  function(e){
           console.log('Read file.');
           sendRequest({
             'action' : 'upload',
@@ -153,38 +193,10 @@ function renderTarget(el){
             'name': file.name,
             'data': e.target.result
             }, function(data){
-              console.log('Done uploading file');
-              var elt = isDroppable(el);
-							files_left--;
-    					mask.innerHTML = 'Uploading '+files_left+' file(s)';
-
-							if(files_left == 0){
-	              try{
-		  						mask.style.webkitTransition = 'opacity 0.6s ease'
-									mask.style.opacity = '0';
-									setTimeout(function(){
-										mask.parentNode.removeChild(mask);	
-									},700);
-								}catch(err){};
-							}
-							try{el.focus();}catch(err){};
-              //try{el.select();}catch(err){};
-              setTimeout(function(){
-                if(elt == 1){ //input
-                  if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
-                  el.value += data.url + ' ';
-                }else if(elt == 2){ //contentEditable
-                  var a = doc.createElement('a');
-                  a.href = data.url;
-                  a.innerText = data.url;
-                  el.appendChild(a);
-									//links dont tend to work as well
-									
-									//var span = doc.createElement('span');
-									//span.innerText = data.url;
-									//el.appendChild(span);
-                }
-              },100);
+              console.log('Done uploading file ',file.name);
+  						files_left--;
+							checkFilesUploading();
+              insertLink(el, data.url);
             });
         }
       })(el, files[i], i);
