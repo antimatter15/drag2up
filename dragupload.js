@@ -177,7 +177,7 @@ function renderTarget(el){
                   //a.innerText = data.url;
                   //el.appendChild(a);
 									//links dont tend to work very well
-									var span = doc.creatElement('span');
+									var span = doc.createElement('span');
 									span.innerText = data.url;
 									el.appendChild(span);
                 }
