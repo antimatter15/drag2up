@@ -39,10 +39,12 @@ function sendRequest(data, callback){
 
 window.addEventListener('message', function(e){
 	//hi.
-	console.log(e.data.substr(0,8))
 	if(e.data.substr(0,7) == '__D2U@@'){
 		var json = JSON.parse(e.data.substr(7));
-		window[json._callback](json);
+		if(window[json._callback]){
+			window[json._callback](json);
+			delete window[json._callback];
+		}
 	}
 }, false);
 
@@ -172,14 +174,15 @@ function renderTarget(el){
                   if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
                   el.value += data.url + ' ';
                 }else if(elt == 2){ //contentEditable
-                  //var a = doc.createElement('a');
-                  //a.href = data.url;
-                  //a.innerText = data.url;
-                  //el.appendChild(a);
-									//links dont tend to work very well
-									var span = doc.createElement('span');
-									span.innerText = data.url;
-									el.appendChild(span);
+                  var a = doc.createElement('a');
+                  a.href = data.url;
+                  a.innerText = data.url;
+                  el.appendChild(a);
+									//links dont tend to work as well
+									
+									//var span = doc.createElement('span');
+									//span.innerText = data.url;
+									//el.appendChild(span);
                 }
               },100);
             });
@@ -283,7 +286,6 @@ initialize(document);
 
 window.addEventListener('message', function(e){
 	//hi.
-	console.log(e.data.substr(0,8))
 	if(e.data.substr(0,7) == '$$D2U##'){
 		var json = JSON.parse(e.data.substr(7));
 		console.log('json')
