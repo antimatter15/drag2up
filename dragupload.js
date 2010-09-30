@@ -247,7 +247,7 @@ doc.documentElement.addEventListener('dragenter', function(e){
     getTargets();
   }
 
-  if(dropTargets.length != 0 || isDroppable(e.target)){
+  if(dropTargets.length != 0){
 		e.stopPropagation();
   	e.preventDefault();
 	}
@@ -259,7 +259,7 @@ var lastDrag = 0;
 doc.documentElement.addEventListener('dragover', function(e){
 	//allow default to happen for normal drag/drops
 	lastDrag = +new Date; 
-  if(dropTargets.length != 0 || isDroppable(e.target)){
+  if(dropTargets.length != 0){
 		e.stopPropagation();  
   	e.preventDefault();
 	}
@@ -267,14 +267,6 @@ doc.documentElement.addEventListener('dragover', function(e){
 
 doc.documentElement.addEventListener('drop', function(e){
 	//dont do anything if theres nowhere to drag to
-  if(isDroppable(e.target) == 1){
-    if(e.dataTransfer.types.indexOf('URL') != -1){
-      e.target.value += e.dataTransfer.getData('URL');
-      e.stopPropagation();  
-    	e.preventDefault();  
-    	clearTargets();
-    }
-  }
 	if(dropTargets.length != 0){
   	e.stopPropagation();
   	e.preventDefault();  
