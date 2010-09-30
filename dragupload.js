@@ -1,13 +1,16 @@
 function initialize(doc){
 function isDroppable(el){
   var tag = el.tagName.toLowerCase();
+
   if((tag == 'input' && el.type.toLowerCase() == 'text') || tag == 'textarea'){
 		if(el.disabled == false && el.readOnly == false){
     	return 1
 		}
   }
   if(el.isContentEditable){ //two differnt modes of insertion
-    return 2; //content editable divs are a bit hard
+		if(el.parentNode.isContentEditable == false || tag == 'body'){
+    	return 2; //content editable divs are a bit hard
+		}
   }
 
   return false;
@@ -16,15 +19,32 @@ function isDroppable(el){
 var dropTargets = [];
 
 function sendRequest(data, callback){
-  if(typeof chrome != 'undefined'){
+  if(typeof chrome != 'undefined' && typeof chrome.extension != 'undefined' && typeof chrome.extension.sendRequest != 'undefined'){
     chrome.extension.sendRequest(data, callback);
   }else{
-    var customEvent = document.createEvent('Event');
-    customEvent.initEvent('drag2upbubble', true, true);
-    customEvent.xeventdata = data;
-    document.documentElement.dispatchEvent(customEvent);
+    //var customEvent = document.createEvent('Event');
+    //customEvent.initEvent('drag2upbubble', true, true);
+    //customEvent.xeventdata = JSON.stringify(data);
+    //window.top.document.documentElement.dispatchEvent(customEvent);
+		var n = '_$c411b4ck_'+Math.random().toString(36).substr(4,6);
+		window[n] = function(superdata){
+			callback(superdata);
+		}
+		data._callback = n;
+
+		window.top.postMessage('$$D2U##'+JSON.stringify(data), '*')
   }
 }
+
+
+window.addEventListener('message', function(e){
+	//hi.
+	console.log(e.data.substr(0,8))
+	if(e.data.substr(0,7) == '__D2U@@'){
+		var json = JSON.parse(e.data.substr(7));
+		window[json._callback](json);
+	}
+}, false);
 
 //stolen from http://www.quirksmode.org/js/findpos.html
 function findPos(obj) {
@@ -152,10 +172,14 @@ function renderTarget(el){
                   if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
                   el.value += data.url + ' ';
                 }else if(elt == 2){ //contentEditable
-                  var a = doc.createElement('a');
-                  a.href = data.url;
-                  a.innerText = data.url;
-                  el.appendChild(a);
+                  //var a = doc.createElement('a');
+                  //a.href = data.url;
+                  //a.innerText = data.url;
+                  //el.appendChild(a);
+									//links dont tend to work very well
+									var span = doc.creatElement('span');
+									span.innerText = data.url;
+									el.appendChild(span);
                 }
               },100);
             });
@@ -257,10 +281,32 @@ doc.documentElement.addEventListener('click', function(e){
 
 initialize(document);
 
-var script = document.createElement('script');
-script.innerHTML = '(function(){'+initialize.toString()+';})()';
-document.documentElement.appendChild(script);
+window.addEventListener('message', function(e){
+	//hi.
+	console.log(e.data.substr(0,8))
+	if(e.data.substr(0,7) == '$$D2U##'){
+		var json = JSON.parse(e.data.substr(7));
+		console.log('json')
+		chrome.extension.sendRequest(json, function(res){
+			console.log('got data back woot')
+			res._callback = json._callback;
+			e.source.postMessage('__D2U@@'+JSON.stringify(res), "*")
+		})
+	}
+}, false);
 
-document.documentElement.addEventListener('drag2upbubble', function(e){
-  console.log(e.blahblah);
-})
+
+
+setTimeout(function(){
+	if(frames.length > 0){
+		var init = function(){
+			for(var l = frames.length; l--;){
+				try{initialize(frames[l].document);}catch(err){};
+			}
+		}
+		var script = document.createElement('script');
+		script.innerHTML = '(function(){'+initialize.toString()+';('+init+')();})()';
+		document.documentElement.appendChild(script);
+	}
+},1500)
+
