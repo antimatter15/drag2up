@@ -168,7 +168,7 @@ function renderTarget(el){
         if(elt == 1){ //input
           if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
           
-
+          //simple little test to use bbcode insertion if it's something that looks like bbcode
           if(/\[img\]/i.test(document.body.innerHTML) && file.type.indexOf('image/') == 0){
             el.value += '[img]'+url+'[/img]' + ' ';
           }else{
@@ -335,17 +335,19 @@ window.addEventListener('message', function(e){
 }, false);
 
 
-
-setTimeout(function(){
-	if(frames.length > 0){
+var lastFrameLength = 0;
+setInterval(function(){
+	if(frames.length > lastFrameLength){
 		var init = function(){
-			for(var l = frames.length; l--;){
+			for(var l = INITFRAMELEN; l < frames.length; l++){
 				try{initialize(frames[l].document);}catch(err){};
 			}
 		}
 		var script = document.createElement('script');
-		script.innerHTML = '(function(){'+initialize.toString()+';('+init+')();})()';
+		script.innerHTML = '(function(){'+initialize.toString()+';('+init.toString().replace('INITFRAMELEN', lastFrameLength)+')();})()';
 		document.documentElement.appendChild(script);
+		
+	  lastFrameLength = frames.length;
 	}
-},1500)
+},100)
 
