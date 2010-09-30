@@ -75,6 +75,8 @@ function renderTarget(el){
 
   mask.style.position = 'absolute';
   var pad = 5;
+  var elt = isDroppable(el); //get the type of drop mode
+  if(elt == 2) pad = 0;
   
   mask.style.left = pos[0]-pad+'px';
   mask.style.top = pos[1]-pad+'px';
@@ -84,7 +86,7 @@ function renderTarget(el){
   mask.style.zIndex = 9007199254740991;
   mask.style.webkitTransition = 'opacity 0.5s ease'
   mask.style.textAlign = 'center';
-  mask.style.fontSize = 'large';
+  mask.style.fontSize = Math.sqrt(Math.min(height,width)/50)*20+'px';
   mask.style.color = 'white';
 	mask.style.borderRadius = pad+'px';
 	mask.style.webkitBorderRadius = pad+'px';
