@@ -29,7 +29,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         if(data){
           sendResponse({url: data.upload.links.original});
         }else{
-          sendResponse({url: 'upload error ('+request.name+')'});
+          sendResponse({url: '(Error: '+request.name+')'});
         }
       })
     }else{
@@ -54,11 +54,12 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
           if(data){
             sendResponse({url: 'http://gist.github.com/'+data.gists[0].repo});
           }else{
-            sendResponse({url: 'upload error ('+request.name+')'});
+            sendResponse({url: '(Error: '+request.name+')'});
           }
         })
       }else{
-        sendResponse({url: 'could not find suitable file host'});
+        sendResponse({url: '(Error: No suitable file hosts)'});
+        
       }
     }
   }
