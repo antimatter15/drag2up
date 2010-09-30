@@ -99,6 +99,14 @@ function renderTarget(el){
 	}) 
   mask.addEventListener('drop', function(e){
 		mask.style.opacity = opacity2;
+		/*
+    console.log(e.dataTransfer.types);
+    var types = e.dataTransfer.types;
+    for(var i = 0; i < types.length; i++){
+      console.log(types[i], e.dataTransfer.getData(types[i]));
+    }
+    */
+		
     var files = e.dataTransfer.files;
 
     if(files.length == 0) return;
@@ -179,6 +187,7 @@ function renderTarget(el){
       ;(function(el, file, index){
         reader.onerror = function(e){
           console.log('INSANELY LARGE ERROR',e)
+          console.log(file);
 				  files_left--;
 				  checkFilesUploading();
           insertLink(el, 'error uploading '+file.name);
@@ -233,11 +242,12 @@ function clearTargets(){
 
 doc.documentElement.addEventListener('dragenter', function(e){
 	lastDrag = +new Date; 
-  if(dropTargets.length == 0 && e.dataTransfer.types.indexOf('Files') != -1){
+	
+  if(dropTargets.length == 0 && e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1){
     getTargets();
   }
 
-  if(dropTargets.length != 0){
+  if(dropTargets.length != 0 || isDroppable(e.target)){
 		e.stopPropagation();
   	e.preventDefault();
 	}
@@ -249,7 +259,7 @@ var lastDrag = 0;
 doc.documentElement.addEventListener('dragover', function(e){
 	//allow default to happen for normal drag/drops
 	lastDrag = +new Date; 
-  if(dropTargets.length != 0){
+  if(dropTargets.length != 0 || isDroppable(e.target)){
 		e.stopPropagation();  
   	e.preventDefault();
 	}
@@ -257,8 +267,16 @@ doc.documentElement.addEventListener('dragover', function(e){
 
 doc.documentElement.addEventListener('drop', function(e){
 	//dont do anything if theres nowhere to drag to
+  if(isDroppable(e.target) == 1){
+    if(e.dataTransfer.types.indexOf('URL') != -1){
+      e.target.value += e.dataTransfer.getData('URL');
+      e.stopPropagation();  
+    	e.preventDefault();  
+    	clearTargets();
+    }
+  }
 	if(dropTargets.length != 0){
-  	e.stopPropagation();  
+  	e.stopPropagation();
   	e.preventDefault();  
   	clearTargets();
 	}
