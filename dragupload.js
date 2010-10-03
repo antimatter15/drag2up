@@ -1,7 +1,9 @@
 function initialize(doc){
 function isDroppable(el){
   var tag = el.tagName.toLowerCase();
-
+  if(tag == 'div' && dropTargets.indexOf(el) != -1){
+    return 3;
+  }
   if((tag == 'input' && el.type.toLowerCase() == 'text') || tag == 'textarea'){
     if(el.disabled == false && el.readOnly == false){
       return 1
@@ -261,8 +263,7 @@ doc.documentElement.addEventListener('dragenter', function(e){
   if(dropTargets.length == 0 && e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1){
     getTargets();
   }
-
-  if(dropTargets.length != 0){
+  if(dropTargets.length != 0 && isDroppable(e.target)){
     e.stopPropagation();
     e.preventDefault();
   }
@@ -274,7 +275,7 @@ var lastDrag = 0;
 doc.documentElement.addEventListener('dragover', function(e){
   //allow default to happen for normal drag/drops
   lastDrag = +new Date; 
-  if(dropTargets.length != 0){
+  if(dropTargets.length != 0 && isDroppable(e.target)){
     e.stopPropagation();  
     e.preventDefault();
   }

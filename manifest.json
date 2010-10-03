@@ -1,6 +1,6 @@
 {
   "name": "drag2up",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "Drag any file from your Desktop onto any text field to upload and insert a link.",
 	"background_page": "background.html",
   "permissions": [
