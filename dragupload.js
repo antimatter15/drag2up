@@ -1,6 +1,18 @@
 function initialize(doc){
 if(location.hostname.indexOf('mail.google') == 0) return;
 
+var initialDocumentHTML = '';
+var dropFriendly = true;
+
+function getDocumentHTML(){ //get document HTML without picking up droptargets
+  var html = doc.documentElement.innerHTML;
+  dropTargets.forEach(function(el){
+    html = html.replace(el.outerHTML, '');
+  });
+  return html;
+}
+
+
 function isDroppable(el){
   var tag = el.tagName.toLowerCase();
   if(tag == 'div' && dropTargets.indexOf(el) != -1){
@@ -82,16 +94,22 @@ function renderTarget(el){
   var elt = isDroppable(el); //get the type of drop mode
   if(elt == 2) pad = 0;
   
-  mask.style.left = pos[0]-pad+'px';
-  mask.style.top = pos[1]-pad+'px';
+  //mask.style.left = pos[0]-pad+'px';
+  //mask.style.top = pos[1]-pad+'px';
 
+  var boxheight = Math.min(height, 42), boxwidth = Math.min(width, 420);
 
-  var fontSize = Math.sqrt(Math.min(height,width)/50)*20;
-  var tpad = Math.max(0, height/2 - fontSize * 0.6);
+  mask.style.left = pos[0] + width/2 - boxwidth/2 - pad + 'px';
+  mask.style.top = pos[1] + height/2 - boxheight/2 - pad+ 'px';
+  
+  
+  var fontSize = Math.sqrt(Math.min(boxheight,boxwidth)/50)*20;
+  var tpad = Math.max(0, boxheight/2 - fontSize * 0.6);
 
     
-  mask.style.width = width+'px';
-  mask.style.height = height-tpad+'px';
+  mask.style.width = boxwidth+'px';
+  mask.style.height = boxheight-tpad+'px';
+  
   mask.style.padding = pad+'px';
   mask.style.paddingTop = (pad+tpad)+'px';
   mask.style.zIndex = 9007199254740991;
@@ -106,9 +124,11 @@ function renderTarget(el){
   mask.hasDropped = false;
   mask.addEventListener('dragenter', function(e){
     mask.style.opacity = opacity2; //so long and thanks for all the fish
+    console.log('dragenter');
   }) 
   mask.addEventListener('dragleave', function(e){
     mask.style.opacity = opacity;
+    console.log('dragleave');
   }) 
   mask.addEventListener('drop', function(e){
     mask.style.opacity = opacity2;
@@ -259,13 +279,21 @@ function clearTargets(){
   dropTargets = [];
 }
 
+
 doc.documentElement.addEventListener('dragenter', function(e){
   lastDrag = +new Date; 
   
-  if(dropTargets.length == 0 && e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1){
+  if(dropTargets.length == 0 && e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1 && dropFriendly){
     getTargets();
+    console.log('blah blah blah');
+    initialDocumentHTML = getDocumentHTML();
   }
-  if(dropTargets.length != 0 && isDroppable(e.target)){
+}, true);
+
+doc.documentElement.addEventListener('dragenter', function(e){
+  lastDrag = +new Date; 
+  
+  if(dropTargets.length != 0 && isDroppable(e.target) && dropFriendly){
     e.stopPropagation();
     e.preventDefault();
   }
@@ -277,7 +305,13 @@ var lastDrag = 0;
 doc.documentElement.addEventListener('dragover', function(e){
   //allow default to happen for normal drag/drops
   lastDrag = +new Date; 
+  
   if(dropTargets.length != 0 && isDroppable(e.target)){
+    if(initialDocumentHTML != getDocumentHTML()){
+      //dropFriendly = false;
+      //clearTargets();
+      return;
+    }
     e.stopPropagation();  
     e.preventDefault();
   }
@@ -285,7 +319,12 @@ doc.documentElement.addEventListener('dragover', function(e){
 
 doc.documentElement.addEventListener('drop', function(e){
   //dont do anything if theres nowhere to drag to
-  if(dropTargets.length != 0){
+  if(dropTargets.length != 0 && dropFriendly){
+    if(initialDocumentHTML != getDocumentHTML()){
+      //dropFriendly = false;
+      //clearTargets();
+      return;
+    }
     e.stopPropagation();
     e.preventDefault();  
     clearTargets();
