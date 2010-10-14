@@ -1,4 +1,6 @@
 function initialize(doc){
+if(location.hostname.indexOf('mail.google') == 0) return;
+
 function isDroppable(el){
   var tag = el.tagName.toLowerCase();
   if(tag == 'div' && dropTargets.indexOf(el) != -1){
