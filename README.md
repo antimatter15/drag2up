@@ -3,6 +3,9 @@
 
 Okay, so now I'm going to write a semblance of a readme file. Hopefully, there's really not that much to read about, this project is the source code behind the infinitely awesome drag2up extension (for lack of a better name). It was at one point up2drag/updrag and now lift/airfoil sounds like a pretty decent although undescriptive name. Either way, blah blah blah, here's a readme.
 
+### If you own a file host or know of one that will host small files (< 10MB) with an API and little user intrusion
+please contact me at twitter.com/antimatter15 or antimatter15@gmail.com
+
 
 ## How it works:
 
