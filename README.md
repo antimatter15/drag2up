@@ -4,7 +4,7 @@
 Okay, so now I'm going to write a semblance of a readme file. Hopefully, there's really not that much to read about, this project is the source code behind the infinitely awesome drag2up extension (for lack of a better name). It was at one point up2drag/updrag and now lift/airfoil sounds like a pretty decent although undescriptive name. Either way, blah blah blah, here's a readme.
 
 
-== How it works:
+## How it works:
 
 1. Content script runs on every webpage
 
@@ -23,7 +23,7 @@ Okay, so now I'm going to write a semblance of a readme file. Hopefully, there's
 8. Send URL back to the content script and insert it onto the end of the element. Detect if [img][/img] is present anywhere on page and if so, assume it's bbcode-enabled and wrap url in [img] tags (if the filetype is also an image). Otherwise just insert link. If it's a contentEditable page, append a linkified <a> tag.
 
 
-== Alternate:
+## Alternate:
 
 1. Content script runs on every webpage
 
@@ -34,7 +34,7 @@ Okay, so now I'm going to write a semblance of a readme file. Hopefully, there's
 4. Do the same as the primary stuff, except that the data gets first sent to the parent page with postMessage and back the same way.
 
 
-== Ideas:
+## Ideas:
 
 It could be possible to use this in conjunction with an image shortening service, so that the URL is added immediately while the upload happens in the background, however, this puts another potential space for error and requires me to implement some sort of upload progress, which many APIs simply don't have.
 
