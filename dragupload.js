@@ -1,5 +1,5 @@
 function initialize(doc){
-if(!doc){ console.log('no document'); return}
+if(!doc){ console.warn('no document'); return}
 
 var isDragging = false;
 var dropTargets = [];
@@ -10,7 +10,13 @@ function clearTargets(){
   isDragging = false;
   for(var i = dropTargets.length; i--;){
     if(dropTargets[i] && dropTargets[i].parentNode && dropTargets[i].hasDropped == false){
-      dropTargets[i].parentNode.removeChild(dropTargets[i]);
+      //TODO: move function declaration outside of loop for speed/mem
+      (function(target){
+        target.style.opacity = '0';
+        setTimeout(function(){
+          target.parentNode.removeChild(target);
+        },500);
+      })(dropTargets[i]);
     }
   }
   dropTargets = [];
@@ -44,11 +50,14 @@ function findPos(obj) {
 }
 
 function propagateMessage(msg){
+  window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'root_' + msg, '*');
+}
+
+function trickleMessage(msg){
   //based on Stephen Colbert's economic "trickle down" theory. Lime flavored event messages are given to 
   //the top 3% root windows, which flow through the system and eventually trickle down to the other 97%
   //http://www.colbertnation.com/the-colbert-report-videos/341481/july-28-2010/the-word---ownership-society
   window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'trickle_' + msg, '*')
-  console.log(msg);
 }
 
 window.addEventListener('message', function(e){
@@ -57,44 +66,62 @@ window.addEventListener('message', function(e){
   if(data.substr(0,7) == 'trickle'){
     //propagate downwards
     for(var i = 0; i < frames.length; i++) frames[i] && frames[i].postMessage && frames[i].postMessage(e.data, '*');
-    var cmd = data.substr(0, 18), date = parseInt(data.substr(18), 10);
-    if(cmd == 'trickle_reactivate'){ //it should just be activate, but re seems like a good prefix to make them the same length
-      lastDrag = date; 
+    if(data == 'trickle_reactivate'){ //it should just be activate, but re seems like a good prefix to make them the same length
       if(isDragging == false){
         isDragging = true;
         getTargets();
       }
-    }else if(cmd == 'trickle_deactivate'){
-      var lastBodyLeave = date;
+    }else if(data == 'trickle_deactivate') clearTargets();
+  }else if(data.substr(0, 4) == 'root'){
+    var cmd = data.substr(0,15);
+    if(cmd == 'root_reactivate'){
+      if(isDragging == false) trickleMessage('reactivate');
+      lastDrag = (+new Date); //TODO; utilize the value that got passed
+    }else if(cmd == 'root_deactivate'){
+      var lastDeactivation = +new Date;
       setTimeout(function(){
-        if(lastDrag + 50 < lastBodyLeave){
-          clearTargets();
+        if(lastDrag < lastDeactivation){
+          trickleMessage('deactivate');
+          //console.warn('fuh reeelz!')
+          
         }
-      },300)
-      
+      },200);
+    }else if(cmd == 'root_forcedkill'){ //woot, same length!
+      isDragging && trickleMessage('deactivate');
     }
   }
 })
 
 
 function renderTarget(el){
-  var pos = findPos(el);
-  var width = el.offsetWidth;
-  var height = el.offsetHeight;
-
-  if(!pos[0] && !pos[1] && !width && !height) return;
-
-  var mask = doc.createElement('div');
-  var opacity = "0.84";
-  var opacity2 = "0.42"
-  mask.style.opacity = opacity;
-  mask.style.backgroundColor = "rgb(50,150,50)";
-  mask.dropTarget = el;
-
+  var pos = findPos(el), width = el.offsetWidth, height = el.offsetHeight;
+  if(!width && !height) return; //no zero widther
+  var opacity_normal = '0.84', opacity_hover = '0.42';
+  var mask = doc.createElement('div'); //this is what we're making!
+  mask.style.opacity = '0'; //set to zero initially, for nice fade in
+  setTimeout(function(){ mask.style.opacity = opacity_normal;},0);
+  
+  mask.style.backgroundColor = "rgb(50,150,50)"; //a shade of green
+  mask.dropTarget = el; //reference original element
   mask.style.position = 'absolute';
-  var pad = 5;
-  var elt = isDroppable(el); //get the type of drop mode
-  if(elt == 2) pad = 0;
+  mask.style.zIndex = 9007199254740991;
+  mask.style.webkitTransition = 'opacity 0.5s ease'
+  mask.style.textAlign = 'center';
+  mask.style.color = 'white';
+  mask.style.borderRadius = '5px';
+  mask.style.webkitBorderRadius = '5px';
+  mask.style.fontFamily = 'sans-serif, arial, helvetica'
+  mask.innerHTML = 'Drop file here';
+  mask.hasDropped = false;
+  
+  var cx = pos[0] + width/2, cy = pos[1] + height/2;
+  if(width * height > 32000){ //a random magic number. Basically, it's derived from twitter's whats happening box which is 482x56
+    //and thats close to 500x60 which is 30,000 but 32,000 feels nicer.
+    //here, the box is too big, so instead of covering it, you make a smaller one in the center  
+  
+  }else{
+    var padding = 5; //five pixel padding for normal thingsies
+  }
   
   mask.style.left = pos[0]-pad+'px';
   mask.style.top = pos[1]-pad+'px';
@@ -108,16 +135,11 @@ function renderTarget(el){
   mask.style.height = height-tpad+'px';
   mask.style.padding = pad+'px';
   mask.style.paddingTop = (pad+tpad)+'px';
-  mask.style.zIndex = 9007199254740991;
-  mask.style.webkitTransition = 'opacity 0.5s ease'
-  mask.style.textAlign = 'center';
+  
+  
+
+  
   mask.style.fontSize = fontSize+'px';
-  mask.style.color = 'white';
-  mask.style.borderRadius = '5px';
-  mask.style.webkitBorderRadius = '5px';
-  mask.style.fontFamily = 'sans-serif, arial, helvetica'
-  mask.innerHTML = 'Drop file here';
-  mask.hasDropped = false;
 
   mask.addEventListener('dragenter', function(e){
     mask.style.opacity = opacity2;
@@ -127,11 +149,12 @@ function renderTarget(el){
   }, false);
   mask.addEventListener('dragover', function(e){
     e.preventDefault();
-    e.stopPropagation();
   }, true);
   mask.addEventListener('drop', function(e){
     e.preventDefault();
     e.stopImmediatePropagation();
+    mask.hasDropped = true;
+    clearTargets();
   }, true);
   doc.body.appendChild(mask);
 
@@ -156,39 +179,29 @@ function getTargets(){
 
 
 doc.documentElement.addEventListener('dragenter', function(e){
-  lastDrag = +new Date; 
   if(isDragging == false && e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1){
-    isDragging = true;
-    propagateMessage('reactivate'+lastDrag);
-    setTimeout(getTargets, 50);
+    //isDragging = true;
+    propagateMessage('reactivate');
+    //setTimeout(getTargets, 50);
   }
-
 }, false);
 
 doc.documentElement.addEventListener('dragover', function(e){
   //allow default to happen for normal drag/drops
-  lastDrag = +new Date; 
-  isDragging && propagateMessage('reactivate'+lastDrag);
+  isDragging && propagateMessage('reactivate');
 }, false);
 
 doc.documentElement.addEventListener('dragleave', function(e){
-  var lastBodyLeave = +new Date;
-  setTimeout(function(){
-    if(lastDrag + 50 < lastBodyLeave){
-      clearTargets();
-      propagateMessage('deactivate'+lastBodyLeave);
-    }
-    console.log(lastBodyLeave - lastDrag);
-    
-  },200)
+  propagateMessage('deactivate');
 }, false);
 
 
 doc.documentElement.addEventListener('mouseup', function(e){
-  var lastBodyLeave = +new Date;
-  propagateMessage('deactivate'+lastBodyLeave);
-  clearTargets();
+  if(isDragging) propagateMessage('forcedkill');
 }, false);
+
+
+//TODO: shift key forcedkill
 
 }
 
