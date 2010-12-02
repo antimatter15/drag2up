@@ -21,11 +21,14 @@ function isDroppable(el){
   var tag = el.tagName.toLowerCase(), A;
   //if(tag == 'div' && dropTargets.indexOf(el) != -1) return 3;
   if(((tag == 'input' && el.type.toLowerCase() == 'text') || tag == 'textarea') && (el.disabled == false && el.readOnly == false)) A =  1;
-  if(el.isContentEditable && (el.parentNode.isContentEditable == false || tag == 'body')) A = 2;
+  if(el.isContentEditable && el.parentNode.isContentEditable == false) A = 2.5; //aaah! close your eyes! it's too hacky!
+  if(el.isContentEditable && tag == 'body') A = 2;
   //structured this weird way because profiling shows this part is the slowest
-  if(A){
-    var pos = findPos(el)
-    if(el.ownerDocument.elementFromPoint(pos[0]+1, pos[1]+1) == el) return A; //ensure that that element is on top
+  if(A == 2){
+    return A;
+  }else if(A == 1 || A == 2.5){
+    var pos = findPos(el); //oh crap this is hacky
+    if(el.ownerDocument.elementFromPoint(pos[0]+1, pos[1]+1) == el) return ~~A; //ensure that that element is on top
   }
   return false;
 }
@@ -56,15 +59,19 @@ window.addEventListener('message', function(e){
     for(var i = 0; i < frames.length; i++) frames[i] && frames[i].postMessage && frames[i].postMessage(e.data, '*');
     var cmd = data.substr(0, 18), date = parseInt(data.substr(18), 10);
     if(cmd == 'trickle_reactivate'){ //it should just be activate, but re seems like a good prefix to make them the same length
-      if(isDragging == false) getTargets();
       lastDrag = date; 
+      if(isDragging == false){
+        isDragging = true;
+        getTargets();
+      }
     }else if(cmd == 'trickle_deactivate'){
       var lastBodyLeave = date;
       setTimeout(function(){
-        if(lastDrag < lastBodyLeave){
+        if(lastDrag + 50 < lastBodyLeave){
           clearTargets();
         }
-      },150)
+      },300)
+      
     }
   }
 })
@@ -106,8 +113,8 @@ function renderTarget(el){
   mask.style.textAlign = 'center';
   mask.style.fontSize = fontSize+'px';
   mask.style.color = 'white';
-  mask.style.borderRadius = pad+'px';
-  mask.style.webkitBorderRadius = pad+'px';
+  mask.style.borderRadius = '5px';
+  mask.style.webkitBorderRadius = '5px';
   mask.style.fontFamily = 'sans-serif, arial, helvetica'
   mask.innerHTML = 'Drop file here';
   mask.hasDropped = false;
@@ -137,7 +144,9 @@ function getTargets(){
     var all = doc.getElementsByTagName('*');
     for(var l = all.length; l--;){
       if(isDroppable(all[l])){
-        renderTarget(all[l]);
+        //search to make sure it doesnt already exist there
+        for(var i = dropTargets.length; i-- && dropTargets[i].dropTarget != all[l];){};
+        if(i == -1) renderTarget(all[l]);
       }
     }
   }
@@ -158,18 +167,20 @@ doc.documentElement.addEventListener('dragenter', function(e){
 
 doc.documentElement.addEventListener('dragover', function(e){
   //allow default to happen for normal drag/drops
-  isDragging && propagateMessage('reactivate'+lastDrag);
   lastDrag = +new Date; 
+  isDragging && propagateMessage('reactivate'+lastDrag);
 }, false);
 
 doc.documentElement.addEventListener('dragleave', function(e){
   var lastBodyLeave = +new Date;
   setTimeout(function(){
-    if(lastDrag < lastBodyLeave){
+    if(lastDrag + 50 < lastBodyLeave){
       clearTargets();
       propagateMessage('deactivate'+lastBodyLeave);
     }
-  },50)
+    console.log(lastBodyLeave - lastDrag);
+    
+  },200)
 }, false);
 
 
