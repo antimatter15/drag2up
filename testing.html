@@ -1,0 +1,19 @@
+<script>
+document.documentElement.addEventListener('dragenter', function(e){
+  console.log(e)
+}, false);
+document.documentElement.addEventListener('dragover', function(e){
+  console.log(e)
+}, false);
+
+document.documentElement.addEventListener('dragleave', function(e){
+  console.log(e)
+}, false);
+
+setTimeout(function(){
+  var i = document.createElement('iframe');
+  document.body.appendChild(i);
+  i.src = 'http://www.google.com';
+},1000);
+
+</script>
