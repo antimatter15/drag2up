@@ -5,7 +5,8 @@
 	"background_page": "background.html",
   "permissions": [
     "https://api.imgur.com/",
-    "http://gist.github.com/"
+    "http://gist.github.com/",
+    "http://drag2up.appspot.com/"
   ],
   "content_scripts": [
     {

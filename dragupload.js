@@ -6,6 +6,8 @@ var isDragging = false;
 var dropTargets = [];
 var lastDrag = 0;
 var postMessageHeader = '!/__drag2up-$/!'; //crammed a bunch of random characters
+var callbacks = {};
+
 
 function clearTargets(){
   isDragging = false;
@@ -69,12 +71,19 @@ window.addEventListener('message', function(e){
   if(data.substr(0,7) == 'trickle'){
     //propagate downwards
     for(var i = 0; i < frames.length; i++) frames[i] && frames[i].postMessage && frames[i].postMessage(e.data, '*');
-    if(data == 'trickle_reactivate'){ //it should just be activate, but re seems like a good prefix to make them the same length
+    var cmd = data.substr(0,18);
+    if(cmd == 'trickle_reactivate'){ //it should just be activate, but re seems like a good prefix to make them the same length
       if(isDragging == false){
         isDragging = true;
         getTargets();
       }
-    }else if(data == 'trickle_deactivate') clearTargets();
+    }else if(cmd == 'trickle_deactivate'){
+      clearTargets();
+    }else if(cmd == 'trickle_docallback'){
+      var json = JSON.parse(data.substr(18))
+      var cb = callbacks[json.callback];
+      if(cb) cb(json);
+    }
   }else if(data.substr(0, 4) == 'root'){
     var cmd = data.substr(0,15);
     if(cmd == 'root_reactivate'){
@@ -91,9 +100,45 @@ window.addEventListener('message', function(e){
       },200);
     }else if(cmd == 'root_forcedkill'){ //woot, same length!
       isDragging && trickleMessage('deactivate');
+    }else if(cmd == 'root_initupload'){
+      chrome.extension.sendRequest(JSON.parse(data.substr(15)), function(data){
+        trickleMessage('docallback'+JSON.stringify(data));
+      });
     }
   }
 })
+
+function insertLink(el, url, type){
+  console.log(el, url, type);
+  try{el.focus();}catch(err){};
+  //try{el.select();}catch(err){};
+  setTimeout(function(){
+    var elt = isDroppable(el); //get the type of drop mode
+    if(elt == 1){ //input
+      if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
+      console.log('input yay');
+      //simple little test to use bbcode insertion if it's something that looks like bbcode
+      if(/\[img\]/i.test(document.body.innerHTML) && type.indexOf('image/') == 0){
+        el.value += '[img]'+url+'[/img]' + ' ';
+      }else{
+        el.value += url + ' ';
+      }
+
+      
+    }else if(elt == 2){ //contentEditable
+      var a = doc.createElement('a');
+      a.href = url;
+      a.innerText = url;
+      el.appendChild(a);
+      //links dont tend to work as well
+      
+      //var span = doc.createElement('span');
+      //span.innerText = data.url;
+      //el.appendChild(span);
+    }
+  },100);
+}
+
 
 
 function renderTarget(el){
@@ -156,6 +201,30 @@ function renderTarget(el){
     //clearTargets();
     
     mask.style.backgroundColor = '#007fff';
+    mask.innerHTML = 'Uploading '+files.length+' file(s)';
+    
+    for(var i = 0; i < files.length; i++){
+      (function(file){
+      if(file.size > 1024 * 1024 * 5) if(!confirm('The file "'+file.name+'" is over 5MB. Are you sure you want to upload it?')) continue;
+      
+      var cb = Math.random().toString(36).substr(3);
+      callbacks[cb] = function(data){
+        mask.parentNode.removeChild(mask);
+        
+        console.log('got magic data', data, el);
+        insertLink(el, 'http://'+data.url, file.type)
+      }
+      
+      propagateMessage('initupload'+JSON.stringify({
+        name: file.name, 
+        size: file.size, 
+        host: '!!!!TODO: insert current host!!!!',
+        callback: cb
+      }));
+      
+      })(files[i]);
+    }
+    
     
   }, true);
   doc.body.appendChild(mask);
