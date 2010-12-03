@@ -10,7 +10,7 @@ import os
 
 #http://stackoverflow.com/questions/2350454/simplest-way-to-store-a-value-in-google-app-engine-python
 class Link(db.Model):
-	val = db.StringProperty()
+	val = db.TextProperty()
 	modify = db.StringProperty()
 	date = db.DateTimeProperty(auto_now_add=True)
 	size = db.IntegerProperty()
