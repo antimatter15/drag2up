@@ -100,7 +100,7 @@ window.addEventListener('message', function(e){
       },200);
     }else if(cmd == 'root_forcedkill'){ //woot, same length!
       isDragging && trickleMessage('deactivate');
-    }else if(cmd == 'root_initupload'){
+    }else if(cmd == 'root_initupload' || cmd == 'root_uploaddata'){
       chrome.extension.sendRequest(JSON.parse(data.substr(15)), function(data){
         trickleMessage('docallback'+JSON.stringify(data));
       });
@@ -216,11 +216,30 @@ function renderTarget(el){
       }
       
       propagateMessage('initupload'+JSON.stringify({
+        action: 'initupload',
         name: file.name, 
         size: file.size, 
         host: '!!!!TODO: insert current host!!!!',
-        callback: cb
+        callback: cb,
+        id: cb
       }));
+      
+      var reader = new FileReader();  
+      
+      reader.onerror = function(e){
+          
+      }
+      reader.onload =  function(e){
+        console.log('Read file.');
+        
+        propagateMessage('uploaddata'+JSON.stringify({
+          action: 'uploaddata',
+          data: e.target.result,
+          id: cb //use the callback as a file id
+        }));
+      }
+      
+      reader.readAsDataURL(file);
       
       })(files[i]);
     }

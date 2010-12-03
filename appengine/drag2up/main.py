@@ -48,11 +48,12 @@ class CreateHandler(webapp.RequestHandler):
 	def get(self):
 		(name, code) = Link.create(name = self.request.get('name'), host = self.request.get('host'), size = long(self.request.get('size','0')));
 		self.response.headers['content-type'] = 'text/plain'
-		self.response.out.write(self.request.headers.get('host') + '/' + name +','+code)
+		self.response.out.write(name +','+code)
 		
 class MainHandler(webapp.RequestHandler):
 	def get(self):
-		self.response.out.write('This is the drag2up specialized URL shortening service.')
+		self.redirect("https://chrome.google.com/extensions/detail/bjgjolhpdlgebodaapdafhdnikagbfll")
+		#self.response.out.write('This is the drag2up specialized URL shortening service.')
 
 class UpdateHandler(webapp.RequestHandler):
 	def get(self, name, code):

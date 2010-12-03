@@ -1,26 +1,45 @@
 <script>
+var filetable = {};
+
 function params(obj){
   var str = [];
   for(var i in obj) str.push(i+'='+encodeURIComponent(obj[i]));
   return str.join('&');
 }
+
+
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   console.log(request)
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET','http://drag2up.appspot.com/new?'+params({
-    host: request.host,
-    size: request.size,
-    name: request.name
-  }), true);
-  xhr.onload = function(){
-    var parts = xhr.responseText.split(',');
-    sendResponse({
-      callback: request.callback,
-      url: parts[0],
-      code: parts[1]
-    })
+  if(request.action == 'initupload'){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET','http://drag2up.appspot.com/new?'+params({
+      host: request.host,
+      size: request.size,
+      name: request.name
+    }), true);
+    xhr.onload = function(){
+      var parts = xhr.responseText.split(',');
+      sendResponse({
+        callback: request.callback,
+        url: parts[0],
+        code: parts[1]
+      });
+      filetable[request.id] = {
+        code: parts[1],
+        url: parts[0]
+      }
+    }
+    xhr.send();
+  }else if(request.action == 'uploaddata'){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET','http://drag2up.appspot.com/update/'+key+'/'+code+params({
+      host: request.host,
+      size: request.size,
+      name: request.name
+    }), true);
+    xhr.send();
   }
-  xhr.send();
+  
 });
 
 </script>
