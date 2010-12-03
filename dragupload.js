@@ -123,7 +123,7 @@ function renderTarget(el){
   var cx = pos[0] + width/2, cy = pos[1] + height/2;
   var pad = 5; //five pixel padding for normal thingsies
   
-  if(width * height > 22000){ //a random magic number. Basically, it's derived from twitter's whats happening box which is 482x56
+  if(width * height > 32000){ //a random magic number. Basically, it's derived from twitter's whats happening box which is 482x56
     //and thats close to 500x60 which is 30,000 but 32,000 feels nicer.
     //here, the box is too big, so instead of covering it, you make a smaller one in the center  
     width = Math.min(200, width);

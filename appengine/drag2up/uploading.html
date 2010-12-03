@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+	<head>
+		<title>still uploading!</title>
+		<style>
+			body {
+				font-family: sans-serif, helvetica, arial;
+			}
+		</style>
+		<script>
+		var interval = 5 * 1000;
+		var yay = false;
+		setTimeout(function(){
+			if(yay) return;
+			var x = new XMLHttpRequest();
+			x.open('GET', '/poll/{{key}}', true);
+			x.send(null);
+			x.onload = function(){
+				if(x.responseText == 'yay'){
+					document.getElementById('link').style.display = 'block'
+					yay = true;
+					if(document.getElementById('annoy').checked) alert('{{name}} is done uploading');
+				}
+			}
+			setTimeout(arguments.callee, interval *= 1.337);
+		},interval)
+		
+		</script>
+	</head>
+	<body>
+		<h1>Still uploading!</h1>
+		<p>
+			The file <tt>{{name}}</tt> has been uploading for {{date|timesince}} to {{host}}, hopefully it'll finish soon.
+		</p>
+		<p>
+			When the file is done uploading, a link will appear below. <input type="checkbox" id="annoy"> Check this box to get alerted when it's done.
+		</p>
+		<div id="link" style="display:none">
+			<a href="/{{key}}">Download/Open {{name}}</a>
+		</div>
+	</body>
+</html>

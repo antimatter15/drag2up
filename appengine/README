@@ -1,0 +1,6 @@
+Now, I know what you're asking. Why does drag2up have a server component?
+
+It's actually pretty simple really, this is a glorified URL shortener that
+doesnt really make things that short. But it has the nice property of being
+able to get reset based on a certain magic token, and has customized messages
+for when things are still being uploaded.
