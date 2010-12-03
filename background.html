@@ -48,7 +48,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 function linkData(id, url){
     var xhr = new XMLHttpRequest();
     xhr.open('GET','http://drag2up.appspot.com/update/'+filetable[id].key+'/'+filetable[id].code+'?'+params({
-      url: url
+      url: url.replace('data:base64','data:text/plain;base64')
     }), true);
     xhr.send();
 }
