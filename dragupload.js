@@ -148,7 +148,8 @@ function renderTarget(el){
     e.preventDefault();
     e.stopImmediatePropagation();
     mask.hasDropped = true;
-    clearTargets();
+    //clearTargets();
+    propagateMessage('forcedkill');
   }, true);
   doc.body.appendChild(mask);
 
@@ -194,6 +195,9 @@ doc.documentElement.addEventListener('mouseup', function(e){
   if(isDragging) propagateMessage('forcedkill');
 }, false);
 
+doc.documentElement.addEventListener('keydown', function(e){
+  if(isDragging && e.shiftKey) propagateMessage('forcedkill');
+}, false);
 
 
 //TODO: shift key forcedkill
