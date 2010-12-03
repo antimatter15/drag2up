@@ -212,7 +212,7 @@ function renderTarget(el){
         mask.parentNode.removeChild(mask);
         
         console.log('got magic data', data, el);
-        insertLink(el, 'http://'+data.url, file.type)
+        insertLink(el, data.url, file.type)
       }
       
       propagateMessage('initupload'+JSON.stringify({

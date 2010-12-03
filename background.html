@@ -21,21 +21,19 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       var parts = xhr.responseText.split(',');
       sendResponse({
         callback: request.callback,
-        url: parts[0],
+        url: 'http://drag2up.appspot.com/'+parts[0],
         code: parts[1]
       });
       filetable[request.id] = {
         code: parts[1],
-        url: parts[0]
+        key: parts[0]
       }
     }
     xhr.send();
   }else if(request.action == 'uploaddata'){
     var xhr = new XMLHttpRequest();
-    xhr.open('GET','http://drag2up.appspot.com/update/'+key+'/'+code+params({
-      host: request.host,
-      size: request.size,
-      name: request.name
+    xhr.open('GET','http://drag2up.appspot.com/update/'+filetable[request.id].key+'/'+filetable[request.id].code+'?'+params({
+      url: request.data
     }), true);
     xhr.send();
   }
