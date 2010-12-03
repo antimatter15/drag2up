@@ -145,11 +145,18 @@ function renderTarget(el){
   mask.addEventListener('dragover', function(e){ e.preventDefault(); }, true);
   
   mask.addEventListener('drop', function(e){
+    setTimeout(function(){propagateMessage('forcedkill');},0);
     e.preventDefault();
     e.stopImmediatePropagation();
+    var files = e.dataTransfer.files;
+    if(files.length == 0) return;
+    
+    
     mask.hasDropped = true;
     //clearTargets();
-    propagateMessage('forcedkill');
+    
+    mask.style.backgroundColor = '#007fff';
+    
   }, true);
   doc.body.appendChild(mask);
 
