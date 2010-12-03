@@ -1,6 +1,7 @@
 function initialize(doc){
 if(!doc){ console.warn('no document'); return}
-
+if(!window.top){console.warn('no top'); return;}
+console.log('initialized at',window);
 var isDragging = false;
 var dropTargets = [];
 var lastDrag = 0;
@@ -51,6 +52,8 @@ function findPos(obj) {
 
 function propagateMessage(msg){
   window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'root_' + msg, '*');
+  
+  //console.log(msg,window, window.top, window.parent);
 }
 
 function trickleMessage(msg){
@@ -82,7 +85,7 @@ window.addEventListener('message', function(e){
       setTimeout(function(){
         if(lastDrag < lastDeactivation){
           trickleMessage('deactivate');
-          //console.warn('fuh reeelz!')
+          //console.warn('fuh reeelz!',lastDeactivation - lastDrag)
           
         }
       },200);
@@ -96,6 +99,9 @@ window.addEventListener('message', function(e){
 function renderTarget(el){
   var pos = findPos(el), width = el.offsetWidth, height = el.offsetHeight;
   if(!width && !height) return; //no zero widther
+  
+  console.log(el);
+  
   var opacity_normal = '0.84', opacity_hover = '0.42';
   var mask = doc.createElement('div'); //this is what we're making!
   mask.style.opacity = '0'; //set to zero initially, for nice fade in
@@ -115,41 +121,29 @@ function renderTarget(el){
   mask.hasDropped = false;
   
   var cx = pos[0] + width/2, cy = pos[1] + height/2;
+  var pad = 5; //five pixel padding for normal thingsies
+  
   if(width * height > 32000){ //a random magic number. Basically, it's derived from twitter's whats happening box which is 482x56
     //and thats close to 500x60 which is 30,000 but 32,000 feels nicer.
     //here, the box is too big, so instead of covering it, you make a smaller one in the center  
-  
-  }else{
-    var padding = 5; //five pixel padding for normal thingsies
+    width = Math.min(200, width);
+    height = Math.min(80, height);
   }
   
-  mask.style.left = pos[0]-pad+'px';
-  mask.style.top = pos[1]-pad+'px';
-
-
-  var fontSize = Math.sqrt(Math.min(height,width)/50)*20;
-  var tpad = Math.max(0, height/2 - fontSize * 0.6);
-
-    
+  mask.style.left = cx - width/2 - pad+'px';
+  mask.style.top = cy - height/2 - pad+'px';
+  
   mask.style.width = width+'px';
-  mask.style.height = height-tpad+'px';
+  mask.style.height = height+'px';
+  
   mask.style.padding = pad+'px';
-  mask.style.paddingTop = (pad+tpad)+'px';
-  
-  
 
-  
-  mask.style.fontSize = fontSize+'px';
+  mask.style.fontSize = '16px';
 
-  mask.addEventListener('dragenter', function(e){
-    mask.style.opacity = opacity2;
-  }, false);
-  mask.addEventListener('dragleave', function(e){
-    mask.style.opacity = opacity;
-  }, false);
-  mask.addEventListener('dragover', function(e){
-    e.preventDefault();
-  }, true);
+  mask.addEventListener('dragenter', function(e){ mask.style.opacity = opacity_hover; }, false);
+  mask.addEventListener('dragleave', function(e){ mask.style.opacity = opacity_normal;}, false);
+  mask.addEventListener('dragover', function(e){ e.preventDefault(); }, true);
+  
   mask.addEventListener('drop', function(e){
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -188,7 +182,7 @@ doc.documentElement.addEventListener('dragenter', function(e){
 
 doc.documentElement.addEventListener('dragover', function(e){
   //allow default to happen for normal drag/drops
-  isDragging && propagateMessage('reactivate');
+  propagateMessage('reactivate');
 }, false);
 
 doc.documentElement.addEventListener('dragleave', function(e){
@@ -201,11 +195,17 @@ doc.documentElement.addEventListener('mouseup', function(e){
 }, false);
 
 
+
 //TODO: shift key forcedkill
+
+window.addEventListener('drag2upTestEvent', function(e){ e.preventDefault(); });
 
 }
 
 initialize(document);
+
+var customEvent = document.createEvent('Event');
+customEvent.initEvent('myCustomEvent', true, true);
 
 
 //*
@@ -214,7 +214,15 @@ setInterval(function(){
   if(frames.length > lastFrameLength){
     var init = function(){
       for(var l = INITFRAMELEN; l < frames.length; l++){
-        try{initialize(frames[l].document);}catch(err){};
+        try{
+          //check to make sure drag2up isnt already loaded
+          var customEvent = frames[l].document.createEvent('Event');
+          customEvent.initEvent('drag2upTestEvent', true, true);
+          if(frames[l].dispatchEvent(customEvent)){
+            initialize(frames[l].document);
+          }
+        
+        }catch(err){};
       }
     }
     var script = document.createElement('script');
