@@ -69,7 +69,7 @@ function uploadData(file, callback){
 function uploadDataURL(file, callback){
 	//here's the lazy data url encoding system :P
 	setTimeout(function(){
-		callback(data.replace('data:base64','data:text/plain;base64'));
+		callback(file.data.replace('data:base64','data:text/plain;base64'));
 	},1337);
 }
 

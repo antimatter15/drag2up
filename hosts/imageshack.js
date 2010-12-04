@@ -10,5 +10,8 @@ function uploadImageshack(file, callback){
 	bb.append(atob(file.data.replace(/^data.+base64,/i,'')));
 	var blob = bb.getBlob();
 	formData.append("fileupload", blob);
+	xhr.onload = function(){
+		
+	}
 	xhr.send(formData);
 }

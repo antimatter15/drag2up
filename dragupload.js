@@ -48,8 +48,20 @@ function isDroppable(el){
   if(A == 2){
     return A;
   }else if(A == 1 || A == 2.5){
+    
     var pos = findPos(el); //oh crap this is hacky
-    if(el.ownerDocument.elementFromPoint(pos[0]+1, pos[1]+1) == el) return ~~A; //ensure that that element is on top
+    //for fixed positioned elements
+    var over_el = el.ownerDocument.elementFromPoint(pos[0]+1, pos[1]+1);
+    if(over_el == el) return ~~A;
+    if(over_el && over_el.tagName.toLowerCase() == 'label') return ~~A;
+    //for absolutely positioned elements
+	var over_mid = el.ownerDocument.elementFromPoint(pos[0]+1 - scrollX, pos[1]+1-scrollY);
+    if(over_mid == el) return ~~A;
+    
+    if(over_mid && over_mid.tagName.toLowerCase() == 'label') return ~~A;
+    
+    console.log('booooooo', el, over_mid, over_el, pos, scrollX, scrollY);
+    
   }
   return false;
 }
@@ -109,9 +121,9 @@ window.addEventListener('message', function(e){
           //console.warn('fuh reeelz!',lastDeactivation - lastDrag)
           
         }
-      },200);
+      },300);
     }else if(cmd == 'root_forcedkill'){ //woot, same length!
-      isDragging && trickleMessage('deactivate');
+      trickleMessage('deactivate');
     }else if(cmd == 'root_initupload' || cmd == 'root_uploaddata'){
       chrome.extension.sendRequest(JSON.parse(data.substr(15)), function(data){
         trickleMessage('docallback'+JSON.stringify(data));
@@ -122,9 +134,19 @@ window.addEventListener('message', function(e){
 
 function insertLink(el, url, type){
   console.log(el, url, type);
-  try{el.focus();}catch(err){};
+  try{
+	  el.focus();
+	  var evt = el.ownerDocument.createEvent('MouseEvents');
+	  evt.initMouseEvent('click', true, true, el.ownerDocument.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+      el.dispatchEvent(evt);
+      el.focus();
+  }catch(err){};
   //try{el.select();}catch(err){};
   setTimeout(function(){
+	  try{el.focus();}catch(err){};
+  },100);
+  setTimeout(function(){
+	try{el.focus();}catch(err){};
     var elt = isDroppable(el); //get the type of drop mode
     if(elt == 1){ //input
       if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
@@ -148,7 +170,7 @@ function insertLink(el, url, type){
       //span.innerText = data.url;
       //el.appendChild(span);
     }
-  },100);
+  },200);
 }
 
 
@@ -169,6 +191,9 @@ function renderTarget(el){
   mask.style.backgroundColor = "rgb(50,150,50)"; //a shade of green
   mask.dropTarget = el; //reference original element
   mask.style.position = 'absolute';
+  
+  if(el.tagName.toLowerCase() == 'body') mask.style.position = 'fixed';
+  
   mask.style.zIndex = 9007199254740991;
   mask.style.webkitTransition = 'opacity 0.5s ease'
   mask.style.textAlign = 'center';
@@ -179,10 +204,10 @@ function renderTarget(el){
   mask.innerHTML = 'Drop file here';
   mask.hasDropped = false;
   
-  height = Math.min(height, innerHeight);
-  width = Math.min(width, innerWidth);
+  height = Math.min(height, innerHeight/2);
+  width = Math.min(width, innerWidth/2);
   
-  var cx = pos[0] + width/2, cy = pos[1] + height/2;
+  var cx = pos[0] + width/2 , cy = pos[1] + height/2 ;
   var pad = 5; //five pixel padding for normal thingsies
   
   if(width * height > 32000){ //a random magic number. Basically, it's derived from twitter's whats happening box which is 482x56
@@ -315,6 +340,11 @@ doc.documentElement.addEventListener('dragover', function(e){
   isDragging && propagateMessage('reactivate');
 }, false);
 
+doc.documentElement.addEventListener('mousemove', function(e){
+  //allow default to happen for normal drag/drops
+  isDragging && propagateMessage('reactivate');
+}, false);
+
 doc.documentElement.addEventListener('dragleave', function(e){
   isDragging && propagateMessage('deactivate');
 }, false);
@@ -323,6 +353,8 @@ doc.documentElement.addEventListener('dragleave', function(e){
 doc.documentElement.addEventListener('mouseup', function(e){
   if(isDragging) propagateMessage('forcedkill');
 }, false);
+
+
 
 doc.documentElement.addEventListener('drop', function(e){
   console.log(e);

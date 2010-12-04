@@ -12,164 +12,172 @@
 		font-family: sans-serif, arial, helvetica;
 	}
 	.panel {
-		background-color: yellow;
-		width: 20%;
-		position: absolute;		
+		width: 210px;
+		position: fixed;		
 		top: 0;
 		z-index: -1;
+		padding: 10px;
 		right: 0;
-		opacity: 0.4;
 	}
 	.panel.binary {
 		top: 0%;
 		height: 33%;
+		background-color: hsl(48, 100%, 95%);
 	}
 	
 	.panel.text {
 		top: 33%;
 		height: 33%;
-		background-color: lightblue;
+		background-color: hsl(200, 100%, 95%);
 	}
-	
 	
 	.panel.image {
 		top: 66%;
 		height: 33%;
-		background-color: rgb(255,200,200);
+		background-color: hsl(9, 100%, 95%);
 	}
-	.hasbinary, .hastext, .hasimage {display: none; border-radius: 4px}
-	.binary .hasbinary { display: inline; background-color: yellow}
-	.text .hastext { display: inline; background-color: lightblue}
-	.image .hasimage { display: inline; background-color: rgb(255,200,200)}
+	
+	.has .binary, .active.binary{
+		background-color: hsl(48, 100%, 80%);
+	}
+	
+	.has .text, .active.text {
+		background-color: hsl(200, 100%, 80%);
+	}
+	
+	.has .image, .active.image {
+		background-color: hsl(9, 100%, 80%);
+	}
+	
+	.login .has .login{
+		color: red;
+		display: inline;
+	}
+		
+	
+	.has span {display: none; border-radius: 4px; padding: 3px}
+	.binary .binary { display: inline; }
+	.text .text { display: inline; }
+	.image .image { display: inline;}
 	
 	.filehost {
 		float: left;
 		width: 150px;
 		padding: 20px;
 		height: 100px;
-		background-color: lightgreen;
+		background-color: hsl(120, 73%, 75%);
 		margin: 10px;
 		border-radius: 10px;
 	}
 	
-	.ui-state-hover {
-		opacity: 1;
+	.filehost img {
+		width: 100%;
+		border-radius: 5px;
 	}
+	
+	
 	</style>
 	<script>
 	$(function() {
 		$( ".filehost" ).draggable({
-			revert: true,
+			revert: "invalid",
 			containment: "body",
+			helper: "clone",
 			scroll: false
 		});
 		$( ".image.panel" ).droppable({
 			accept: ".filehost.image",
-			activeClass: "ui-state-hover",
-			hoverClass: "ui-state-active",
+			activeClass: "active",
 			drop: function( event, ui ) {
 				$( this )
-					.addClass( "ui-state-highlight" )
 					.find( "p" )
-						.html( "Dropped!" );
+						.html('')
+						.append(ui.draggable.clone())
 			}
 		});
 		$( ".text.panel" ).droppable({
 			accept: ".filehost.text",
-			activeClass: "ui-state-hover",
-			hoverClass: "ui-state-active",
+			activeClass: "active",
 			drop: function( event, ui ) {
 				$( this )
-					.addClass( "ui-state-highlight" )
 					.find( "p" )
-						.html( "Dropped!" );
+						.html('')
+						.append(ui.draggable.clone())
 			}
 		});
 		$( ".binary.panel" ).droppable({
 			accept: ".filehost.binary",
-			activeClass: "ui-state-hover",
-			hoverClass: "ui-state-active",
+			activeClass: "active",
 			drop: function( event, ui ) {
-			  console.log(event);
 				$( this )
-					.addClass( "ui-state-highlight" )
 					.find( "p" )
-						.html( "Dropped!");
+						.html('')
+						.append(ui.draggable.clone())
 			}
 		});
+		
+		var has = $('div.has');
+		$('.filehost').each(function(){
+			$(this).append(has.clone())
+		})
 	});
 	</script>
 
 <h1>Drag2Up Settings</h1>
-
+<div style="display:none">
+	<div class="has">
+		<span class="text">Text</span>
+		<span class="binary">Binary</span>
+		<span class="image">Image</span>
+		<span class="login">Registration</span>
+	</div>	
+</div>
 <div class="binary panel">
-	<p>accept: '#draggable'</p>
+	<h4>Binary File Host</h4>
+	<p>binary</p>
 </div>
 
 <div class="text panel">
-	<p>accept: '#draggable'</p>
+	<h4>Text  File Host</h4>
+	<p>text</p>
 </div>
 
 
 <div class="image panel">
-	<p>accept: '#draggable'</p>
+	<h4>Image File Host</h4>
+	<p>image</p>
 </div>
 
-
-<div style="width: 80%">
-
-<div class="filehost binary image text">
-
-	kitten kitten 656
-	<div class="has">
-	<span class="hastext">Text</span>
-	<span class="hasbinary">Binary</span>
-	<span class="hasimage">Image</span>
-	</div>
-</div>
-<div class="filehost binary">
-	kitten kitten 'l;'
-	<div class="has">
-	<span class="hastext">Text</span>
-	<span class="hasbinary">Binary</span>
-	<span class="hasimage">Image</span>
-	</div>
-</div>
+<div style="margin-right:220px;">
+<p>
+	Here you can configure which hosts you'd like to use for different types of files. 
+	The three types of files are Text, Image and Other (Binary). Some hosts, like imgur and pastebin only
+	support a certain type of file, whereas sites like Dropbox support all files.
+</p>
 <div class="filehost image">
-	kitten kitten adsdqw
-	<div class="has">
-	<span class="hastext">Text</span>
-	<span class="hasbinary">Binary</span>
-	<span class="hasimage">Image</span>
-	</div>	
+	<img src="hosts/logo/imgur.png">
 </div>
-<div class="filehost image">
 
-	kitten kitten xcvxcv
-	<div class="has">
-	<span class="hastext">Text</span>
-	<span class="hasbinary">Binary</span>
-	<span class="hasimage">Image</span>
-	</div>	
+<div class="filehost text">
+	<img src="hosts/logo/gist.png">
+</div>
+<div class="filehost binary image text login">
+	<img src="hosts/logo/dropbox.png">
 </div>
 <div class="filehost text">
-
-	kitten kitten 234234234
-	<div class="has">
-	<span class="hastext">Text</span>
-	<span class="hasbinary">Binary</span>
-	<span class="hasimage">Image</span>
-	</div>	
+	<img src="hosts/logo/pastebin.png">
 </div>
-<div class="filehost text">
 
-	kitten kitten asdf2e
-	<div class="has">
-	<span class="hastext">Text</span>
-	<span class="hasbinary">Binary</span>
-	<span class="hasimage">Image</span>
-	</div>	
+<div class="filehost binary image text login">
+	<img src="hosts/logo/cloudapp.png">
 </div>
+
+<div class="filehost image" id="blah">
+
+	<img src="hosts/logo/imageshack.png">
+
+</div>
+
 </div>
 </body>
 </html>
