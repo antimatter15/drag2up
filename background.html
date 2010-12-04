@@ -56,8 +56,10 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
 function uploadData(data, callback){
 	//segregate data types, choose blah blah, etc.
+	
+	//here's the lazy data url encoding system :P
 	setTimeout(function(){
-		callback(data);
+		callback(data.replace('data:base64','data:text/plain;base64'));
 	},1337);
 }
 
@@ -65,10 +67,11 @@ function uploadData(data, callback){
 function linkData(id, url){
     var xhr = new XMLHttpRequest();
     xhr.open('GET','http://drag2up.appspot.com/update/'+filetable[id].key+'/'+filetable[id].code+'?'+params({
-      url: url.replace('data:base64','data:text/plain;base64')
+      url: url
     }), true);
     xhr.onload = function(e){
 		if(xhr.status != 200){
+			//doomsday scenario: error leads to error leading to error leading to effective DoS
 			linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
 		}
 	}
