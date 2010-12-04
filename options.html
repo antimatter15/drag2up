@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset=utf-8 />
+<title>Drag2Up Options</title>
+<script src="jquery.min.js"></script>
+<script src="jquery-ui.min.js"></script>
+<body>
+	
+	<style>
+	body {
+		font-family: sans-serif, arial, helvetica;
+	}
+	.panel {
+		background-color: yellow;
+		width: 20%;
+		position: absolute;		
+		top: 0;
+		z-index: -1;
+		right: 0;
+		opacity: 0.4;
+	}
+	.panel.binary {
+		top: 0%;
+		height: 33%;
+	}
+	
+	.panel.text {
+		top: 33%;
+		height: 33%;
+		background-color: lightblue;
+	}
+	
+	
+	.panel.image {
+		top: 66%;
+		height: 33%;
+		background-color: rgb(255,200,200);
+	}
+	.hasbinary, .hastext, .hasimage {display: none; border-radius: 4px}
+	.binary .hasbinary { display: inline; background-color: yellow}
+	.text .hastext { display: inline; background-color: lightblue}
+	.image .hasimage { display: inline; background-color: rgb(255,200,200)}
+	
+	.filehost {
+		float: left;
+		width: 150px;
+		padding: 20px;
+		height: 100px;
+		background-color: lightgreen;
+		margin: 10px;
+		border-radius: 10px;
+	}
+	
+	.ui-state-hover {
+		opacity: 1;
+	}
+	</style>
+	<script>
+	$(function() {
+		$( ".filehost" ).draggable({
+			revert: true,
+			containment: "body",
+			scroll: false
+		});
+		$( ".image.panel" ).droppable({
+			accept: ".filehost.image",
+			activeClass: "ui-state-hover",
+			hoverClass: "ui-state-active",
+			drop: function( event, ui ) {
+				$( this )
+					.addClass( "ui-state-highlight" )
+					.find( "p" )
+						.html( "Dropped!" );
+			}
+		});
+		$( ".text.panel" ).droppable({
+			accept: ".filehost.text",
+			activeClass: "ui-state-hover",
+			hoverClass: "ui-state-active",
+			drop: function( event, ui ) {
+				$( this )
+					.addClass( "ui-state-highlight" )
+					.find( "p" )
+						.html( "Dropped!" );
+			}
+		});
+		$( ".binary.panel" ).droppable({
+			accept: ".filehost.binary",
+			activeClass: "ui-state-hover",
+			hoverClass: "ui-state-active",
+			drop: function( event, ui ) {
+			  console.log(event);
+				$( this )
+					.addClass( "ui-state-highlight" )
+					.find( "p" )
+						.html( "Dropped!");
+			}
+		});
+	});
+	</script>
+
+<h1>Drag2Up Settings</h1>
+
+<div class="binary panel">
+	<p>accept: '#draggable'</p>
+</div>
+
+<div class="text panel">
+	<p>accept: '#draggable'</p>
+</div>
+
+
+<div class="image panel">
+	<p>accept: '#draggable'</p>
+</div>
+
+
+<div style="width: 80%">
+
+<div class="filehost binary image text">
+
+	kitten kitten 656
+	<div class="has">
+	<span class="hastext">Text</span>
+	<span class="hasbinary">Binary</span>
+	<span class="hasimage">Image</span>
+	</div>
+</div>
+<div class="filehost binary">
+	kitten kitten 'l;'
+	<div class="has">
+	<span class="hastext">Text</span>
+	<span class="hasbinary">Binary</span>
+	<span class="hasimage">Image</span>
+	</div>
+</div>
+<div class="filehost image">
+	kitten kitten adsdqw
+	<div class="has">
+	<span class="hastext">Text</span>
+	<span class="hasbinary">Binary</span>
+	<span class="hasimage">Image</span>
+	</div>	
+</div>
+<div class="filehost image">
+
+	kitten kitten xcvxcv
+	<div class="has">
+	<span class="hastext">Text</span>
+	<span class="hasbinary">Binary</span>
+	<span class="hasimage">Image</span>
+	</div>	
+</div>
+<div class="filehost text">
+
+	kitten kitten 234234234
+	<div class="has">
+	<span class="hastext">Text</span>
+	<span class="hasbinary">Binary</span>
+	<span class="hasimage">Image</span>
+	</div>	
+</div>
+<div class="filehost text">
+
+	kitten kitten asdf2e
+	<div class="has">
+	<span class="hastext">Text</span>
+	<span class="hasbinary">Binary</span>
+	<span class="hasimage">Image</span>
+	</div>	
+</div>
+</div>
+</body>
+</html>

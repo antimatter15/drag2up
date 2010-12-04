@@ -190,9 +190,17 @@ function renderTarget(el){
   mask.addEventListener('dragover', function(e){ e.preventDefault(); }, true);
   
   mask.addEventListener('drop', function(e){
-    setTimeout(function(){propagateMessage('forcedkill');},0);
+    setTimeout(function(){
+		propagateMessage('forcedkill');
+		var leaveEvent = document.createEvent('Event');
+		leaveEvent.initEvent('drop', true, true);
+		el.dispatchEvent(leaveEvent);
+	},0);
     e.preventDefault();
     e.stopImmediatePropagation();
+
+	
+    
     var files = e.dataTransfer.files;
     if(files.length == 0) return;
     
@@ -278,11 +286,11 @@ doc.documentElement.addEventListener('dragenter', function(e){
 
 doc.documentElement.addEventListener('dragover', function(e){
   //allow default to happen for normal drag/drops
-  propagateMessage('reactivate');
+  isDragging && propagateMessage('reactivate');
 }, false);
 
 doc.documentElement.addEventListener('dragleave', function(e){
-  propagateMessage('deactivate');
+  isDragging && propagateMessage('deactivate');
 }, false);
 
 
