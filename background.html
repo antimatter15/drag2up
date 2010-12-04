@@ -1,3 +1,4 @@
+<script src="jquery.min.js"></script>
 <script>
 var filetable = {};
 
@@ -38,7 +39,11 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	chrome.pageAction.show(tab);
 	tabqueue[tab] = (tabqueue[tab] || 0) + 1;
 
-	uploadData(request.data, function(url){
+	uploadData({
+			data: request.data,
+			name: request.name,
+			size: request.size
+		}, function(url){
 		var cb = function(){
 			linkData(request.id, url);
 			tabqueue[tab]--;
@@ -54,9 +59,14 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 });
 
 
-function uploadData(data, callback){
+function uploadData(file, callback){
 	//segregate data types, choose blah blah, etc.
 	
+	uploadDataURL(file, callback);
+}
+
+
+function uploadDataURL(file, callback){
 	//here's the lazy data url encoding system :P
 	setTimeout(function(){
 		callback(data.replace('data:base64','data:text/plain;base64'));

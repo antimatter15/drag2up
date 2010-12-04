@@ -263,6 +263,8 @@ function renderTarget(el){
         
         propagateMessage('uploaddata'+JSON.stringify({
           action: 'uploaddata',
+          name: file.name, 
+		  size: file.size, 
           data: e.target.result,
           id: cb //use the callback as a file id
         }));
