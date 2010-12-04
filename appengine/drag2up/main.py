@@ -22,9 +22,6 @@ class Link(db.Model):
 	def get(cls, key):
 		return cls.get_by_key_name(key)
 	
-	#http://localhost:8080/new?size=4200000&host=tinypic&name=jesus.aXXo.x264.DvDrip.m4v	
-	#localhost:8080/update/ksHu/CM0T?url=http://www.google.com
-	
 	@classmethod
 	def create(cls, size = None, name = None, host = None):
 		letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -71,6 +68,13 @@ class LinkHandler(webapp.RequestHandler):
 		link = memcache.get(name)
 		if link is None:
 			entity = Link.get(name)
+			if entity is None:
+				self.error(404)
+				self.response.out.write("""Nothing to see here. 
+				I'm not capable of creating an interesting 404 page, 
+				which seems to be a trend, so instead, I'll include this 
+				self referential message about trends in 404 pages.""")
+				return
 			if entity.val is None:
 				template_values = {
 				'host': entity.host,
@@ -82,9 +86,11 @@ class LinkHandler(webapp.RequestHandler):
 				
 				path = os.path.join(os.path.dirname(__file__), 'uploading.html')
 				self.response.out.write(template.render(path, template_values))
-			else:
-				memcache.add(name, entity.val)
-				self.redirect(entity.val)
+				return
+			memcache.add(name, entity.val)
+			link = entity.val
+		if link.startswith("error:"):
+			self.response.out.write(link)
 		else:
 			self.redirect(link)
 		
