@@ -4,10 +4,14 @@
   "description": "Drag files onto any site to upload.",
 	"background_page": "background.html",
   "permissions": [
+    "http://drag2up.appspot.com/",
     "https://api.imgur.com/",
-    "http://gist.github.com/",
-    "http://drag2up.appspot.com/"
+    "http://gist.github.com/"
   ],
+  "page_action": {
+    "default_icon": "icon/22.png",
+    "default_title": "Uploading files..."
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

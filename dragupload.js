@@ -231,24 +231,23 @@ function renderTarget(el){
     
     mask.style.backgroundColor = '#007fff';
     mask.innerHTML = 'Uploading '+files.length+' file(s)';
-    
+    var numleft = files.length;
     for(var i = 0; i < files.length; i++){
       (function(file){
       if(file.size > 1024 * 1024 * 5) if(!confirm('The file "'+file.name+'" is over 5MB. Are you sure you want to upload it?')) continue;
       
       var cb = Math.random().toString(36).substr(3);
       callbacks[cb] = function(data){
-        mask.parentNode.removeChild(mask);
-        
+        numleft--;
         console.log('got magic data', data, el);
-        insertLink(el, data.url, file.type)
+        insertLink(el, data.url, file.type);
+        if(numleft == 0) mask.parentNode.removeChild(mask);
       }
       
       propagateMessage('initupload'+JSON.stringify({
         action: 'initupload',
         name: file.name, 
         size: file.size, 
-        host: '!!!!TODO: insert current host!!!!',
         callback: cb,
         id: cb
       }));
@@ -256,7 +255,8 @@ function renderTarget(el){
       var reader = new FileReader();  
       
       reader.onerror = function(e){
-          
+          numleft--;
+          if(numleft == 0) mask.parentNode.removeChild(mask);
       }
       reader.onload =  function(e){
         console.log('Read file.');

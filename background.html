@@ -6,14 +6,14 @@ function params(obj){
   for(var i in obj) str.push(i+'='+encodeURIComponent(obj[i]));
   return str.join('&');
 }
-
+var tabqueue = {};
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   console.log(request)
   if(request.action == 'initupload'){
     var xhr = new XMLHttpRequest();
     xhr.open('GET','http://drag2up.appspot.com/new?'+params({
-      host: request.host,
+      host: "TODO: host",
       size: request.size,
       name: request.name
     }), true);
@@ -34,22 +34,44 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     }
     xhr.send();
   }else if(request.action == 'uploaddata'){
-    if(filetable[request.id]){
-      linkData(request.id, request.data);
-    }else{
-      filetable[request.id] = function(){
-        linkData(request.id, request.data);
-      }
-    }
+	var tab = sender.tab.id;
+	chrome.pageAction.show(tab);
+	tabqueue[tab] = (tabqueue[tab] || 0) + 1;
+
+	uploadData(request.data, function(url){
+		var cb = function(){
+			linkData(request.id, url);
+			tabqueue[tab]--;
+			if(tabqueue[tab] == 0){
+				chrome.pageAction.hide(tab);
+			}
+		};
+		
+		if(filetable[request.id]) cb(); else filetable[request.id] = cb;
+	});
   }
   
 });
+
+
+function uploadData(data, callback){
+	//segregate data types, choose blah blah, etc.
+	setTimeout(function(){
+		callback(data);
+	},1337);
+}
+
 
 function linkData(id, url){
     var xhr = new XMLHttpRequest();
     xhr.open('GET','http://drag2up.appspot.com/update/'+filetable[id].key+'/'+filetable[id].code+'?'+params({
       url: url.replace('data:base64','data:text/plain;base64')
     }), true);
+    xhr.onload = function(e){
+		if(xhr.status != 200){
+			linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
+		}
+	}
     xhr.send();
 }
 
