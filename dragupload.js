@@ -179,6 +179,9 @@ function renderTarget(el){
   mask.innerHTML = 'Drop file here';
   mask.hasDropped = false;
   
+  height = Math.min(height, innerHeight);
+  width = Math.min(width, innerWidth);
+  
   var cx = pos[0] + width/2, cy = pos[1] + height/2;
   var pad = 5; //five pixel padding for normal thingsies
   
