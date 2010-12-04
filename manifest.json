@@ -7,7 +7,8 @@
     "http://drag2up.appspot.com/",
     "https://api.imgur.com/",
     "http://gist.github.com/",
-    "http://pastebin.com/"
+    "http://pastebin.com/",
+    "http://www.imageshack.us/"
   ],
   "page_action": {
     "default_icon": "icon/22.png",
