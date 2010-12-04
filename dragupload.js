@@ -1,15 +1,27 @@
 function initialize(doc){
 if(!doc){ console.warn('no document'); return}
-if(!window.top){console.warn('no top'); return;}
-console.log('initialized at',window);
+if(!window.top){ console.warn('no top'); return};
+
+window.addEventListener('drag2upTestEvent', function(e){ 
+	e.preventDefault(); 
+	e.stopPropagation(); 
+	e.stopImmediatePropagation(); 
+	return false
+}, true);
+
 var isDragging = false;
 var dropTargets = [];
 var lastDrag = 0;
 var postMessageHeader = '!/__drag2up-$/!'; //crammed a bunch of random characters
 var callbacks = {};
 
+//instance ID. useful for debugging.
+var iId = Math.random().toString(36).substr(2,3);
+
+console.log('initialized ',iId,' at',window);
 
 function clearTargets(){
+//return;
   isDragging = false;
   for(var i = dropTargets.length; i--;){
     if(dropTargets[i] && dropTargets[i].parentNode && dropTargets[i].hasDropped == false){
@@ -142,10 +154,12 @@ function insertLink(el, url, type){
 
 
 function renderTarget(el){
+  if(!el || !el.parentNode) return;
   var pos = findPos(el), width = el.offsetWidth, height = el.offsetHeight;
   if(!width && !height) return; //no zero widther
   
-  console.log(el);
+  console.log(iId, el);
+  
   
   var opacity_normal = '0.84', opacity_hover = '0.42';
   var mask = doc.createElement('div'); //this is what we're making!
@@ -187,9 +201,16 @@ function renderTarget(el){
 
   mask.addEventListener('dragenter', function(e){ mask.style.opacity = opacity_hover; }, false);
   mask.addEventListener('dragleave', function(e){ mask.style.opacity = opacity_normal;}, false);
-  mask.addEventListener('dragover', function(e){ e.preventDefault(); }, true);
+  mask.addEventListener('dragover', function(e){ 
+	  propagateMessage('reactivate')
+	  e.preventDefault();
+	  e.stopImmediatePropagation();
+	  e.stopPropagation();
+	  return false;
+  }, true);
   
   mask.addEventListener('drop', function(e){
+	console.log('file was dropped');
     setTimeout(function(){
 		propagateMessage('forcedkill');
 		var leaveEvent = document.createEvent('Event');
@@ -298,14 +319,10 @@ doc.documentElement.addEventListener('mouseup', function(e){
   if(isDragging) propagateMessage('forcedkill');
 }, false);
 
-
-
-window.addEventListener('keydown', function(e){
-  if(isDragging && String.fromCharCode(e.keyCode).toLowerCase() == 'x') propagateMessage('forcedkill');
+doc.documentElement.addEventListener('drop', function(e){
+  console.log(e);
 }, false);
 
-
-window.addEventListener('drag2upTestEvent', function(e){ e.preventDefault(); });
 
 }
 
@@ -320,7 +337,7 @@ var lastFrameLength = 0;
 setInterval(function(){
   if(frames.length > lastFrameLength){
     var init = function(){
-      for(var l = INITFRAMELEN; l < frames.length; l++){
+      for(var l = 0; l < frames.length; l++){
         try{
           //check to make sure drag2up isnt already loaded
           var customEvent = frames[l].document.createEvent('Event');
@@ -328,14 +345,15 @@ setInterval(function(){
           if(frames[l].dispatchEvent(customEvent)){
             initialize(frames[l].document);
           }
-        
         }catch(err){};
       }
     }
     var script = document.createElement('script');
-    script.innerHTML = '(function(){'+initialize.toString()+';('+init.toString().replace('INITFRAMELEN', lastFrameLength)+')();})()';
+    script.innerHTML = '(function(){'+initialize.toString()+';('+init.toString()+')();})()';
     document.documentElement.appendChild(script);
-    
+    setTimeout(function(){
+		if(script.parentNode) script.parentNode.removeChild(script);
+	},0)
     lastFrameLength = frames.length;
   }
 },1000)
