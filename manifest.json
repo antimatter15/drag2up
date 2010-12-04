@@ -6,7 +6,8 @@
   "permissions": [
     "http://drag2up.appspot.com/",
     "https://api.imgur.com/",
-    "http://gist.github.com/"
+    "http://gist.github.com/",
+    "http://pastebin.com/"
   ],
   "page_action": {
     "default_icon": "icon/22.png",
