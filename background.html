@@ -1,5 +1,7 @@
 <script src="jquery.min.js"></script>
 <script>
+var instant = true; //woot. its called instant because google made google instant.
+
 var filetable = {};
 
 function params(obj){
@@ -7,71 +9,89 @@ function params(obj){
   for(var i in obj) str.push(i+'='+encodeURIComponent(obj[i]));
   return str.join('&');
 }
+
+
 var tabqueue = {};
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   console.log(request)
   if(request.action == 'initupload'){
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET','http://drag2up.appspot.com/new?'+params({
-      host: "TODO: host",
-      size: request.size,
-      name: request.name
-    }), true);
-    xhr.onload = function(){
-      var parts = xhr.responseText.split(',');
-      /*sendResponse({
-        callback: request.callback,
-        url: 'http://drag2up.appspot.com/'+parts[0],
-        code: parts[1]
-      });*/
-      var cb;
-      if(filetable[request.id]) cb = filetable[request.id];
-      filetable[request.id] = {
-        code: parts[1],
-        key: parts[0]
+    if(instant){
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET','http://drag2up.appspot.com/new?'+params({
+        host: "TODO: host",
+        size: request.size,
+        name: request.name
+      }), true);
+      xhr.onload = function(){
+        var parts = xhr.responseText.split(',');
+        sendResponse({
+          callback: request.callback,
+          url: 'http://drag2up.appspot.com/'+parts[0],
+          code: parts[1]
+        });
+        var cb;
+        if(filetable[request.id]) cb = filetable[request.id];
+        filetable[request.id] = {
+          code: parts[1],
+          key: parts[0]
+        }
+        if(cb) cb();
       }
-      if(cb) cb();
+      xhr.send();
+    }else{
+      filetable[request.id] = {
+        fn: sendResponse,
+        callback: request.callback
+      }
     }
-    xhr.send();
   }else if(request.action == 'uploaddata'){
-	var tab = sender.tab.id;
-	chrome.pageAction.show(tab);
-	tabqueue[tab] = (tabqueue[tab] || 0) + 1;
+    var tab = sender.tab.id;
+    chrome.pageAction.show(tab);
+    tabqueue[tab] = (tabqueue[tab] || 0) + 1;
 
-	uploadData({
-			data: request.data,
-			name: request.name,
-			size: request.size
-		}, function(url){
-		var cb = function(){
-			linkData(request.id, url);
-			tabqueue[tab]--;
-			if(tabqueue[tab] == 0){
-				chrome.pageAction.hide(tab);
-			}
-		};
-		
-		if(filetable[request.id]) cb(); else filetable[request.id] = cb;
-	});
+    uploadData({
+        data: request.data,
+        name: request.name,
+        size: request.size
+      }, function(url){
+      var cb = function(){
+        if(instant){      
+          linkData(request.id, url);
+        }else if(filetable[request.id]){ //non-instnat
+          filetable[request.id].fn({
+            callback: filetable[request.id].callback,
+            url: url
+          })
+        }
+        tabqueue[tab]--;
+        if(tabqueue[tab] == 0){
+          chrome.pageAction.hide(tab);
+        }
+      };
+      
+      if(filetable[request.id]) cb(); else filetable[request.id] = cb;
+    });
   }
   
 });
 
 
 function uploadData(file, callback){
-	//segregate data types, choose blah blah, etc.
-	
-	uploadDataURL(file, callback);
+  //segregate data types, choose blah blah, etc.
+  
+  uploadDataURL(file, callback);
 }
 
 
 function uploadDataURL(file, callback){
-	//here's the lazy data url encoding system :P
-	setTimeout(function(){
-		callback(file.data.replace('data:base64','data:text/plain;base64'));
-	},1337);
+  //here's the lazy data url encoding system :P
+  setTimeout(function(){
+    callback(file.data.replace('data:base64','data:text/plain;base64'));
+  },1337);
 }
+
+
 
 
 function linkData(id, url){
@@ -80,11 +100,11 @@ function linkData(id, url){
       url: url
     }), true);
     xhr.onload = function(e){
-		if(xhr.status != 200){
-			//doomsday scenario: error leads to error leading to error leading to effective DoS
-			linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
-		}
-	}
+    if(xhr.status != 200){
+      //doomsday scenario: error leads to error leading to error leading to effective DoS
+      linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
+    }
+  }
     xhr.send();
 }
 
