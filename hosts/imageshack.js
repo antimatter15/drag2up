@@ -23,27 +23,17 @@ function uploadImageshack(file, callback){
 	formData.append("key", "39ACEJNQa5b92fbce7fd90b1cb6f1104d728eccb"); 
 	xhr.onload = function(){
 		console.log(xhr)
+		var link = xhr.responseXML.getElementsByTagName('image_link');
+		if(link.length){
+		  callback(link[0].childNodes[0].nodeValue)
+    }else{
+      callback('error:Imageshack hosting error '+xhr.responseText)
+    }
+	}
+	xhr.onerror = function(){
+	  callback('error: imageshack hosting error')
 	}
 	xhr.send(formData);
 }
 
 
-function uploadImageshack3(file, callback){
-  var xhr = new XMLHttpRequest();
-	xhr.open("POST", "http://www.imageshack.us/upload_api.php");  
-	xhr.onload = function(){
-    console.log(xhr);
-	}
-	xhr.sendMultipart({
-	  key: "39ACEJNQa5b92fbce7fd90b1cb6f1104d728eccb",
-	  fileupload: file
-	})
-}
-
-
-function uploadImageshack2(file, callback){	
-	ajaxMultipart("http://www.imageshack.us/upload_api.php", [
-	  ['fileupload', file],
-	  ['key', "39ACEJNQa5b92fbce7fd90b1cb6f1104d728eccb"]
-	])
-}
