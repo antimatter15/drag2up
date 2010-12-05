@@ -20,11 +20,11 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     }), true);
     xhr.onload = function(){
       var parts = xhr.responseText.split(',');
-      sendResponse({
+      /*sendResponse({
         callback: request.callback,
         url: 'http://drag2up.appspot.com/'+parts[0],
         code: parts[1]
-      });
+      });*/
       var cb;
       if(filetable[request.id]) cb = filetable[request.id];
       filetable[request.id] = {

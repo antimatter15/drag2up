@@ -229,7 +229,25 @@ function renderTarget(el){
   mask.innerHTML = 'Drop file here';
   mask.hasDropped = false;
   
+  //so apparently, Apple synces the blinky power light with human breathing which is more emotionally awesome
+  //so logically, this is totally what I'm going to do. It's going to blinky blinky with the pattern of breathing
+  //so you aren't annoyed by how slow imgur is at uploading a two megabyte image that you took in paris that
+  //totally looks like that scene from Inception.
+  
+  //http://en.wikipedia.org/wiki/Respiratory_rate says that the human breathing rate is 12/60 hertz
+  //that means that you breathe once every five seconds on average
+  //and that means each half-breath is 2.5 seconds
 
+  //this was more important the last version when there wasnt the magical instant feature
+
+  setTimeout(function(){
+    if(mask.parentNode){
+      mask.style.webkitTransition = 'opacity 2.5s ease'
+      var opacity_breathe = "0.2"
+      mask.style.opacity = (mask.style.opacity == opacity_breathe)?opacity_normal:opacity_breathe;
+      setTimeout(arguments.callee, 2500);
+    }
+  }, 2500);
   
   var cx = pos[0] + width/2 , cy = pos[1] + height/2 ;
   var pad = 5; //five pixel padding for normal thingsies
