@@ -6,6 +6,7 @@
 <script src="hosts/gist.js"></script>
 <script src="hosts/pastebin.js"></script>
 <script src="hosts/imgur.js"></script>
+<script src="hosts/hotfile.js"></script>
 <script>
 var instant = false; //woot. its called instant because google made google instant.
 
@@ -60,33 +61,70 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     var tab = sender.tab.id;
     chrome.pageAction.show(tab);
     tabqueue[tab] = (tabqueue[tab] || 0) + 1;
-
-    uploadData({
-        data: request.data,
-        name: request.name,
-        type: request.type,
-        size: request.size
-      }, function(url){
-      var cb = function(){
-        if(instant){      
-          linkData(request.id, url);
-        }else if(filetable[request.id]){ //non-instnat
-          filetable[request.id].fn({
-            callback: filetable[request.id].callback,
-            url: url
-          })
+    
+    function doUpload(){
+       uploadData({
+          data: request.data,
+          name: request.name,
+          type: request.type,
+          size: request.size
+        }, function(url){
+        var cb = function(){
+          if(instant){      
+            linkData(request.id, url);
+          }else if(filetable[request.id]){ //non-instnat
+            filetable[request.id].fn({
+              callback: filetable[request.id].callback,
+              url: url
+            })
+          }
+          tabqueue[tab]--;
+          if(tabqueue[tab] == 0){
+            chrome.pageAction.hide(tab);
+          }
+        };
+        
+        if(filetable[request.id]) cb(); else filetable[request.id] = cb;
+      });
+    }
+    
+    if(request.url){
+      if(/^data:/.test(request.url)){
+        //reencode all the data urls because they may be escape encoded and to extract the mime type
+        var parts = request.url.match(/^data:(.+),/)[0].split(';');
+        var data = request.url.substr(request.url.indexOf(',')+1)
+        var mime = parts[0], b64 = parts.indexOf('base64') != -1;
+        var bin = '';
+        if(b64){
+          data = atob(data)
+        }else{
+          data = unescape(data);
         }
-        tabqueue[tab]--;
-        if(tabqueue[tab] == 0){
-          chrome.pageAction.hide(tab);
+        var enc = 'data:'+mime+';base64,'+btoa(data);
+        request.type = mime;
+        request.data = enc;
+        
+        doUpload();
+        
+      }else{
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', request.url);
+        xhr.onload = function(){
+          var mime = xhr.getResponseHeader('Content-Type')||'application/octet-stream';
+          request.type = mime;
+          request.data = 'data:'+mime+';base64,'+btoa(xhr.responseText);
+          doUpload();
         }
-      };
-      
-      if(filetable[request.id]) cb(); else filetable[request.id] = cb;
-    });
+      }
+    }else{
+      doUpload();
+    }
+    
   }
   
 });
+
+
 
 
 function uploadData(file, callback){

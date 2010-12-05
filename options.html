@@ -106,6 +106,7 @@
 			accept: ".filehost.image",
 			activeClass: "active",
 			drop: function( event, ui ) {
+			  localStorage.imghost = ui.draggable.attr('name')
 				$( this )
 					.find( "p" )
 						.html('')
@@ -116,6 +117,8 @@
 			accept: ".filehost.text",
 			activeClass: "active",
 			drop: function( event, ui ) {
+			  localStorage.texhost = ui.draggable.attr('name')
+			  
 				$( this )
 					.find( "p" )
 						.html('')
@@ -126,6 +129,7 @@
 			accept: ".filehost.binary",
 			activeClass: "active",
 			drop: function( event, ui ) {
+			  localStorage.binhost = ui.draggable.attr('name')
 				$( this )
 					.find( "p" )
 						.html('')
@@ -139,6 +143,14 @@
 		})
 		
 		$('.filehost, .panel').disableSelection();
+		var bname = localStorage.binhost || 'hotfile';
+		var tname = localStorage.texhost || 'gist';
+		var iname = localStorage.imghost || 'imgur';
+		
+		$(".panel.binary").find("p").html('').append($(document.getElementsByName(bname)[0]).clone())
+		$(".panel.text").find("p").html('').append($(document.getElementsByName(tname)[0]).clone())
+		$(".panel.image").find("p").html('').append($(document.getElementsByName(iname)[0]).clone())
+		
 	});
 	</script>
 
@@ -148,7 +160,7 @@
 		<span class="text">Text</span>
 		<span class="binary">Binary</span>
 		<span class="image">Image</span>
-		<span class="login">Registration</span>
+		<span class="login">Login</span>
 	</div>	
 </div>
 <div id="panelcontainer">
@@ -178,33 +190,28 @@
 	The three types of files are Text, Image and Other (Binary). Some hosts, like imgur and pastebin only
 	support a certain type of file, whereas sites like Dropbox support all files.
 </p>
-<div class="filehost image">
+<div class="filehost image" name="imgur">
 	<img src="hosts/logo/imgur.png">
 </div>
 
-<div class="filehost text">
+<div class="filehost text" name="gist">
 	<img src="hosts/logo/gist.png">
 </div>
-<div class="filehost binary image text login">
+<div class="filehost binary image text login" name="dropbox">
 	<img src="hosts/logo/dropbox.png">
 </div>
-<div class="filehost text">
+<div class="filehost text" name="pastebin">
 	<img src="hosts/logo/pastebin.png">
 </div>
 
-<div class="filehost binary image text login">
+<div class="filehost binary image text login" name="cloudapp">
 	<img src="hosts/logo/cloudapp.png">
 </div>
-
-
-
-<div class="filehost image" id="blah">
-
+<div class="filehost image" name="imageshack">
 	<img src="hosts/logo/imageshack.png">
-
 </div>
 
-<div class="filehost binary image text">
+<div class="filehost binary image text" name="hotfile">
 	<img src="hosts/logo/hotfile.png">
 </div>
 

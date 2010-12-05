@@ -4,12 +4,7 @@
   "description": "Drag files onto any site to upload and share.",
 	"background_page": "background.html",
   "permissions": [
-    "http://drag2up.appspot.com/",
-    "https://api.imgur.com/",
-    "http://gist.github.com/",
-    "http://pastebin.com/",
-    "http://www.imageshack.us/",
-    "http://*.hotfile.com/"
+    "*://*/"
   ],
   "page_action": {
     "default_icon": "icon/22.png",

@@ -310,8 +310,27 @@ function renderTarget(el){
   
     
     var files = e.dataTransfer.files;
-    if(files.length == 0) return;
     
+    console.log(e.dataTransfer.getData('text/html'))
+    console.log(e.dataTransfer.getData('url'))
+    console.log(e.dataTransfer.getData('text/uri-list'))
+    
+    
+    
+    if(files.length == 0){
+      var url = e.dataTransfer.getData('url');
+      if(url){
+        files = [
+          {
+            url: url,
+            size: 0,
+            name: url.match(/\/.+?$/)
+          }
+        ]
+      }else{
+        return;
+      }
+    }
     
     mask.hasDropped = true;
     //clearTargets();
@@ -321,6 +340,7 @@ function renderTarget(el){
     var numleft = files.length;
     for(var i = 0; i < files.length; i++){
       (function(file){
+      
       if(file.size > 1024 * 1024 * 5) if(!confirm('The file "'+file.name+'" is over 5MB. Are you sure you want to upload it?')) continue;
       
       var cb = Math.random().toString(36).substr(3);
@@ -340,28 +360,37 @@ function renderTarget(el){
         callback: cb,
         id: cb
       }));
-      
-      var reader = new FileReader();  
-      
-      reader.onerror = function(e){
-          numleft--;
-          if(numleft == 0) mask.parentNode.removeChild(mask);
-      }
-      reader.onload =  function(e){
-        console.log('Read file.');
-        
+      if(file.url){
         propagateMessage('uploaddata'+JSON.stringify({
           action: 'uploaddata',
           name: file.name, 
           type: file.type,
           size: file.size, 
-          data: e.target.result,
+          url: file.url,
           id: cb //use the callback as a file id
         }));
+      }else{    
+        var reader = new FileReader();  
+        
+        reader.onerror = function(e){
+          numleft--;
+          if(numleft == 0) mask.parentNode.removeChild(mask);
+        }
+        reader.onload =  function(e){
+          console.log('Read file.');
+          
+          propagateMessage('uploaddata'+JSON.stringify({
+            action: 'uploaddata',
+            name: file.name, 
+            type: file.type,
+            size: file.size, 
+            data: e.target.result,
+            id: cb //use the callback as a file id
+          }));
+        }
+        
+        reader.readAsDataURL(file);
       }
-      
-      reader.readAsDataURL(file);
-      
       })(files[i]);
     }
     
@@ -388,7 +417,7 @@ function getTargets(){
 
 
 document.documentElement.addEventListener('dragenter', function(e){
-  console.log(e.dataTransfer.types, e)
+  //console.log(e.dataTransfer.types, e)
 
   if(e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1){
     propagateMessage('reactivate');
