@@ -1,7 +1,7 @@
 function initialize(){
 
 if(!document){ console.warn('no document'); return}
-if(!window.top){ console.warn('no top'); return};
+if(!window.top){ console.warn('no top', location.href); return};
 if(document.__drag2up){console.warn('already exists in this window'); return}
 
 document.__drag2up = true;
@@ -21,14 +21,12 @@ var postMessageHeader = '!/__drag2up-$/!'; //crammed a bunch of random character
 var callbacks = {};
 
 //instance ID. useful for debugging.
-if(!window.wId){
-  window.wId = Math.random().toString(36).substr(2,3);
-}
+
 
 var iId = Math.random().toString(36).substr(2,3);
 
 
-console.log('initialized ',iId,' at',wId, window);
+console.log('initialized ',iId,' at', location.href);
 
 function clearTargets(){
 //return;
@@ -117,7 +115,7 @@ window.addEventListener('message', function(e){
       }
     }
     
-    
+
     var cmd = data.substr(0,18);
     if(cmd == 'trickle_reactivate'){ //it should just be activate, but re seems like a good prefix to make them the same length
       if(isDragging == false){
@@ -187,6 +185,7 @@ function insertLink(el, url, type){
       a.href = url;
       a.innerText = url;
       el.appendChild(a);
+      el.appendChild(document.createTextNode(' ')); //add a space at the end
       //links dont tend to work as well
       
       //var span = document.createElement('span');
@@ -199,6 +198,9 @@ function insertLink(el, url, type){
 
 
 function renderTarget(el){
+  for(var i = dropTargets.length; i-- && dropTargets[i].dropTarget != el;){};
+  if(i != -1) return; //already rendered
+  
   if(!el || !el.parentNode) return;
   var pos = findPos(el), width = el.offsetWidth, height = el.offsetHeight;
   if(!width && !height) return; //no zero widther
@@ -290,7 +292,7 @@ function renderTarget(el){
       var cb = Math.random().toString(36).substr(3);
       callbacks[cb] = function(data){
         numleft--;
-        console.log('got magic data', data, el);
+        //console.log('got magic data', data, el);
         insertLink(el, data.url, file.type);
         if(numleft == 0) mask.parentNode.removeChild(mask);
         delete callbacks[cb];
@@ -336,14 +338,12 @@ function renderTarget(el){
 
 
 function getTargets(){
-  if(document && document.getElementsByTagName){
+  if(document.body && document.body.isContentEditable){
+    renderTarget(document.body);
+  }else{
     var all = document.getElementsByTagName('*');
     for(var l = all.length; l--;){
-      if(isDroppable(all[l])){
-        //search to make sure it doesnt already exist there
-        for(var i = dropTargets.length; i-- && dropTargets[i].dropTarget != all[l];){};
-        if(i == -1) renderTarget(all[l]);
-      }
+      if(isDroppable(all[l])) renderTarget(all[l]);
     }
   }
 }
@@ -388,6 +388,7 @@ document.documentElement.addEventListener('drop', function(e){
 var lastFrameLength = 0;
 setInterval(function(){
   if(frames.length > lastFrameLength){
+  console.log('found a new frame');
     var init = function(){
       for(var l = 0; l < frames.length; l++){
         try{
