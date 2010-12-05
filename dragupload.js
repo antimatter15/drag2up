@@ -229,6 +229,8 @@ function renderTarget(el){
   mask.innerHTML = 'Drop file here';
   mask.hasDropped = false;
   
+  mask.contentEditable = 'true'; //hey - everyone who is bored by waiting long durations can have fun editing it
+  
   //so apparently, Apple synces the blinky power light with human breathing which is more emotionally awesome
   //so logically, this is totally what I'm going to do. It's going to blinky blinky with the pattern of breathing
   //so you aren't annoyed by how slow imgur is at uploading a two megabyte image that you took in paris that
@@ -240,19 +242,15 @@ function renderTarget(el){
 
   //this was more important the last version when there wasnt the magical instant feature
 
-  setTimeout(function(){
-    if(mask.parentNode){
-      mask.style.webkitTransition = 'opacity 2.5s ease'
-      var opacity_breathe = "0.2"
-      mask.style.opacity = (mask.style.opacity == opacity_breathe)?opacity_normal:opacity_breathe;
-      setTimeout(arguments.callee, 2500);
-    }
-  }, 2500);
+
   
   var cx = pos[0] + width/2 , cy = pos[1] + height/2 ;
   var pad = 5; //five pixel padding for normal thingsies
   if(el.tagName.toLowerCase() == 'body'){
     mask.style.position = 'fixed';
+    
+    height = el.ownerDocument.documentElement.offsetHeight;
+    width = el.ownerDocument.documentElement.offsetWidth;
     
     height = Math.min(height, innerHeight/2);
     width = Math.min(width, innerWidth/2);
@@ -268,8 +266,8 @@ function renderTarget(el){
     height = Math.min(80, height);
   }
   
-  mask.style.left = cx - width/2 - pad+'px';
-  mask.style.top = cy - height/2 - pad+'px';
+  mask.style.left = Math.max(0,cx - width/2 - pad)+'px';
+  mask.style.top = Math.max(0,cy - height/2 - pad)+'px';
   
   mask.style.width = width+'px';
   mask.style.height = height+'px';
@@ -281,7 +279,7 @@ function renderTarget(el){
   mask.addEventListener('dragenter', function(e){ mask.style.opacity = opacity_hover; }, false);
   mask.addEventListener('dragleave', function(e){ mask.style.opacity = opacity_normal;}, false);
   mask.addEventListener('dragover', function(e){ 
-    propagateMessage('reactivate')
+    if(isDragging) propagateMessage('reactivate');
     e.preventDefault();
     e.stopImmediatePropagation();
     e.stopPropagation();
@@ -289,7 +287,17 @@ function renderTarget(el){
   }, true);
   
   mask.addEventListener('drop', function(e){
-  console.log('file was dropped');
+    setTimeout(function(){
+      if(mask.parentNode){
+        mask.style.webkitTransition = 'opacity 2.5s ease'
+        var opacity_breathe = "0.2"
+        mask.style.opacity = (mask.style.opacity == opacity_breathe)?opacity_normal:opacity_breathe;
+        setTimeout(arguments.callee, 2500);
+      }
+    }, 2500);
+    
+    console.log('file was dropped');
+    
     setTimeout(function(){
       propagateMessage('forcedkill');
       var leaveEvent = document.createEvent('Event');
@@ -328,6 +336,7 @@ function renderTarget(el){
         action: 'initupload',
         name: file.name, 
         size: file.size, 
+        type: file.type,
         callback: cb,
         id: cb
       }));
@@ -344,6 +353,7 @@ function renderTarget(el){
         propagateMessage('uploaddata'+JSON.stringify({
           action: 'uploaddata',
           name: file.name, 
+          type: file.type,
           size: file.size, 
           data: e.target.result,
           id: cb //use the callback as a file id

@@ -65,7 +65,7 @@
 		width: 150px;
 		padding: 20px;
 		height: 100px;
-		background-color: hsl(120, 73%, 75%);
+		background-color: hsl(120, 73%, 90%);
 		margin: 10px;
 		border-radius: 10px;
 	}
@@ -120,6 +120,8 @@
 		$('.filehost').each(function(){
 			$(this).append(has.clone())
 		})
+		
+		$('.filehost, .panel').disableSelection();
 	});
 	</script>
 
@@ -176,11 +178,18 @@
 	<img src="hosts/logo/cloudapp.png">
 </div>
 
+
+
 <div class="filehost image" id="blah">
 
 	<img src="hosts/logo/imageshack.png">
 
 </div>
+
+<div class="filehost binary image text">
+	<img src="hosts/logo/hotfile.png">
+</div>
+
 
 </div>
 </body>

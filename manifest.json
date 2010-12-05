@@ -8,7 +8,8 @@
     "https://api.imgur.com/",
     "http://gist.github.com/",
     "http://pastebin.com/",
-    "http://www.imageshack.us/"
+    "http://www.imageshack.us/",
+    "http://*.hotfile.com/"
   ],
   "page_action": {
     "default_icon": "icon/22.png",

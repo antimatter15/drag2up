@@ -1,6 +1,11 @@
 <script src="jquery.min.js"></script>
+<script src="multipart.js"></script>
+<script src="hosts/imageshack.js"></script>
+<script src="hosts/gist.js"></script>
+<script src="hosts/pastebin.js"></script>
+<script src="hosts/imgur.js"></script>
 <script>
-var instant = true; //woot. its called instant because google made google instant.
+var instant = false; //woot. its called instant because google made google instant.
 
 var filetable = {};
 
@@ -53,6 +58,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     uploadData({
         data: request.data,
         name: request.name,
+        type: request.type,
         size: request.size
       }, function(url){
       var cb = function(){
@@ -100,11 +106,15 @@ function linkData(id, url){
       url: url
     }), true);
     xhr.onload = function(e){
-    if(xhr.status != 200){
-      //doomsday scenario: error leads to error leading to error leading to effective DoS
-      linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
+      if(xhr.status != 200){
+        //doomsday scenario: error leads to error leading to error leading to effective DoS
+        linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
+      }
     }
-  }
+    xhr.onerror = function(e){
+      console.log(e)
+      linkData(id, 'error: could not link.')
+    }
     xhr.send();
 }
 
