@@ -7,31 +7,39 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
 
   var req = new BlobBuilder();
   req.append("--" + BOUNDARY);
-
+  
+  var file_param = -1;
+  
   for (var i in params) {
     req.append(rn + "Content-Disposition: form-data; name=\"" + i + "\"");
     if (typeof params[i] != "string") {
-      var file = params[i];
-      var url = file.data;
-      var base64 = url.substr(url.indexOf(",") + 1);
-      var bin = window.atob(base64);
-      var arr = new Int8Array(bin.length);
-	    for(var i = 0, l = bin.length; i < l; i++){
-	      arr[i] = bin.charCodeAt(i)
-	    }
-	
-	    //bb.append(arr.buffer)
-	    //var blob = bb.getBlob(file.type);
-	
-      req.append("; filename=\""+file.name+"\"" + rn + "Content-type: "+file.type);
-
-      req.append(rn + rn);
-      req.append(arr.buffer)
-      req.append(rn + "--" + BOUNDARY);
+      file_param = i;
     } else {
       req.append(rn + rn + params[i] + rn + "--" + BOUNDARY);
     }
   }
+  
+  if(file_param != -1){
+    var i = file_param;
+    var file = params[i];
+    var url = file.data;
+    var base64 = url.substr(url.indexOf(",") + 1);
+    var bin = window.atob(base64);
+    var arr = new Int8Array(bin.length);
+    for(var i = 0, l = bin.length; i < l; i++){
+      arr[i] = bin.charCodeAt(i)
+    }
+
+    //bb.append(arr.buffer)
+    //var blob = bb.getBlob(file.type);
+
+    req.append("; filename=\""+file.name+"\"" + rn + "Content-type: "+file.type);
+
+    req.append(rn + rn);
+    req.append(arr.buffer)
+    req.append(rn + "--" + BOUNDARY);
+  }
+  
   req.append("--");
 
   this.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);

@@ -4,7 +4,8 @@
   "description": "Drag files onto any site to upload and share.",
 	"background_page": "background.html",
   "permissions": [
-    "*://*/"
+    "*://*/",
+    "tabs"
   ],
   "page_action": {
     "default_icon": "icon/22.png",
