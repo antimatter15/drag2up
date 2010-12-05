@@ -1,13 +1,18 @@
-function initialize(doc){
-if(!doc){ console.warn('no document'); return}
-if(!window.top){ console.warn('no top'); return};
+function initialize(){
 
+if(!document){ console.warn('no document'); return}
+if(!window.top){ console.warn('no top'); return};
+if(document.__drag2up){console.warn('already exists in this window'); return}
+
+document.__drag2up = true;
+/*
 window.addEventListener('drag2upTestEvent', function(e){ 
-	e.preventDefault(); 
-	e.stopPropagation(); 
-	e.stopImmediatePropagation(); 
-	return false
+  e.preventDefault(); 
+  e.stopPropagation(); 
+  e.stopImmediatePropagation(); 
+  return false
 }, true);
+*/
 
 var isDragging = false;
 var dropTargets = [];
@@ -16,9 +21,14 @@ var postMessageHeader = '!/__drag2up-$/!'; //crammed a bunch of random character
 var callbacks = {};
 
 //instance ID. useful for debugging.
+if(!window.wId){
+  window.wId = Math.random().toString(36).substr(2,3);
+}
+
 var iId = Math.random().toString(36).substr(2,3);
 
-console.log('initialized ',iId,' at',window);
+
+console.log('initialized ',iId,' at',wId, window);
 
 function clearTargets(){
 //return;
@@ -55,12 +65,12 @@ function isDroppable(el){
     if(over_el == el) return ~~A;
     if(over_el && over_el.tagName.toLowerCase() == 'label') return ~~A;
     //for absolutely positioned elements
-	var over_mid = el.ownerDocument.elementFromPoint(pos[0]+1 - scrollX, pos[1]+1-scrollY);
+  var over_mid = el.ownerDocument.elementFromPoint(pos[0]+1 - scrollX, pos[1]+1-scrollY);
     if(over_mid == el) return ~~A;
     
     if(over_mid && over_mid.tagName.toLowerCase() == 'label') return ~~A;
     
-    console.log('booooooo', el, over_mid, over_el, pos, scrollX, scrollY);
+    //console.log('booooooo', el, over_mid, over_el, pos, scrollX, scrollY);
     
   }
   return false;
@@ -79,14 +89,15 @@ function findPos(obj) {
 function propagateMessage(msg){
   window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'root_' + msg, '*');
   
-  //console.log(msg,window, window.top, window.parent);
+  //console.log('hey root', msg,window, window.top, window.parent);
 }
 
 function trickleMessage(msg){
   //based on Stephen Colbert's economic "trickle down" theory. Lime flavored event messages are given to 
   //the top 3% root windows, which flow through the system and eventually trickle down to the other 97%
   //http://www.colbertnation.com/the-colbert-report-videos/341481/july-28-2010/the-word---ownership-society
-  window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'trickle_' + msg, '*')
+  window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'trickle_' + msg, '*');
+  //console.log('trikling', window.top, window.top.postMessage);
 }
 
 window.addEventListener('message', function(e){
@@ -94,7 +105,19 @@ window.addEventListener('message', function(e){
   var data = e.data.substr(postMessageHeader.length);
   if(data.substr(0,7) == 'trickle'){
     //propagate downwards
-    for(var i = 0; i < frames.length; i++) frames[i] && frames[i].postMessage && frames[i].postMessage(e.data, '*');
+    for(var i = 0; i < frames.length; i++){
+      if(frames[i]){
+        frames[i] && frames[i].postMessage && frames[i].postMessage(e.data, '*');
+      }else{
+        //bypass the weird stuff that content scripts do
+        var s = document.createElement('script');
+        s.innerHTML = "frames["+i+"] && frames["+i+"].postMessage && frames["+i+"].postMessage("+JSON.stringify(e.data)+", '*');";
+        document.documentElement.appendChild(s);
+        s.parentNode.removeChild(s);
+      }
+    }
+    
+    
     var cmd = data.substr(0,18);
     if(cmd == 'trickle_reactivate'){ //it should just be activate, but re seems like a good prefix to make them the same length
       if(isDragging == false){
@@ -133,20 +156,20 @@ window.addEventListener('message', function(e){
 })
 
 function insertLink(el, url, type){
-  console.log(el, url, type);
+  console.log('insertLink',iId, el, url, type);
   try{
-	  el.focus();
-	  var evt = el.ownerDocument.createEvent('MouseEvents');
-	  evt.initMouseEvent('click', true, true, el.ownerDocument.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-      el.dispatchEvent(evt);
-      el.focus();
+    el.focus();
+    var evt = el.ownerDocument.createEvent('MouseEvents');
+    evt.initMouseEvent('click', true, true, el.ownerDocument.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+    el.dispatchEvent(evt);
+    el.focus();
   }catch(err){};
   //try{el.select();}catch(err){};
   setTimeout(function(){
-	  try{el.focus();}catch(err){};
+    try{el.focus();}catch(err){};
   },100);
   setTimeout(function(){
-	try{el.focus();}catch(err){};
+  try{el.focus();}catch(err){};
     var elt = isDroppable(el); //get the type of drop mode
     if(elt == 1){ //input
       if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
@@ -160,13 +183,13 @@ function insertLink(el, url, type){
 
       
     }else if(elt == 2){ //contentEditable
-      var a = doc.createElement('a');
+      var a = document.createElement('a');
       a.href = url;
       a.innerText = url;
       el.appendChild(a);
       //links dont tend to work as well
       
-      //var span = doc.createElement('span');
+      //var span = document.createElement('span');
       //span.innerText = data.url;
       //el.appendChild(span);
     }
@@ -180,11 +203,11 @@ function renderTarget(el){
   var pos = findPos(el), width = el.offsetWidth, height = el.offsetHeight;
   if(!width && !height) return; //no zero widther
   
-  console.log(iId, el);
+  console.log('renderTarget',iId, el);
   
   
   var opacity_normal = '0.84', opacity_hover = '0.42';
-  var mask = doc.createElement('div'); //this is what we're making!
+  var mask = document.createElement('div'); //this is what we're making!
   mask.style.opacity = '0'; //set to zero initially, for nice fade in
   setTimeout(function(){ mask.style.opacity = opacity_normal;},0);
   
@@ -230,25 +253,25 @@ function renderTarget(el){
   mask.addEventListener('dragenter', function(e){ mask.style.opacity = opacity_hover; }, false);
   mask.addEventListener('dragleave', function(e){ mask.style.opacity = opacity_normal;}, false);
   mask.addEventListener('dragover', function(e){ 
-	  propagateMessage('reactivate')
-	  e.preventDefault();
-	  e.stopImmediatePropagation();
-	  e.stopPropagation();
-	  return false;
+    propagateMessage('reactivate')
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    return false;
   }, true);
   
   mask.addEventListener('drop', function(e){
-	console.log('file was dropped');
+  console.log('file was dropped');
     setTimeout(function(){
-		propagateMessage('forcedkill');
-		var leaveEvent = document.createEvent('Event');
-		leaveEvent.initEvent('drop', true, true);
-		el.dispatchEvent(leaveEvent);
-	},0);
+      propagateMessage('forcedkill');
+      var leaveEvent = document.createEvent('Event');
+      leaveEvent.initEvent('drop', true, true);
+      el.dispatchEvent(leaveEvent);
+    },0);
     e.preventDefault();
     e.stopImmediatePropagation();
 
-	
+  
     
     var files = e.dataTransfer.files;
     if(files.length == 0) return;
@@ -270,6 +293,7 @@ function renderTarget(el){
         console.log('got magic data', data, el);
         insertLink(el, data.url, file.type);
         if(numleft == 0) mask.parentNode.removeChild(mask);
+        delete callbacks[cb];
       }
       
       propagateMessage('initupload'+JSON.stringify({
@@ -292,7 +316,7 @@ function renderTarget(el){
         propagateMessage('uploaddata'+JSON.stringify({
           action: 'uploaddata',
           name: file.name, 
-		  size: file.size, 
+          size: file.size, 
           data: e.target.result,
           id: cb //use the callback as a file id
         }));
@@ -305,15 +329,15 @@ function renderTarget(el){
     
     
   }, true);
-  doc.body.appendChild(mask);
+  document.body.appendChild(mask);
 
   dropTargets.push(mask);
 }
 
 
 function getTargets(){
-  if(doc && doc.getElementsByTagName){
-    var all = doc.getElementsByTagName('*');
+  if(document && document.getElementsByTagName){
+    var all = document.getElementsByTagName('*');
     for(var l = all.length; l--;){
       if(isDroppable(all[l])){
         //search to make sure it doesnt already exist there
@@ -327,7 +351,7 @@ function getTargets(){
 
 
 
-doc.documentElement.addEventListener('dragenter', function(e){
+document.documentElement.addEventListener('dragenter', function(e){
   if(isDragging == false && e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1){
     //isDragging = true;
     propagateMessage('reactivate');
@@ -335,39 +359,30 @@ doc.documentElement.addEventListener('dragenter', function(e){
   }
 }, false);
 
-doc.documentElement.addEventListener('dragover', function(e){
+document.documentElement.addEventListener('dragover', function(e){
   //allow default to happen for normal drag/drops
   isDragging && propagateMessage('reactivate');
 }, false);
 
-doc.documentElement.addEventListener('mousemove', function(e){
+document.documentElement.addEventListener('mousemove', function(e){
   //allow default to happen for normal drag/drops
   isDragging && propagateMessage('reactivate');
 }, false);
 
-doc.documentElement.addEventListener('dragleave', function(e){
+document.documentElement.addEventListener('dragleave', function(e){
   isDragging && propagateMessage('deactivate');
 }, false);
 
 
-doc.documentElement.addEventListener('mouseup', function(e){
+document.documentElement.addEventListener('mouseup', function(e){
   if(isDragging) propagateMessage('forcedkill');
 }, false);
 
 
 
-doc.documentElement.addEventListener('drop', function(e){
+document.documentElement.addEventListener('drop', function(e){
   console.log(e);
 }, false);
-
-
-}
-
-initialize(document);
-
-var customEvent = document.createEvent('Event');
-customEvent.initEvent('myCustomEvent', true, true);
-
 
 //*
 var lastFrameLength = 0;
@@ -377,22 +392,30 @@ setInterval(function(){
       for(var l = 0; l < frames.length; l++){
         try{
           //check to make sure drag2up isnt already loaded
-          var customEvent = frames[l].document.createEvent('Event');
-          customEvent.initEvent('drag2upTestEvent', true, true);
-          if(frames[l].dispatchEvent(customEvent)){
-            initialize(frames[l].document);
+          if(!frames[l].document.__drag2up){
+            frames[l].eval("("+initialize.toString()+")()");
           }
+          
         }catch(err){};
       }
     }
     var script = document.createElement('script');
     script.innerHTML = '(function(){'+initialize.toString()+';('+init.toString()+')();})()';
+
     document.documentElement.appendChild(script);
-    setTimeout(function(){
-		if(script.parentNode) script.parentNode.removeChild(script);
-	},0)
+    script.parentNode.removeChild(script);
     lastFrameLength = frames.length;
   }
 },1000)
 //*/
+
+
+
+
+}
+
+initialize();
+
+
+
 
