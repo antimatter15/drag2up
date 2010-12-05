@@ -12,7 +12,7 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
   
   for (var i in params) {
     req.append(rn + "Content-Disposition: form-data; name=\"" + i + "\"");
-    if (typeof params[i] != "string") {
+    if (params[i].data) {
       file_param = i;
     } else {
       req.append(rn + rn + params[i] + rn + "--" + BOUNDARY);

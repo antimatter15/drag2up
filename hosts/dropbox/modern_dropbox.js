@@ -7,44 +7,32 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 	var _storagePrefix = "moderndropbox_";
 	var _isSandbox = false;
 	var _cache = true;
-	var _authCallback = "data:text/html,done";
+	var _authCallback = "";
 	var _fileListLimit = 10000;
 	var _cookieTimeOut = 3650;
 	var _dropboxApiVersion = 0;
 	var _xhr = new XMLHttpRequest();
 	
-	var _ajaxSendFileContents = function(message, content) {
+	var _ajaxSendFileContents = function(message, filename, content, callback) {
 		_xhr.open("POST", message.action, true);
 		
-		var boundary = '---------------------------';
-		boundary += Math.floor(Math.random() * 32768);
-		boundary += Math.floor(Math.random() * 32768);
-		boundary += Math.floor(Math.random() * 32768);
-		_xhr.setRequestHeader("Content-Type", 'multipart/form-data; boundary=' + boundary);
-	
-		var body = '';
+		var params = {};
 
 		for (i in message.parameters) {
-		  if(message.parameters[i][0] == 'file') continue;
-			body += '--' + boundary + '\r\n' + 'Content-Disposition: form-data; name="';
-			body += message.parameters[i][0];
-			body += '"\r\n\r\n';
-			body += message.parameters[i][1];
-			body += '\r\n';
+			params[message.parameters[i][0]] = message.parameters[i][1];
 		}
 
-		body += '--' + boundary + "\r\n";
-		body += "Content-Disposition: form-data; name=file; filename=" + message.filename + "\r\n";
-		body += "Content-type: application/octet-stream\r\n\r\n";
-		body += content;
-		body += "\r\n";
-		body += '--' + boundary + '--';
-		
+    content.name = filename;
+    params.file = content;
+
 		_xhr.onreadystatechange = function() {
-			console.log(this);
+			//console.log(this);
+			if(_xhr.status == 200 && _xhr.readyState == 4){
+			  callback(_xhr);
+			}
 		}
-		
-		_xhr.send(body);
+		console.log(params);
+		_xhr.sendMultipart(params);
 	};
 	
 	var _setAuthCallback = function(callback) {
@@ -112,15 +100,13 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		var accessor = {
 			consumerSecret: _consumerSecret,
 		};
-		console.log(options.token, _tokens.accessToken);
+		
 		if (!options.token) {
 			message.parameters.push(["oauth_token", _tokens["accessToken"]]);
 		} else {
 			message.parameters.push(["oauth_token", options.token]);
 			delete options.token;
 		}
-		
-		
 		
 		if (!options.tokenSecret) {
 			accessor.tokenSecret = _tokens["accessTokenSecret"];
@@ -137,7 +123,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		for (key in options) {
 			message.parameters.push([key, options[key]]);
 		}
-
+		
 		OAuth.setTimestampAndNonce(message);
 		OAuth.SignatureMethod.sign(message, accessor);
 
@@ -164,7 +150,9 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		if (options.multipart) {
 			_ajaxSendFileContents(
 				message,
-				options.content
+				options.filename,
+				options.content,
+				options.success
 			);
 		} else {
 			$.ajax({
@@ -178,7 +166,9 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		}
 	};
 	
-	var init = function() {
+	// Public
+	return ({
+		initialize: function() {
 			_setupAuthStorage();
 
 			if (!_isAccessGranted()) {
@@ -206,27 +196,10 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 					
 							_storeAuth(authTokens);
 		
-							chrome.tabs.create({
-				        url: "http://api.getdropbox.com/" + _dropboxApiVersion + "/oauth/authorize?oauth_token=" 
+							document.location = "http://api.getdropbox.com/" + _dropboxApiVersion + "/oauth/authorize?oauth_token=" 
 								+ authTokens["requestToken"] 
 								+ "&oauth_callback=" 
-								+ _authCallback
-				      }, function(tab){
-				        var poll = function(){
-			            chrome.tabs.get(tab.id, function(info){
-				            if(info.url.indexOf('uid=') != -1){
-					            chrome.tabs.remove(tab.id);
-					            //dropbox.setup();
-					            init();
-					            
-				            }else{
-					            setTimeout(poll, 100)
-				            }
-			            })
-		            };
-		            poll();
-				      })	
-								
+								+ _authCallback;
 						}).bind(this)
 					});
 				} else {
@@ -261,11 +234,10 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 			}
 			
 			return this;
-		}
-	// Public
-	return ({
-		initialize: init,
-		
+		},
+		isAccessGranted: function(){
+		  return _isAccessGranted()
+		},
 		getAccountInfo: function(callback) {
 			var url = "https://api.dropbox.com/" + _dropboxApiVersion + "/account/info";
 			var message = _createOauthRequest(url);
@@ -310,17 +282,16 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 			});
 		},
 		
-		putFileContents: function(path, filename, content, callback) {
-			var url = "https://api-content.dropbox.com/" + _dropboxApiVersion + "/files/dropbox/" + path;
-			var message = _createOauthRequest(url, {
-			  method: 'POST',
-			  file: filename
-			});
-			message.filename = filename;
+		putFileContents: function(path, file, callback) {
+			var filename = path.match(/([^\\\/]+)$/)[1];
+			var file_path = path.match(/^(.*?)[^\\\/]+$/)[1];
+			var url = "https://api-content.dropbox.com/" + _dropboxApiVersion + "/files/dropbox/" + file_path + "?file=" + filename;
+			var message = _createOauthRequest(url, { method: "POST" });
 			
 			_sendOauthRequest(message, {
 				multipart: true,
-				content: content,
+				content: file,
+				filename: filename,
 				success: (function(data) { callback(data); }).bind(this)
 			});
 		},
