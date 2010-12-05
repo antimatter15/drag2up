@@ -388,11 +388,15 @@ function getTargets(){
 
 
 document.documentElement.addEventListener('dragenter', function(e){
-  if(isDragging == false && e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1){
-    //isDragging = true;
+  console.log(e.dataTransfer.types, e)
+
+  if(e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1){
     propagateMessage('reactivate');
-    //setTimeout(getTargets, 50);
+  }else if(e.dataTransfer.types.join(',') == 'text/html,text/uri-list,url'){ //images from other pages
+    propagateMessage('reactivate');
   }
+  
+  
 }, false);
 
 document.documentElement.addEventListener('dragover', function(e){
@@ -415,10 +419,11 @@ document.documentElement.addEventListener('mouseup', function(e){
 }, false);
 
 
-
+/*
 document.documentElement.addEventListener('drop', function(e){
   console.log(e);
 }, false);
+*/
 
 //*
 var lastFrameLength = 0;

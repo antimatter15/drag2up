@@ -11,6 +11,11 @@
 	body {
 		font-family: sans-serif, arial, helvetica;
 	}
+	
+	#panelcontainer.dragging .panel {
+	  opacity: 0.2;
+	}
+	
 	.panel {
 		width: 210px;
 		position: fixed;		
@@ -37,6 +42,9 @@
 		background-color: hsl(9, 100%, 95%);
 	}
 	
+	.panel.active {
+    opacity: 1 !important;
+  }
 	.has .binary, .active.binary{
 		background-color: hsl(48, 100%, 80%);
 	}
@@ -84,6 +92,15 @@
 			containment: "body",
 			helper: "clone",
 			scroll: false
+		});
+		$(".panel").droppable({
+		  accept: '.filehost',
+		  activate: function(){
+			  $('#panelcontainer').addClass('dragging')
+		  },
+		  deactivate: function(){
+  			$('#panelcontainer').removeClass('dragging')
+		  }
 		});
 		$( ".image.panel" ).droppable({
 			accept: ".filehost.image",
@@ -134,6 +151,7 @@
 		<span class="login">Registration</span>
 	</div>	
 </div>
+<div id="panelcontainer">
 <div class="binary panel">
 	<h4>Binary File Host</h4>
 	<p>binary</p>
@@ -149,7 +167,7 @@
 	<h4>Image File Host</h4>
 	<p>image</p>
 </div>
-
+</div>
 <div style="margin-right:220px;">
 <p>
   <h3 style="display:inline">Basic</h3><input type="checkbox" id="instant" checked> <label for="instant">Enable Instant mode</label>
