@@ -217,7 +217,7 @@ function renderTarget(el){
   mask.dropTarget = el; //reference original element
   mask.style.position = 'absolute';
   
-  if(el.tagName.toLowerCase() == 'body') mask.style.position = 'fixed';
+  
   
   mask.style.zIndex = 9007199254740991;
   mask.style.webkitTransition = 'opacity 0.5s ease'
@@ -229,11 +229,19 @@ function renderTarget(el){
   mask.innerHTML = 'Drop file here';
   mask.hasDropped = false;
   
-  height = Math.min(height, innerHeight/2);
-  width = Math.min(width, innerWidth/2);
+
   
   var cx = pos[0] + width/2 , cy = pos[1] + height/2 ;
   var pad = 5; //five pixel padding for normal thingsies
+  if(el.tagName.toLowerCase() == 'body'){
+    mask.style.position = 'fixed';
+    
+    height = Math.min(height, innerHeight/2);
+    width = Math.min(width, innerWidth/2);
+    
+    width = Math.min(200, width);
+    height = Math.min(80, height);
+  }
   
   if(width * height > 32000){ //a random magic number. Basically, it's derived from twitter's whats happening box which is 482x56
     //and thats close to 500x60 which is 30,000 but 32,000 feels nicer.
