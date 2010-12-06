@@ -2,6 +2,7 @@
  * uploadPastebin({data:btoa('hello world')},function(url){console.log(url)})
  * http://pastebin.com/x43mgnhf
  * */
+ //no https
 function uploadPastebin(file, callback){
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "http://pastebin.com/api_public.php");  

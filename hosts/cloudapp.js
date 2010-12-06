@@ -1,3 +1,4 @@
+//does not support https
 function uploadCloudApp(file, callback){
   var xhr = new XMLHttpRequest();
   xhr.open('GET', 'http://my.cl.ly/items/new');
