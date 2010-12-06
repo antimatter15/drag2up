@@ -26,7 +26,8 @@ function params(obj){
 
 var tabqueue = {};
 
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+
+function handleRequest(request, sender, sendResponse){
   console.log(request)
   var instant = localStorage.instant; //woot. its called instant because google made google instant.
   if(instant === undefined) instant = true;
@@ -35,7 +36,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if(instant){
       var xhr = new XMLHttpRequest();
       xhr.open('GET','http://drag2up.appspot.com/new?'+params({
-        host: hostName({name:request.name, type: request.type, data:"this is why this is \x0a estimate of the final host. you cant \xbe certain. without the actual file. \x50 so this has tons of non ascii characters so it liberally says binary."}),
+        host: hostName({name:request.name, type: request.type, data:"data:application/octet-stream;base64,VDdIVVQV8WxsZWR3aXRo4HZpbA="}),
         size: request.size,
         name: request.name
       }), true);
@@ -127,6 +128,13 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     
   }
   
+}
+
+
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+  setTimeout(function(){
+    handleRequest(request, sender, sendResponse)
+  }, 0);
 });
 
 

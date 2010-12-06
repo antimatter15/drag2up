@@ -231,6 +231,7 @@ function initialize(){
     mask.hasDropped = false;
     
     mask.contentEditable = 'false'; //hey - everyone who is bored by waiting long durations can have fun editing it
+    //actually that was a really dumb idea. undid it.
     
     //so apparently, Apple synces the blinky power light with human breathing which is more emotionally awesome
     //so logically, this is totally what I'm going to do. It's going to blinky blinky with the pattern of breathing

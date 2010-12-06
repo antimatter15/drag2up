@@ -5,16 +5,35 @@
 		<style>
 			body {
 				font-family: sans-serif, helvetica, arial;
+				margin-right: 50px;
+				margin-left: 120px;
+				background: url(https://github.com/antimatter15/drag2up/raw/master/icon/64.png) no-repeat;
+				background-position: 30px 30px;
+				
+			}
+			label {
+			  font-weight: bold;
 			}
 		</style>
 		<script>
-		var interval = 5 * 1000;
+		var interval = 3133.7;
 		var yay = false;
+		var lastChecked = +new Date;
+		var uploaded = new Date("{{date}}"||0);
+		
+		function relative(time){
+		  if(time < 60) return time + 'seconds';
+		  if(time < 60 * 60) return Math.floor(time/60) + ' minutes ' + (time%60) + ' seconds';
+		  if(time < 60 * 60 * 24) return Math.floor(time/60/60) + ' hours';
+		  if(time < 60 * 60 * 24 * 365) return Math.floor(time/60/60/24) + ' days';
+		}
+		
 		setTimeout(function(){
 			if(yay) return;
 			var x = new XMLHttpRequest();
 			x.open('GET', '/poll/{{key}}', true);
 			x.send(null);
+			lastChecked = +new Date;
 			x.onload = function(){
 				if(x.responseText == 'yay'){
 					document.getElementById('link').style.display = 'block'
@@ -23,20 +42,35 @@
 				}
 			}
 			setTimeout(arguments.callee, interval *= 1.337);
-		},interval)
+		},interval);
+		
+		setInterval(function(){
+		  var last = Math.floor((new Date - lastChecked)/1000);
+		  if(Math.round(interval/1000 - last + 1) > -1){
+		    document.getElementById('last').innerHTML = 'Upload status was last checked '+last+' seconds ago and will be checked in '+Math.round(interval/1000 - last + 1);
+		  }else{
+        document.getElementById('last').innerHTML = 'Upload status checking server failure';
+      }
+		  
+		  document.getElementById('since').innerHTML = relative(new Date - uploaded);
+    },500)
 		
 		</script>
 	</head>
 	<body>
-		<h1>Still uploading!</h1>
+		<h2>Still uploading!</h2>
 		<p>
-			The file <tt>{{name}}</tt> ({{size}} bytes) has been uploading for {{date|timesince}} to {{host}}, hopefully it'll finish soon.
+			The file <tt>{{name}}</tt> ({{size}} bytes) has been uploading for <span id="since">{{date|timesince}}</span> to {{host}}, hopefully it'll finish soon. 
+			<b>When the file is done uploading, a link will appear below.</b> 
 		</p>
-		<p>
-			When the file is done uploading, a link will appear below. <input type="checkbox" id="annoy"> <label for="annoy">Check this box to get alerted when it's done.</label>
+		<p><input type="checkbox" id="annoy"> <label for="annoy">Alert me when it's done.</label> <div id="last"></div>
 		</p>
 		<div id="link" style="display:none">
-			<a href="/{{key}}">Download/Open {{name}}</a>
+			<h1><a href="/{{key}}">{{name}}</a></h1>
+		</div>
+		<hr>
+		<div style="font-size: small">
+		  Part of the <a href="https://github.com/antimatter15/drag2up">Drag2Up project</a>. Written by <a href="http://twitter.com/antimatter15">@antimatter15</a> (please follow me on twitter). Email comments and concerns to antimatter15@gmail.com.
 		</div>
 	</body>
 </html>
