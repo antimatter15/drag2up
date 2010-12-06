@@ -22,9 +22,9 @@ function uploadGist(file, callback){
   var data = {};
   data['files['+encodeURIComponent(file.name||'untitled')+']'] = atob(file.data.replace(/^data.+base64,/i,''));
 
-  postJSON("https://gist.github.com/api/v1/json/new", data, function(data){
+  postJSON(https()+"gist.github.com/api/v1/json/new", data, function(data){
     if(data){
-      callback('https://gist.github.com/'+data.gists[0].repo)
+      callback(https()+'gist.github.com/'+data.gists[0].repo)
     }else{
       callback('error: could not upload github gist');
     }

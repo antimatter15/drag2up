@@ -2,10 +2,10 @@ function uploadHotfile(file, callback){
   //http://api.hotfile.com/?action=getuploadserver
 
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "https://api.hotfile.com/?action=getuploadserver");  
+	xhr.open("GET", https()+"api.hotfile.com/?action=getuploadserver");  
 	xhr.send();
 	xhr.onload = function(){
-		var post_url = 'https://'+xhr.responseText.trim()+'/upload.cgi?'+(+new Date);
+		var post_url = https()+xhr.responseText.trim()+'/upload.cgi?'+(+new Date);
 		
 	  var xhr2 = new XMLHttpRequest();
 	  xhr2.open("POST", post_url);  

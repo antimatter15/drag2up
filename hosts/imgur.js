@@ -17,7 +17,7 @@ function uploadImgur(file, callback){
 		}
 	  };
 	}
-	postJSON("https://api.imgur.com/2/upload.json", {
+	postJSON(https()+"api.imgur.com/2/upload.json", {
         key: '390230bc94c4cc1354bcdb2dae0b9afd', /*should i invent a meaningless means of obfuscating this? no.*/
         type: 'base64',
         name: file.name,

@@ -27,16 +27,27 @@ function params(obj){
 var tabqueue = {};
 
 
+function https(){
+  if(localStorage.no_https == 'on'){
+    return 'http://'; //idk why someone would want this
+  }
+  return 'https://';
+}
+
 function handleRequest(request, sender, sendResponse){
   console.log(request)
-  var instant = localStorage.instant; //woot. its called instant because google made google instant.
-  if(instant === undefined) instant = true;
+  var instant = (localStorage.instant || 'on') == 'on'; //woot. its called instant because google made google instant.
+ 
 
   if(request.action == 'initupload'){
     if(instant){
       var xhr = new XMLHttpRequest();
-      xhr.open('GET','http://drag2up.appspot.com/new?'+params({
-        host: hostName({name:request.name, type: request.type, data:"data:application/octet-stream;base64,VDdIVVQV8WxsZWR3aXRo4HZpbA="}),
+      xhr.open('GET','https://drag2up.appspot.com/new?'+params({
+        host: hostName({
+          name:request.name, 
+          type: request.type, 
+          data:"data:application/octet-stream;base64,VDdIVVQV8WxsZWR3aXRo4HZpbA="
+        }),
         size: request.size,
         name: request.name
       }), true);
@@ -44,7 +55,7 @@ function handleRequest(request, sender, sendResponse){
         var parts = xhr.responseText.split(',');
         sendResponse({
           callback: request.callback,
-          url: 'http://drag2up.appspot.com/'+parts[0],
+          url: https()+'drag2up.appspot.com/'+parts[0],
           code: parts[1]
         });
         var cb;
@@ -185,6 +196,7 @@ function uploadData(file, callback){
     imgur: uploadImgur,
     imageshack: uploadImageshack,
     dropbox: uploadDropbox,
+    pastebin: uploadPastebin,
     cloudapp: uploadCloudApp
   };
   
@@ -192,7 +204,7 @@ function uploadData(file, callback){
   if(fn){
     fn(file, callback);
   }else{
-    callback('error: no host function for type '+typehost[type]+' for file type '+type);
+    callback('error: no host function for type '+hostName(file)+' for file type '+fileType(file));
   }
   
   //uploadDataURL(file, callback);
@@ -216,7 +228,7 @@ function uploadDataURL(file, callback){
 
 function linkData(id, url){
     var xhr = new XMLHttpRequest();
-    xhr.open('GET','http://drag2up.appspot.com/update/'+filetable[id].key+'/'+filetable[id].code+'?'+params({
+    xhr.open('GET',https()+'drag2up.appspot.com/update/'+filetable[id].key+'/'+filetable[id].code+'?'+params({
       url: url
     }), true);
     xhr.onload = function(e){

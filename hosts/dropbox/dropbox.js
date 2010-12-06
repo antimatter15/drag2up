@@ -18,7 +18,7 @@ function uploadDropbox(file, callback){
             console.log('got stuffs now');
             //http://dl.dropbox.com/u/1024307/drag2up/testing.txt
             //console.log(arguments)
-            var url = "http://dl.dropbox.com/u/"+user.uid+"/"+folder+fname;
+            var url = https()+"dl.dropbox.com/u/"+user.uid+"/"+folder+fname;
             callback(url)
           })
         });

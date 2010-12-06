@@ -1,12 +1,22 @@
-#### Works
+#### Works (Textarea)
+http://www.simplemachines.org/community/ - BBCode Detection works too
+http://www.phpbb.com/community - BBCode detection also works
+
+#### Works (WYSIWYG)
 
 http://markitup.jaysalvat.com/examples/html/
 http://batiste.dosimple.ch/blog/posts/2007-09-11-1/rich-text-editor-jquery.html
-http://akzhan.github.com/jwysiwyg/examples/01-basic.html - Note: oddly small drop target
+http://akzhan.github.com/jwysiwyg/examples/01-basic.html
 http://remiya.com/cms/projects/jquery-plugins/htmlbox/demo_full.html
 http://files.wymeditor.org/wymeditor/trunk/src/examples/13-silver-skin.html - Note: line insertion oddities
 http://tinymce.moxiecode.com/examples/full.php
 http://ckeditor.com/demo
 http://developer.yahoo.com/yui/examples/editor/editor_adv_editor.html
 http://xinha.raimundmeyer.de/x_examples/ext_example.html - Note: only works after editor has focus
-http://cheeaun.github.com/mooeditable/ - Note: oddly small drop target
+http://cheeaun.github.com/mooeditable/
+
+http://antimatter15.com/wp/wp-admin (Private URL)
+
+#### Does not work (WYSIWYG)
+https://docs.google.com/ - Does not trigger
+http://writer.zoho.com/ - Does not trigger

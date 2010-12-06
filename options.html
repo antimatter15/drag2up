@@ -163,16 +163,20 @@
 		$(".panel.binary").find("p").html('').append($(document.getElementsByName(bname)[0]).clone())
 		$(".panel.text").find("p").html('').append($(document.getElementsByName(tname)[0]).clone())
 		$(".panel.image").find("p").html('').append($(document.getElementsByName(iname)[0]).clone())
-		var instant = localStorage.instant; //woot. its called instant because google made google instant.
-    if(instant === undefined) instant = true;
-
+		var instant = (localStorage.instant || 'on') == 'on'; //woot. its called instant because google made google instant.
+    
 		$('#instant').attr('checked', instant);
 		$('#instant').change(function(){
-		  localStorage.instant = $('#instant').attr('checked')
+		  localStorage.instant = $('#instant').attr('checked')?'on':'off'
 		})
 		
 		$('.directions').disableSelection();
 		
+    $('#insecure').change(function(){
+		  localStorage.no_https = $('#insecure').attr('checked')?'on':'off';
+		})
+    $('#insecure').attr('checked', localStorage.no_https == 'on');
+    
 		window.ondragstart = function(e){
 		  e.preventDefault();
 		}
@@ -207,7 +211,10 @@
 </div>
 <div style="margin-right:240px;">
 <p>
-  <h3 style="display:inline">Basic</h3><input type="checkbox" id="instant"> <label for="instant">Instantly return URL while uploading occurs in the background.</label>
+  <h3 style="display:inline">Basic</h3>
+  
+  <input type="checkbox" id="instant"> <label for="instant">Instantly return URL while uploading occurs in the background.</label>
+  <input type="checkbox" id="insecure"> <label for="insecure">Prefer insecure http://.</label>
 </p>
 
 <div style="width: 100%;float:left;margin-bottom: 30px">

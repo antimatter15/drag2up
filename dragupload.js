@@ -47,7 +47,10 @@ function initialize(){
 
   // determines if an element can be droppable based on several conditions
   function isDroppable(el){
-    var tag = el.tagName.toLowerCase(), A;
+    if(!el) return false;
+    var tag = 'unknown', A;
+    if(el.tagName && typeof el.tagName.toLowerCase == 'function') tag = el.tagName.toLowerCase();
+    
     //if(tag == 'div' && dropTargets.indexOf(el) != -1) return 3;
     if(((tag == 'input' && el.type.toLowerCase() == 'text') || tag == 'textarea') && (el.disabled == false && el.readOnly == false)) A =  1;
     if(el.isContentEditable && el.parentNode.isContentEditable == false) A = 2.5; //aaah! close your eyes! it's too hacky!
@@ -134,6 +137,26 @@ function initialize(){
       if(cmd == 'root_reactivate'){
         if(isDragging == false) trickleMessage('reactivate');
         lastDrag = (+new Date); //TODO; utilize the value that got passed
+        
+        
+        
+        
+        
+        /*
+         * 
+         * 
+         * 
+         * TODO:
+         * TODO:
+         * 
+         * write a little box that appears that you use to get at settings
+         * 
+         * possibly: hover over me for 3 seconds and then it'll be done once you redirect?
+         * 
+         * i have no clue
+         * 
+         * 
+         * */
       }else if(cmd == 'root_deactivate'){
         var lastDeactivation = +new Date;
         setTimeout(function(){
@@ -157,9 +180,11 @@ function initialize(){
     console.log('insertLink',iId, el, url, type);
     try{
       el.focus();
+      /*
       var evt = el.ownerDocument.createEvent('MouseEvents');
       evt.initMouseEvent('click', true, true, el.ownerDocument.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
       el.dispatchEvent(evt);
+      */
       el.focus();
     }catch(err){};
     //try{el.select();}catch(err){};
