@@ -75,22 +75,32 @@ class LinkHandler(webapp.RequestHandler):
 				which seems to be a trend, so instead, I'll include this 
 				self referential message about trends in 404 pages.""")
 				return
-			if entity.val is None:
-				template_values = {
-				'host': entity.host,
-				'key': name,
-				'name': entity.name,
-				'date': entity.date,
-				'size': entity.size,
-				}
-				
+			link = entity.val
+			
+			from datetime import datetime, timedelta
+			
+			if datetime.now() - entity.date > timedelta(hours = 2):
+			  link = "error: upload timeout. over two hours since uploading began."
+			  
+			template_values = {
+			'host': entity.host,
+			'key': name,
+			'name': entity.name,
+			'date': entity.date,
+			'size': entity.size,
+			'link': link
+			}
+			
+			if link is None:
 				path = os.path.join(os.path.dirname(__file__), 'uploading.html')
 				self.response.out.write(template.render(path, template_values))
 				return
-			memcache.add(name, entity.val)
-			link = entity.val
-		if link.startswith("error:"):
-			self.response.out.write(link)
+			elif link.startswith("error:"):
+			  path = os.path.join(os.path.dirname(__file__), 'error.html')
+				self.response.out.write(template.render(path, template_values))
+			else:
+			  memcache.add(name, entity.val) #yay good data!
+			  
 		else:
 			self.redirect(link)
 		
