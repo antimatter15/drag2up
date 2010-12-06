@@ -33,7 +33,6 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
   if(request.action == 'initupload'){
     if(instant){
-    
       var xhr = new XMLHttpRequest();
       xhr.open('GET','http://drag2up.appspot.com/new?'+params({
         host: hostName({name:request.name, type: request.type, data:"this is why this is \x0a estimate of the final host. you cant \xbe certain. without the actual file. \x50 so this has tons of non ascii characters so it liberally says binary."}),
@@ -75,7 +74,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
           size: request.size
         }, function(url){
         var cb = function(){
-          if(instant){      
+          if(instant){
             linkData(request.id, url);
           }else if(filetable[request.id]){ //non-instnat
             filetable[request.id].fn({
@@ -95,17 +94,18 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     
     if(request.url){
       if(/^data:/.test(request.url)){
+        console.log('data url link');
         //reencode all the data urls because they may be escape encoded and to extract the mime type
-        var parts = request.url.match(/^data:(.+),/)[0].split(';');
+        var parts = request.url.match(/^data:(.+),/)[1].split(';');
         var data = request.url.substr(request.url.indexOf(',')+1)
         var mime = parts[0], b64 = parts.indexOf('base64') != -1;
         var bin = '';
         if(b64){
-          data = atob(data)
+          bin = atob(data)
         }else{
-          data = unescape(data);
+          bin = unescape(data);
         }
-        var enc = 'data:'+mime+';base64,'+btoa(data);
+        var enc = 'data:'+mime+';base64,'+btoa(bin);
         request.type = mime;
         request.data = enc;
         
