@@ -19,10 +19,10 @@
 		var interval = 3133.7;
 		var yay = false;
 		var lastChecked = +new Date;
-		var uploaded = new Date("{{date}}".replace(/\.\d+$/g,''));
+		var uploaded = new Date("{{date}}".replace(/\.\d+$/g,'')+' GMT-0000 (UTC)');
 		
 		function relative(time){
-		  if(time < 60) return time + 'seconds';
+		  if(time < 60) return time + ' seconds';
 		  if(time < 60 * 60) return Math.floor(time/60) + ' minutes ' + (time%60) + ' seconds';
 		  if(time < 60 * 60 * 24) return Math.floor(time/60/60) + ' hours';
 		  if(time < 60 * 60 * 24 * 365) return Math.floor(time/60/60/24) + ' days';
