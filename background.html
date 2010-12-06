@@ -149,14 +149,15 @@ function fileType(file){
 	}else if(text_ext.indexOf(file.name.replace(/^.*\.(\w+?)$/,'$1')) != -1){
 	  return 'text'
 	}else{
-	  var txt =  atob(file.data.replace(/^data.+base64,/i,'').substr(0,512));
+	  var src = atob(file.data.replace(/^data.+base64,/i,''));
+	  var txt = src.substr(0,512) + src.slice(-512);
 	  for(var i = 0, isAscii = true; i < 128; i++){
 	    if(txt.charCodeAt(i) > 128){
 	     isAscii = false;
 	     continue
       }
     }
-    if(isAscii) return 'text';
+    if(isAscii && file.size < 1024 * 300) return 'text';
 	}
 	return 'binary'
 }
