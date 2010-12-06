@@ -13,7 +13,6 @@
 <script src="hosts/dropbox/modern_dropbox.js"></script>
 <script src="hosts/dropbox/dropbox.js"></script>
 <script>
-var instant = false; //woot. its called instant because google made google instant.
 
 
 var filetable = {};
@@ -29,6 +28,9 @@ var tabqueue = {};
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   console.log(request)
+  var instant = localStorage.instant; //woot. its called instant because google made google instant.
+  if(instant === undefined) instant = true;
+
   if(request.action == 'initupload'){
     if(instant){
       var xhr = new XMLHttpRequest();
@@ -128,12 +130,60 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
 
 
+function fileType(file){
+  var text_ext = 'log,less,sass,coffee,yaml,json,md,css,cfm,yaws,html,htm,xhtml,js,pl,php,php4,php3,phtml,py,rb,rhtml,xml,rss,svg,cgi'.split(',');
+  if(file.type.indexOf('image/') == 0){
+	  //image type
+	  return 'image'
+	}else if(file.type.indexOf('text/') == 0){
+	  return 'text'
+	}else if(text_ext.indexOf(file.name.replace(/^.*\.(\w+?)$/,'$1')) != -1){
+	  return 'text'
+	}else{
+	  var txt =  atob(file.data.replace(/^data.+base64,/i,'').substr(0,512));
+	  for(var i = 0, isAscii = true; i < 128; i++){
+	    if(txt.charCodeAt(i) > 128){
+	     isAscii = false;
+	     continue
+      }
+    }
+    if(isAscii) return 'text';
+	}
+	return 'binary'
+}
+
 
 function uploadData(file, callback){
   //segregate data types, choose blah blah, etc.
+  var typehost = {
+    binary: localStorage.binhost || 'hotfile',
+	  text: localStorage.texhost || 'gist',
+	  image: localStorage.imghost || 'imgur'
+	}
+	
+	var type = fileType(file);
+	
+  var hostfn = {
+    hotfile: uploadHotfile,
+    gist: uploadGist,
+    imgur: uploadImgur,
+    imageshack: uploadImageshack,
+    dropbox: uploadDropbox,
+    cloudapp: uploadCloudApp
+  };
   
-  uploadDataURL(file, callback);
+  var fn = hostfn[typehost[type]];
+  if(fn){
+    fn(file, callback);
+  }else{
+    callback('error: no host function for type '+typehost[type]+' for file type '+type);
+  }
+  
+  //uploadDataURL(file, callback);
 }
+
+
+
 
 
 function uploadDataURL(file, callback){
@@ -141,6 +191,8 @@ function uploadDataURL(file, callback){
   setTimeout(function(){
     callback(file.data.replace('data:base64','data:text/plain;base64'));
   },1337);
+  
+  
 }
 
 

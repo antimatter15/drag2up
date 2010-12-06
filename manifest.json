@@ -5,12 +5,14 @@
 	"background_page": "background.html",
   "permissions": [
     "*://*/",
-    "tabs"
+    "tabs",
+    "notifications"
   ],
   "page_action": {
     "default_icon": "icon/22.png",
     "default_title": "Uploading files..."
   },
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

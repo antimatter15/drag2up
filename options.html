@@ -150,6 +150,13 @@
 		$(".panel.binary").find("p").html('').append($(document.getElementsByName(bname)[0]).clone())
 		$(".panel.text").find("p").html('').append($(document.getElementsByName(tname)[0]).clone())
 		$(".panel.image").find("p").html('').append($(document.getElementsByName(iname)[0]).clone())
+		var instant = localStorage.instant; //woot. its called instant because google made google instant.
+    if(instant === undefined) instant = true;
+
+		$('#instant').attr('checked', instant);
+		$('#instant').change(function(){
+		  localStorage.instant = $('#instant').attr('checked')
+		})
 		
 	});
 	</script>
@@ -182,13 +189,14 @@
 </div>
 <div style="margin-right:220px;">
 <p>
-  <h3 style="display:inline">Basic</h3><input type="checkbox" id="instant" checked> <label for="instant">Enable Instant mode</label>
+  <h3 style="display:inline">Basic</h3><input type="checkbox" id="instant"> <label for="instant">Enable Instant - Instantly return URL while uploading occurs in the background.</label>
 </p>
 <p>
   <h3 style="display:inline">Hosts</h3>
 	Here you can configure which hosts you'd like to use for different types of files. 
 	The three types of files are Text, Image and Other (Binary). Some hosts, like imgur and pastebin only
 	support a certain type of file, whereas sites like Dropbox support all files.
+	<i>Drag and drop the hosts into the respective squares on the right.</i>
 </p>
 <div class="filehost image" name="imgur">
 	<img src="hosts/logo/imgur.png">
