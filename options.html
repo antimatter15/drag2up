@@ -172,7 +172,7 @@
 	});
 	</script>
 
-<h1>Drag2Up Settings</h1>
+<h1>drag2up settings</h1>
 <div style="display:none">
 	<div class="has">
 		<span class="text">Text</span>
@@ -183,31 +183,33 @@
 </div>
 <div id="panelcontainer">
 <div class="binary panel">
-	<h4>Binary File Host</h4>
+	<h4>Current Binary Host</h4>
 	<p>binary</p>
 </div>
 
 <div class="text panel">
-	<h4>Text  File Host</h4>
+	<h4>Current Text  Host</h4>
 	<p>text</p>
 </div>
 
 
 <div class="image panel">
-	<h4>Image File Host</h4>
+	<h4>Current Image Host</h4>
 	<p>image</p>
 </div>
 </div>
-<div style="margin-right:220px;">
+<div style="margin-right:240px;">
 <p>
   <h3 style="display:inline">Basic</h3><input type="checkbox" id="instant"> <label for="instant">Instantly return URL while uploading occurs in the background.</label>
 </p>
-<p>
-  <h3 style="display:inline">Hosts</h3>
-	Here you can configure which hosts you'd like to use for different types of files. 
-	The three types of files are Text, Image and Other (Binary). Some hosts, like imgur and pastebin only
-	support a certain type of file, whereas sites like Dropbox support all files.
-</p>
+
+<div style="width: 100%;float:left;margin-bottom: 30px">
+<div class="directions">
+<img src="icon/64r.png" style="float:right">
+<b>Drag hosts</b> to the slots on the right.
+</div>
+
+
 <div class="filehost image" name="imgur">
 	<img src="hosts/logo/imgur.png">
 </div>
@@ -233,10 +235,10 @@
 	<img src="hosts/logo/hotfile.png">
 </div>
 
-<div class="directions">
-<img src="icon/64r.png" style="float:right">
-<b>Drag hosts</b> to the slots on the right.
 </div>
+<p>
+  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The source code is available on <a href="https://github.com/antimatter15/drag2up">github</a>.
+</p>
 
 </div>
 </body>
