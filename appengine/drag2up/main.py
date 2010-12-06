@@ -4,9 +4,15 @@ from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
+from google.appengine.api import channel
 from google.appengine.api import memcache
 import random
 import os
+
+class Channels(db.Model):
+  name = db.StringProperty()
+  token = db.StringProperty()
+
 
 #http://stackoverflow.com/questions/2350454/simplest-way-to-store-a-value-in-google-app-engine-python
 class Link(db.Model):
@@ -43,7 +49,7 @@ class Link(db.Model):
 
 class CreateHandler(webapp.RequestHandler):
   def get(self):
-    (name, code) = Link.create(name = self.request.get('name'), host = self.request.get('host'), size = long(self.request.get('size','0')));
+    (name, code) = Link.create(name = self.request.get('name','untitled'), host = self.request.get('host','the internets'), size = long(self.request.get('size','0')));
     self.response.headers['content-type'] = 'text/plain'
     self.response.out.write(name +','+code)
     
@@ -55,8 +61,16 @@ class MainHandler(webapp.RequestHandler):
 class UpdateHandler(webapp.RequestHandler):
   def get(self, name, code):
     url = self.request.get('url')
-    Link.set(name, code, url)
-    self.response.out.write('done')
+    if Link.set(name, code, url) is True:
+      self.response.out.write('done')
+      #stupid channel api makes everything needlessly complicated
+      query = Channels.all().filter('name =', name)
+      results = query.fetch(1000)
+      for viewer in results:
+        channel.send_message(viewer.token, url)
+        viewer.delete()
+    else:
+      self.response.out.write('fail')
 
 class PollHandler(webapp.RequestHandler):
   def get(self, name):
@@ -96,12 +110,22 @@ class LinkHandler(webapp.RequestHandler):
       
 
       if link is None:
+        clientid = name+'uid'+str(random.random())
+        Channels(name = name, token = clientid).put()
+        template_values['token']  = channel.create_channel(clientid)
         path = os.path.join(os.path.dirname(__file__), 'uploading.html')
         self.response.out.write(template.render(path, template_values))
+        
         return
+        
       elif link.startswith("error:"):
         path = os.path.join(os.path.dirname(__file__), 'error.html')
         self.response.out.write(template.render(path, template_values))
+        query = Channels.all().filter('name =', name)
+        results = query.fetch(1000)
+        for viewer in results:
+          channel.send_message(viewer.token, link)
+          viewer.delete()
       else:
         memcache.add(name, entity.val) #yay good data!
         self.redirect(link)

@@ -1,76 +1,76 @@
 <!doctype html>
 <html>
-	<head>
-		<title>{{name}}</title>
-		<style>
-			body {
-				font-family: sans-serif, helvetica, arial;
-				margin-right: 50px;
-				margin-left: 120px;
-				background: url(static/64.png) no-repeat;
-				background-position: 30px 30px;
-				
-			}
-			label {
-			  font-weight: bold;
-			}
-		</style>
-		<script>
-		var interval = 3133.7;
-		var yay = false;
-		var lastChecked = +new Date;
-		var uploaded = new Date();
-		uploaded.setTime(1000 * parseInt("{{timestamp}}"))
-		function relative(time){
-		  if(time < 60) return time + ' seconds';
-		  if(time < 60 * 60) return Math.floor(time/60) + ' minutes ' + (time%60) + ' seconds';
-		  if(time < 60 * 60 * 24) return Math.floor(time/60/60) + ' hours';
-		  if(time < 60 * 60 * 24 * 365) return Math.floor(time/60/60/24) + ' days';
-		}
-		
-		setTimeout(function(){
-			if(yay) return;
-			var x = new XMLHttpRequest();
-			x.open('GET', '/poll/{{key|addslashes}}', true);
-			x.send(null);
-			lastChecked = +new Date;
-			x.onload = function(){
-				if(x.responseText == 'yay'){
-					document.getElementById('link').style.display = 'block'
-					yay = true;
-					if(document.getElementById('annoy').checked) alert('{{name|addslashes}} is done uploading');
-				}
-			}
-			setTimeout(arguments.callee, interval *= 1.337);
-		},interval);
-		
-		setInterval(function(){
-		  var last = Math.floor((new Date - lastChecked)/1000);
-		  if(Math.round(interval/1000 - last + 1) > -1){
-		    document.getElementById('last').innerHTML = 'Upload status was last checked '+last+' seconds ago and will be checked in '+Math.round(interval/1000 - last + 1);
-		  }else{
-        document.getElementById('last').innerHTML = 'Upload status checking server failure';
+  <head>
+    <title>{{name}}</title>
+    <script src='/_ah/channel/jsapi'></script>
+    <style>
+      body {
+        font-family: sans-serif, helvetica, arial;
+        margin-right: 50px;
+        margin-left: 120px;
+        background: url(static/64.png) no-repeat;
+        background-position: 30px 30px;
+        
       }
-		  
-		  document.getElementById('since').innerHTML = relative(Math.floor((+new Date - uploaded)/1000));
+      label[for=annoy] {
+        font-weight: bold;
+      }
+    </style>
+    <script>
+    var uploaded = new Date();
+    uploaded.setTime(1000 * parseInt("{{timestamp}}"))
+    function relative(time){
+      if(time < 60) return time + ' seconds';
+      if(time < 60 * 60) return Math.floor(time/60) + ' minutes ' + (time%60) + ' seconds';
+      if(time < 60 * 60 * 24) return Math.floor(time/60/60) + ' hours';
+      if(time < 60 * 60 * 24 * 365) return Math.floor(time/60/60/24) + ' days';
+    }
+    
+		var fourchan = new goog.appengine.Channel("{{token}}");
+		fourchan.open({
+			'onopen': function(){},
+			'onmessage': function(obj){
+				var msg = obj.data
+				if(msg.indexOf('error:') == 0){
+					setTimeout(function(){
+						location.reload(true)
+					}, 5555); //wait a bit before reloading for server to be all servererey
+				}else{
+					document.getElementById('link').style.display = 'block'
+					document.getElementById('dlink').href = msg;
+					document.getElementById('progress').innerHTML = 'Done uploading!';
+					if(document.getElementById('annoy').checked) alert('{{name|addslashes}} is done uploading');
+					if(document.getElementById('autodown').checked) location = msg;
+				}
+			},
+			'onerror': function(){},
+			'onclose': function(){}
+		})
+    
+    setInterval(function(){
+        document.getElementById('since').innerHTML = relative(Math.floor((+new Date - uploaded)/1000));
     },500)
-		
-		</script>
-	</head>
-	<body>
-		<h2>Still uploading!</h2>
-		<p>
-			The file <tt>{{name|escape}}</tt> ({{size|filesizeformat}}) has been uploading to {{host|escape}} for <span id="since">{{date|timesince}}</span>, hopefully it'll finish soon. 
-			<b>When the file is done uploading, a link will appear below.</b> 
-		</p>
-		<p><input type="checkbox" id="annoy"> <label for="annoy">Alert me when it's done.</label> <div id="last"></div>
-		</p>
-		<div id="link" style="display:none">
-			<h1><a href="/{{key}}">{{name|escape}}</a></h1>
-		</div>
-		<hr>
-		<div style="font-size: small">
-		  Part of the <a href="https://github.com/antimatter15/drag2up">Drag2Up project</a>. Written by <a href="http://twitter.com/antimatter15">@antimatter15</a> (please follow me on twitter). Email comments and concerns to antimatter15@gmail.com.
-		</div>
-	</body>
+    
+    </script>
+  </head>
+  <body>
+    <h2 id="progress">Still uploading!</h2>
+    <p>
+      The file <tt>{{name|escape}}</tt> ({{size|filesizeformat}}) has been uploading to {{host|escape}} for <span id="since">{{date|timesince}}</span>, and will hopefully finish soon. 
+      <b>When the file is done uploading, a link will appear below.</b> There is no need to refresh as the upload status is being streamed in real time.
+    </p>
+    <p>
+    <input type="checkbox" id="annoy"> <label for="annoy">Alert me when it's done.</label> 
+    <input type="checkbox" id="autodown"> <label for="autodown">Automatically begin downloading when it's done.</label>  <i>(Keep this page open!)</i>
+    </p>
+
+    
+    <div id="link" style="display:none">
+      <h1><a href="/{{key}}" id="dlink">{{name|escape}}</a></h1>
+    </div>
+    <hr>
+    <div style="font-size: small">
+      Part of the <a href="https://github.com/antimatter15/drag2up">Drag2Up project</a>. Written by <a href="http://twitter.com/antimatter15">@antimatter15</a> (please follow me on twitter). Email comments and concerns to antimatter15@gmail.com.
+    </div>
+  </body>
 </html>
