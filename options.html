@@ -75,6 +75,7 @@
 		height: 100px;
 		background-color: hsl(120, 73%, 90%);
 		margin: 10px;
+		border: 1px solid hsl(120, 73%, 70%);
 		border-radius: 10px;
 	}
 	
@@ -84,6 +85,7 @@
 		padding: 20px;
 		height: 100px;
 		background-color: hsl(240, 73%, 90%);
+		border: 1px solid hsl(240, 73%, 70%);
 		margin: 10px;
 		border-radius: 10px;
 	}
@@ -169,6 +171,11 @@
 		  localStorage.instant = $('#instant').attr('checked')
 		})
 		
+		$('.directions').disableSelection();
+		
+		window.ondragstart = function(e){
+		  e.preventDefault();
+		}
 	});
 	</script>
 
@@ -183,18 +190,18 @@
 </div>
 <div id="panelcontainer">
 <div class="binary panel">
-	<h4>Current Binary Host</h4>
+	Current <b>Binary</b> File  Host
 	<p>binary</p>
 </div>
 
 <div class="text panel">
-	<h4>Current Text  Host</h4>
+	Current <b>Text</b>  File  Host
 	<p>text</p>
 </div>
 
 
 <div class="image panel">
-	<h4>Current Image Host</h4>
+	Current <b>Image</b> File Host
 	<p>image</p>
 </div>
 </div>
