@@ -31,14 +31,14 @@
 		setTimeout(function(){
 			if(yay) return;
 			var x = new XMLHttpRequest();
-			x.open('GET', '/poll/{{key}}', true);
+			x.open('GET', '/poll/{{key|escapejs}}', true);
 			x.send(null);
 			lastChecked = +new Date;
 			x.onload = function(){
 				if(x.responseText == 'yay'){
 					document.getElementById('link').style.display = 'block'
 					yay = true;
-					if(document.getElementById('annoy').checked) alert('{{name}} is done uploading');
+					if(document.getElementById('annoy').checked) alert('{{name|escapejs}} is done uploading');
 				}
 			}
 			setTimeout(arguments.callee, interval *= 1.337);
@@ -60,13 +60,13 @@
 	<body>
 		<h2>Still uploading!</h2>
 		<p>
-			The file <tt>{{name}}</tt> ({{size}} bytes) has been uploading for <span id="since">{{date|timesince}}</span> to {{host}}, hopefully it'll finish soon. 
+			The file <tt>{{name|escape}}</tt> ({{size|filesizeformat}}) has been uploading for <span id="since">{{date|timesince}}</span> to {{host|escape}}, hopefully it'll finish soon. 
 			<b>When the file is done uploading, a link will appear below.</b> 
 		</p>
 		<p><input type="checkbox" id="annoy"> <label for="annoy">Alert me when it's done.</label> <div id="last"></div>
 		</p>
 		<div id="link" style="display:none">
-			<h1><a href="/{{key}}">{{name}}</a></h1>
+			<h1><a href="/{{key}}">{{name|escape}}</a></h1>
 		</div>
 		<hr>
 		<div style="font-size: small">
