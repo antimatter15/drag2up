@@ -33,9 +33,10 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
   if(request.action == 'initupload'){
     if(instant){
+    
       var xhr = new XMLHttpRequest();
       xhr.open('GET','http://drag2up.appspot.com/new?'+params({
-        host: "TODO: host",
+        host: hostName({name:request.name, type: request.type, data:"this is why this is \x0a estimate of the final host. you cant \xbe certain. without the actual file. \x50 so this has tons of non ascii characters so it liberally says binary."}),
         size: request.size,
         name: request.name
       }), true);
@@ -152,9 +153,7 @@ function fileType(file){
 	return 'binary'
 }
 
-
-function uploadData(file, callback){
-  //segregate data types, choose blah blah, etc.
+function hostName(file){
   var typehost = {
     binary: localStorage.binhost || 'hotfile',
 	  text: localStorage.texhost || 'gist',
@@ -162,6 +161,14 @@ function uploadData(file, callback){
 	}
 	
 	var type = fileType(file);
+	
+	return typehost[type]
+}
+
+
+function uploadData(file, callback){
+  //segregate data types, choose blah blah, etc.
+
 	
   var hostfn = {
     hotfile: uploadHotfile,
@@ -172,7 +179,7 @@ function uploadData(file, callback){
     cloudapp: uploadCloudApp
   };
   
-  var fn = hostfn[typehost[type]];
+  var fn = hostfn[hostName(file)];
   if(fn){
     fn(file, callback);
   }else{
