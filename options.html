@@ -78,9 +78,20 @@
 		border-radius: 10px;
 	}
 	
+	.directions {
+		float: left;
+		width: 150px;
+		padding: 20px;
+		height: 100px;
+		background-color: hsl(240, 73%, 90%);
+		margin: 10px;
+		border-radius: 10px;
+	}
+	
 	.filehost img {
 		width: 100%;
 		border-radius: 5px;
+		
 	}
 	
 	
@@ -189,14 +200,13 @@
 </div>
 <div style="margin-right:220px;">
 <p>
-  <h3 style="display:inline">Basic</h3><input type="checkbox" id="instant"> <label for="instant">Enable Instant - Instantly return URL while uploading occurs in the background.</label>
+  <h3 style="display:inline">Basic</h3><input type="checkbox" id="instant"> <label for="instant">Instantly return URL while uploading occurs in the background.</label>
 </p>
 <p>
   <h3 style="display:inline">Hosts</h3>
 	Here you can configure which hosts you'd like to use for different types of files. 
 	The three types of files are Text, Image and Other (Binary). Some hosts, like imgur and pastebin only
 	support a certain type of file, whereas sites like Dropbox support all files.
-	<i>Drag and drop the hosts into the respective squares on the right.</i>
 </p>
 <div class="filehost image" name="imgur">
 	<img src="hosts/logo/imgur.png">
@@ -223,6 +233,10 @@
 	<img src="hosts/logo/hotfile.png">
 </div>
 
+<div class="directions">
+<img src="icon/64r.png" style="float:right">
+<b>Drag hosts</b> to the slots on the right.
+</div>
 
 </div>
 </body>
