@@ -19,7 +19,7 @@
 		var interval = 3133.7;
 		var yay = false;
 		var lastChecked = +new Date;
-		var uploaded = new Date("{{date}}"||0);
+		var uploaded = new Date("{{date}}".replace(/\.\d+$/g,''));
 		
 		function relative(time){
 		  if(time < 60) return time + 'seconds';
