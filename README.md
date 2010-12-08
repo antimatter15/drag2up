@@ -15,8 +15,8 @@ Dropbox, CloudApp, hotfile and Imageshack rely on a xhr.sendMultipart function t
 2. on the window.top content script instance, once the drag begin message is recieved, begin a "trickle" message where you postMessage to all immediately accessible frames to recursively attempt to do the trickle. Each node that receives the message sets the isDragging variable to true and loops through all elements on the page detecting which ones are droppable. render the targets.
 3. Rendered targets are divs with rounded corners and a translucent green background. On hover, it changes opacity. When it's dropped, the color becomes blue. A message is sent via postMessage to the page top first describing the file properties, name, size, type. Then the file is read and another message is sent including the base64-data url encoded file contents.
 4. The page top uses chrome.extension.sendRequest to communicate with the background page
-5-instant. The background page requests stuff with the drag2up.appspot.com api in order to create a new upload, stores the nuclear launch codes that are returned, and sends the callback.
-5-slow. The background page waits for the file, picks the appropriate host based on localStorage data and filetype guessing using mimetypes and other magic. The file is then uploaded to the server, and the response link is sent to the callback.
+5. (instant) The background page requests stuff with the drag2up.appspot.com api in order to create a new upload, stores the nuclear launch codes that are returned, and sends the callback.
+5. (slow) The background page waits for the file, picks the appropriate host based on localStorage data and filetype guessing using mimetypes and other magic. The file is then uploaded to the server, and the response link is sent to the callback.
 6.the response is trickled down to all the frames where the appropriate listener is dispatched to add the url/link/image to an element. 
 
 7-instant. The background page gets the second message with the file contents, picks a host based on the data, filetype, and settings, uploads to the host, and gets the url.
