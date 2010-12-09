@@ -9,8 +9,7 @@
     "notifications"
   ],
   "page_action": {
-    "default_icon": "icon/22.png",
-    "default_title": "Uploading files..."
+    "default_icon": "icon/22.png"
   },
   "options_page": "options.html",
   "content_scripts": [

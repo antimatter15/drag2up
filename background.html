@@ -60,6 +60,7 @@ function handleRequest(request, sender, sendResponse){
     var tab = sender.tab.id;
     chrome.pageAction.show(tab);
     tabqueue[tab] = (tabqueue[tab] || 0) + 1;
+    chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
     
     uploadData(file, function(url){
       if(instant){
@@ -68,6 +69,7 @@ function handleRequest(request, sender, sendResponse){
         sendResponse({callback: request.callback, url: url})
       }
       tabqueue[tab]--;
+      chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
       if(tabqueue[tab] == 0) chrome.pageAction.hide(tab);
     });
   
@@ -102,6 +104,12 @@ function instantInit(file, callback){
   xhr.send();
 }
 
+//this webworker is totally overkill
+var bb = new BlobBuilder();
+bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
+//bb.append("onmessage = function(e) {postMessage(e.data.split('').map(function(a){return String.fromCharCode(a.charCodeAt(0) & 0xff)}).join('')) }");
+var worker = new Worker(createObjectURL(bb.getBlob()));
+
 function getURL(request, callback){
   if(/^data:/.test(request.url)){
     console.log('opened via data url');
@@ -123,20 +131,19 @@ function getURL(request, callback){
     xhr.onload = function(){
       console.log('opened via xhr ', request.url);
       var raw = xhr.responseText, data = '';
-      //for(var l = raw.length, i=0; i<l;i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff);
+      //for(var l = raw.length, i=0; i<l;i++){ data += String.fromCharCode(raw.charCodeAt(i) & 0xff); if(!(i%(1024 * 1024))) console.log('1mb') };
+      //var data = postMessage(raw.split('').map(function(a){return String.fromCharCode(a.charCodeAt(0) & 0xff)}).join(''));
       //window.fd = data;
       //callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
-      
+      //because running it here since js is single threaded causes the asynchrouously running instantInit request to be delayed, slowing it down substantially.
       //using a web worker: probably overkill.
-      var bb = new BlobBuilder();
-      bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
-      var worker = new Worker(createObjectURL(bb.getBlob()));
+      //*
       worker.onmessage = function(e) {
         var data = e.data;
         callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
       };
       worker.postMessage(xhr.responseText);
-
+      //*/
       
     }
     xhr.send();
@@ -241,5 +248,11 @@ function linkData(id, url){
   }
   xhr.send();
 }
+
+
+chrome.pageAction.onClicked.addListener(function(tab) {
+  chrome.tabs.create({url: "options.html", selected: true});
+});
+
 
 </script>

@@ -366,7 +366,7 @@ function initialize(){
       }else if(files.length > 0){
         for(var i = 0; i < files.length; i++){
           var file = files[i];
-          //10MB is the new limit. why? it's yet another random number.
+          //10MB is the new limit. why? it's yet another random number. drag2up crashed with a 20MB file.
           if(file.size > 1024 * 1024 * 10 && !confirm('The file "'+file.name+'" is over 10MB. Are you sure you want to upload it?')) continue;
           uploadFile({url: createObjectURL(file), name: file.name, size: file.size, type: file.type});
         }
