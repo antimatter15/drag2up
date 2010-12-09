@@ -336,37 +336,14 @@ function initialize(){
       e.stopImmediatePropagation();
 
     
+      console.log('drop event', +new Date);
       
       var files = e.dataTransfer.files;
       
       //console.log(e.dataTransfer.getData('text/html'))
       //console.log(e.dataTransfer.getData('url'))
       //console.log(e.dataTransfer.getData('text/uri-list'))
-      
-      /*
-      if(files.length == 0){
-        var url = e.dataTransfer.getData('url');
-        if(url){
 
-          var name = url.match(/\/.+?$/);
-          if(url.indexOf('data') == 0){
-            var parts = url.match(/^data:(.+),/)[1].split(';');
-            var mime = parts[0];
-            name = 'DataURL_'+mime.replace(/\//g,'.');
-          }
-          files = [
-            {
-              url: url,
-              size: -1,
-              type: mime,
-              name: name
-            }
-          ]
-        }else{
-          return;
-        }
-      }      
-      */
       
       var url, numleft = 0;
       
@@ -380,6 +357,7 @@ function initialize(){
           delete callbacks[cb];
         }
         file.callback = cb;
+        console.log('sent upload msg', +new Date);
         propagateMessage('background'+JSON.stringify(file))
       }
       
@@ -390,7 +368,7 @@ function initialize(){
           var file = files[i];
           //10MB is the new limit. why? it's yet another random number.
           if(file.size > 1024 * 1024 * 10 && !confirm('The file "'+file.name+'" is over 10MB. Are you sure you want to upload it?')) continue;
-          uploadFile({url: createObjectURL(file), name: file.name, type: file.type});
+          uploadFile({url: createObjectURL(file), name: file.name, size: file.size, type: file.type});
         }
       }
       
@@ -403,64 +381,6 @@ function initialize(){
 
 
 
-      /*
-      for(var i = 0; i < files.length; i++){
-        (function(file){
-        
-        if(file.size > 1024 * 1024 * 5) if(!confirm('The file "'+file.name+'" is over 5MB. Are you sure you want to upload it?')) continue;
-        
-        var cb = Math.random().toString(36).substr(3);
-        callbacks[cb] = function(data){
-          numleft--;
-          //console.log('got magic data', data, el);
-          insertLink(el, data.url, file.type);
-          if(numleft == 0) mask.parentNode.removeChild(mask);
-          delete callbacks[cb];
-        }
-        
-        propagateMessage('initupload'+JSON.stringify({
-          action: 'initupload',
-          name: file.name, 
-          size: file.size, 
-          type: file.type,
-          callback: cb,
-          id: cb
-        }));
-        if(file.url){
-          propagateMessage('uploaddata'+JSON.stringify({
-            action: 'uploaddata',
-            name: file.name, 
-            type: file.type,
-            size: file.size, 
-            url: file.url,
-            id: cb //use the callback as a file id
-          }));
-        }else{    
-          var reader = new FileReader();  
-          
-          reader.onerror = function(e){
-            numleft--;
-            if(numleft == 0) mask.parentNode.removeChild(mask);
-          }
-          reader.onload =  function(e){
-            console.log('Read file.');
-            
-            propagateMessage('uploaddata'+JSON.stringify({
-              action: 'uploaddata',
-              name: file.name, 
-              type: file.type,
-              size: file.size, 
-              data: e.target.result,
-              id: cb //use the callback as a file id
-            }));
-          }
-          
-          reader.readAsDataURL(file);
-        }
-        })(files[i]);
-      }
-      */
-      
     }, true);
     document.body.appendChild(mask);
 

@@ -37,7 +37,7 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
       for(var i = 0, l = bin.length; i < l; i++){
         var b = bin.charCodeAt(i);
         if(b > 240){
-          return alert('fail over 240');
+          //return alert('fail over 240');
         }
       }
     }
