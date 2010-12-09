@@ -20,7 +20,7 @@ function uploadGist(file, callback){
       
   //http://gist.github.com/4277
   var data = {};
-  data['files['+encodeURIComponent(file.name||'untitled')+']'] = atob(file.data.replace(/^data.+base64,/i,''));
+  data['files['+encodeURIComponent(file.name||'untitled')+']'] = file.data /*atob(file.data.replace(/^data.+base64,/i,''))*/;
 
   postJSON(https()+"gist.github.com/api/v1/json/new", data, function(data){
     if(data){

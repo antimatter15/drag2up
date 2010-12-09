@@ -1,6 +1,6 @@
 <script src="jquery.min.js"></script>
 <script src="multipart.js"></script>
-<script src="testing.js"></script>
+<!--<script src="misc/testing.js"></script>-->
 <script src="hosts/imageshack.js"></script>
 <script src="hosts/gist.js"></script>
 <script src="hosts/pastebin.js"></script>
@@ -37,7 +37,7 @@ function https(){
 function handleRequest(request, sender, sendResponse){
   console.log(request)
   var instant = (localStorage.instant || 'on') == 'on'; //woot. its called instant because google made google instant.
- 
+ /*
 
   if(request.action == 'initupload'){
     if(instant){
@@ -138,8 +138,135 @@ function handleRequest(request, sender, sendResponse){
     }
     
   }
+  */
+  getURL(request, function(file){
+    if(instant){
+      var car = new racer(2, function(data){
+        linkData(request.id, data.url);
+      });
+      instantInit(file, function(parts){
+        car.done();
+        sendResponse({
+          callback: request.callback,
+          url: https()+'drag2up.appspot.com/'+parts[0]
+        })
+      })
+    }
+    var tab = sender.tab.id;
+    chrome.pageAction.show(tab);
+    tabqueue[tab] = (tabqueue[tab] || 0) + 1;
+    
+    uploadData(file, function(url){
+      if(instant){
+        car.done({url: url});
+      }else if(filetable[request.id]){ //non-instant
+        sendResponse({callback: request.callback, url: url})
+      }
+      tabqueue[tab]--;
+      if(tabqueue[tab] == 0) chrome.pageAction.hide(tab);
+    });
+  
+    
+  });
   
 }
+
+//solve race conditions
+function racer(num, callback){
+  this.num = num;
+  this._done = 0;
+  this.data = {};
+  this.callback = callback;
+}
+racer.prototype.done = function(data){
+  if(data) for(var i in data) this.data[i] = data[i];
+  if(++this._done >= this.num) this.callback(this.data);
+}
+
+
+function instantInit(file, callback){
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'https://drag2up.appspot.com/new?'+params({
+    host: hostName(file),
+    size: file.size,
+    name: file.name
+  }));
+  xhr.onload = function(){
+    callback(filetable[file.id] = xhr.responseText.split(','));
+  }
+  xhr.send();
+}
+
+/*
+function initRedirect(){
+
+ if(instant){
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET','https://drag2up.appspot.com/new?'+params({
+        host: hostName({
+          name:request.name, 
+          type: request.type, 
+          data:"data:application/octet-stream;base64,VDdIVVQV8WxsZWR3aXRo4HZpbA="
+        }),
+        size: request.size,
+        name: request.name
+      }), true);
+      xhr.onload = function(){
+        var parts = xhr.responseText.split(',');
+        sendResponse({
+          callback: request.callback,
+          url: https()+'drag2up.appspot.com/'+parts[0],
+          code: parts[1]
+        });
+        var cb;
+        if(filetable[request.id]) cb = filetable[request.id];
+        filetable[request.id] = {
+          code: parts[1],
+          key: parts[0]
+        }
+        if(cb) cb();
+      }
+      xhr.send();
+    }else{
+      filetable[request.id] = {
+        fn: sendResponse,
+        callback: request.callback
+      }
+    }
+  }
+}
+
+*/
+
+function getURL(request, callback){
+  if(/^data:/.test(request.url)){
+    console.log('opened via data url');
+    var parts = request.url.match(/^data:(.+),/)[1].split(';');
+    var mime = parts[0], b64 = parts.indexOf('base64') != -1;
+    var enc = request.url.substr(request.url.indexOf(',')+1);
+    var data = b64 ? atob(enc) : unescape(enc);
+    callback({
+      data: data,
+      type: mime,
+      id: request.id,
+      size: data.length,
+      name: enc.substr(enc.length/2 - 6, 6) + '_' + mime.replace('/','.')
+    });
+  }else{
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', request.url, true);
+    xhr.overrideMimeType('text/plain; charset=x-user-defined'); //should i loop through and do that & 0xff?
+    xhr.onload = function(){
+      console.log('opened via xhr ', request.url);
+      var raw = xhr.responseText, data = '';
+      for(var l = raw.length, i=0; i<l;i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff);
+      window.fd = data;
+      callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
+    }
+    xhr.send();
+  }
+}
+
 
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
@@ -160,7 +287,7 @@ function fileType(file){
 	}else if(text_ext.indexOf(file.name.replace(/^.*\.(\w+?)$/,'$1')) != -1){
 	  return 'text'
 	}else{
-	  var src = atob(file.data.replace(/^data.+base64,/i,''));
+	  var src = file.data;//atob(file.data.replace(/^data.+base64,/i,''));
 	  var txt = src.substr(0,512) + src.slice(-512);
 	  for(var i = 0, isAscii = true; i < 128; i++){
 	    if(txt.charCodeAt(i) > 128){
@@ -219,29 +346,27 @@ function uploadDataURL(file, callback){
   setTimeout(function(){
     callback(file.data.replace('data:base64','data:text/plain;base64'));
   },1337);
-  
-  
 }
 
 
 
 
 function linkData(id, url){
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET',https()+'drag2up.appspot.com/update/'+filetable[id].key+'/'+filetable[id].code+'?'+params({
-      url: url
-    }), true);
-    xhr.onload = function(e){
-      if(xhr.status != 200){
-        //doomsday scenario: error leads to error leading to error leading to effective DoS
-        linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
-      }
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET',https()+'drag2up.appspot.com/update/'+filetable[id][0]+'/'+filetable[id][1]+'?'+params({
+    url: url
+  }), true);
+  xhr.onload = function(e){
+    if(xhr.status != 200){
+      //doomsday scenario: error leads to error leading to error leading to effective DoS
+      linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
     }
-    xhr.onerror = function(e){
-      console.log(e)
-      linkData(id, 'error: could not link.')
-    }
-    xhr.send();
+  }
+  xhr.onerror = function(e){
+    console.log(e)
+    linkData(id, 'error: could not link.')
+  }
+  xhr.send();
 }
 
 </script>

@@ -22,14 +22,25 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
   if(file_param != -1){
     var i = file_param;
     var file = params[i];
-    var url = file.data;
-    var base64 = url.substr(url.indexOf(",") + 1);
-    var bin = window.atob(base64);
-    var arr = new Int8Array(bin.length);
-    for(var i = 0, l = bin.length; i < l; i++){
-      arr[i] = bin.charCodeAt(i)
-    }
+    //var url = file.data;
+    //var base64 = url.substr(url.indexOf(",") + 1);
+    //var bin = window.atob(base64);
+    var bin = file.data;
+    if(window.Int8Array){
+      var arr = new Int8Array(bin.length);
+      
+      for(var i = 0, l = bin.length; i < l; i++){
+        arr[i] = bin.charCodeAt(i)
+      }
 
+    }else{
+      for(var i = 0, l = bin.length; i < l; i++){
+        var b = bin.charCodeAt(i);
+        if(b > 240){
+          return alert('fail over 240');
+        }
+      }
+    }
     //bb.append(arr.buffer)
     //var blob = bb.getBlob(file.type);
 

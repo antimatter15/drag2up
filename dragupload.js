@@ -168,7 +168,8 @@ function initialize(){
         },300);
       }else if(cmd == 'root_forcedkill'){ //woot, same length!
         trickleMessage('deactivate');
-      }else if(cmd == 'root_initupload' || cmd == 'root_uploaddata'){
+      //}else if(cmd == 'root_initupload' || cmd == 'root_uploaddata'){
+      }else if(cmd == 'root_background'){
         chrome.extension.sendRequest(JSON.parse(data.substr(15)), function(data){
           trickleMessage('docallback'+JSON.stringify(data));
         });
@@ -342,8 +343,7 @@ function initialize(){
       //console.log(e.dataTransfer.getData('url'))
       //console.log(e.dataTransfer.getData('text/uri-list'))
       
-      
-      
+      /*
       if(files.length == 0){
         var url = e.dataTransfer.getData('url');
         if(url){
@@ -365,14 +365,45 @@ function initialize(){
         }else{
           return;
         }
+      }      
+      */
+      
+      var url, numleft = 0;
+      
+      function uploadFile(file){
+        numleft++;
+        var cb = Math.random().toString(36).substr(3);
+        callbacks[cb] = function(data){
+          numleft--;
+          insertLink(el, data.url, file.type);
+          if(numleft == 0) mask.parentNode.removeChild(mask);
+          delete callbacks[cb];
+        }
+        file.callback = cb;
+        propagateMessage('background'+JSON.stringify(file))
+      }
+      
+      if(files.length == 0 && (url = e.dataTransfer.getData('url'))){
+        uploadFile({url: url});
+      }else if(files.length > 0){
+        for(var i = 0; i < files.length; i++){
+          var file = files[i];
+          //10MB is the new limit. why? it's yet another random number.
+          if(file.size > 1024 * 1024 * 10 && !confirm('The file "'+file.name+'" is over 10MB. Are you sure you want to upload it?')) continue;
+          uploadFile({url: createObjectURL(file), name: file.name, type: file.type});
+        }
       }
       
       mask.hasDropped = true;
       //clearTargets();
       
       mask.style.backgroundColor = '#007fff';
-      mask.innerHTML = 'Uploading '+files.length+' file(s)';
-      var numleft = files.length;
+      mask.innerHTML = 'Uploading '+numleft+' file(s)';
+      //var numleft = files.length;
+
+
+
+      /*
       for(var i = 0; i < files.length; i++){
         (function(file){
         
@@ -428,7 +459,7 @@ function initialize(){
         }
         })(files[i]);
       }
-      
+      */
       
     }, true);
     document.body.appendChild(mask);
