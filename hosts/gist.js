@@ -1,4 +1,6 @@
-function uploadGist(file, callback){
+//based on description from http://gist.github.com/4277
+  
+function uploadGist(req, callback){
   function postJSON(url, data, callback){
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url);  
@@ -17,16 +19,17 @@ function uploadGist(file, callback){
       }
     };
   }
-      
-  //http://gist.github.com/4277
-  var data = {};
-  data['files['+encodeURIComponent(file.name||'untitled')+']'] = file.data /*atob(file.data.replace(/^data.+base64,/i,''))*/;
 
-  postJSON(https()+"gist.github.com/api/v1/json/new", data, function(data){
-    if(data){
-      callback(https()+'gist.github.com/'+data.gists[0].repo)
-    }else{
-      callback('error: could not upload github gist');
-    }
+  getText(req, function(file){
+    var data = {};
+    data['files['+encodeURIComponent(file.name||'untitled')+']'] = file.data;
+    postJSON(https()+"gist.github.com/api/v1/json/new", data, function(data){
+      if(data){
+        callback(https()+'gist.github.com/'+data.gists[0].repo)
+      }else{
+        callback('error: could not upload github gist');
+      }
+    })
   })
+
 }

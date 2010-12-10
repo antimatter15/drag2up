@@ -1,5 +1,5 @@
 <script src="jquery.min.js"></script>
-<script src="multipart.js"></script>
+<script src="files.js"></script>
 <!--<script src="misc/testing.js"></script>-->
 <script src="hosts/imageshack.js"></script>
 <script src="hosts/gist.js"></script>
@@ -7,6 +7,7 @@
 <script src="hosts/imgur.js"></script>
 <script src="hosts/hotfile.js"></script>
 <script src="hosts/cloudapp.js"></script>
+<script src="hosts/immio.js"></script>
 
 <script src="hosts/dropbox/sha1.js"></script>
 <script src="hosts/dropbox/oauth.js"></script>
@@ -25,7 +26,6 @@ function params(obj){
 
 
 var tabqueue = {};
-
 
 function https(){
   if(localStorage.no_https == 'on'){
@@ -55,25 +55,21 @@ function handleRequest(request, sender, sendResponse){
       })
     })
   }
-  getURL(request, function(file){
-    console.log('read file', +new Date);
-    var tab = sender.tab.id;
-    chrome.pageAction.show(tab);
-    tabqueue[tab] = (tabqueue[tab] || 0) + 1;
-    chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
-    
-    uploadData(file, function(url){
-      if(instant){
-        car.done({url: url});
-      }else if(filetable[request.id]){ //non-instant
-        sendResponse({callback: request.callback, url: url})
-      }
-      tabqueue[tab]--;
-      chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
-      if(tabqueue[tab] == 0) chrome.pageAction.hide(tab);
-    });
+  console.log('read file', +new Date);
+  var tab = sender.tab.id;
+  chrome.pageAction.show(tab);
+  tabqueue[tab] = (tabqueue[tab] || 0) + 1;
+  chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
   
-    
+  uploadData(request, function(url){
+    if(instant){
+      car.done({url: url});
+    }else if(filetable[request.id]){ //non-instant
+      sendResponse({callback: request.callback, url: url})
+    }
+    tabqueue[tab]--;
+    chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
+    if(tabqueue[tab] == 0) chrome.pageAction.hide(tab);
   });
   
 }
@@ -104,19 +100,15 @@ function instantInit(file, callback){
   xhr.send();
 }
 
-//this webworker is totally overkill
-var bb = new BlobBuilder();
-bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
-//bb.append("onmessage = function(e) {postMessage(e.data.split('').map(function(a){return String.fromCharCode(a.charCodeAt(0) & 0xff)}).join('')) }");
-var worker = new Worker(createObjectURL(bb.getBlob()));
 
-function getURL(request, callback){
+function getURL(type, request, callback){
   if(/^data:/.test(request.url)){
     console.log('opened via data url');
     var parts = request.url.match(/^data:(.+),/)[1].split(';');
     var mime = parts[0], b64 = parts.indexOf('base64') != -1;
     var enc = request.url.substr(request.url.indexOf(',')+1);
     var data = b64 ? atob(enc) : unescape(enc);
+    //data urls dont have any weird encoding issue as far as i can tell
     callback({
       data: data,
       type: mime,
@@ -124,33 +116,53 @@ function getURL(request, callback){
       size: data.length,
       name: enc.substr(enc.length/2 - 6, 6) + '_' + mime.replace('/','.')
     });
+    
+    //callback(new dFile(data, name, mime, id, size)
   }else{
     var xhr = new XMLHttpRequest();
     xhr.open('GET', request.url, true);
-    xhr.overrideMimeType('text/plain; charset=x-user-defined'); //should i loop through and do that & 0xff?
+    if(type == 'binary'){
+      xhr.overrideMimeType('text/plain; charset=x-user-defined'); //should i loop through and do that & 0xff?
+    }
     xhr.onload = function(){
       console.log('opened via xhr ', request.url);
       var raw = xhr.responseText, data = '';
       //for(var l = raw.length, i=0; i<l;i++){ data += String.fromCharCode(raw.charCodeAt(i) & 0xff); if(!(i%(1024 * 1024))) console.log('1mb') };
       //var data = postMessage(raw.split('').map(function(a){return String.fromCharCode(a.charCodeAt(0) & 0xff)}).join(''));
       //window.fd = data;
-      //callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
+      
+      //var obj = {id: request.id, bin: function(){return raw}, b64: function(){return btoa(data)},type: request.type, size: data.length, name: request.name}
+      //callback(obj);
       //because running it here since js is single threaded causes the asynchrouously running instantInit request to be delayed, slowing it down substantially.
       //using a web worker: probably overkill.
-      //*
-      worker.onmessage = function(e) {
-        var data = e.data;
-        callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
-      };
-      worker.postMessage(xhr.responseText);
-      //*/
-      
+
+      if(type == 'binary'){
+        //*
+        var bb = new BlobBuilder();//this webworker is totally overkill
+        bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
+        var worker = new Worker(createObjectURL(bb.getBlob()));
+        worker.onmessage = function(e) {
+          var data = e.data;
+          callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
+        };
+        worker.postMessage(xhr.responseText);
+        //*/
+      }else{
+        callback({id: request.id, data: raw, type: request.type, size: data.length, name: request.name});
+      }
     }
     xhr.send();
   }
 }
 
 
+function getText(request, callback){
+  getURL('text', request, callback);
+}
+
+function getBinary(request, callback){
+  getURL('binary', request, callback);
+}
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   setTimeout(function(){
@@ -173,7 +185,7 @@ function fileType(file){
 	  var src = file.data;//atob(file.data.replace(/^data.+base64,/i,''));
 	  var txt = src.substr(0,512) + src.slice(-512);
 	  for(var i = 0, isAscii = true; i < 128; i++){
-	    if(txt.charCodeAt(i) > 128){
+	    if((txt.charCodeAt(i) & 0xff) > 128){
 	     isAscii = false;
 	     continue
       }
@@ -207,7 +219,9 @@ function uploadData(file, callback){
     imageshack: uploadImageshack,
     dropbox: uploadDropbox,
     pastebin: uploadPastebin,
-    cloudapp: uploadCloudApp
+    cloudapp: uploadCloudApp,
+    immio: uploadImmio
+    
   };
   
   var fn = hostfn[hostName(file)];

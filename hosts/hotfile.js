@@ -1,3 +1,4 @@
+//uses multipart helper function.
 function uploadHotfile(file, callback){
   //http://api.hotfile.com/?action=getuploadserver
 

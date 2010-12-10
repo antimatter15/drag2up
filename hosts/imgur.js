@@ -1,4 +1,4 @@
-function uploadImgur(file, callback){
+function uploadImgur(req, callback){
 	function postJSON(url, data, callback){
 	  var xhr = new XMLHttpRequest();
 	  xhr.open("POST", url);  
@@ -17,16 +17,18 @@ function uploadImgur(file, callback){
 		  }
 	  };
 	}
-	postJSON(https()+"api.imgur.com/2/upload.json", {
-    key: '390230bc94c4cc1354bcdb2dae0b9afd', /*should i invent a meaningless means of obfuscating this? no.*/
-    type: 'base64',
-    name: file.name,
-    image: btoa(file.data) //file.data.replace(/^data.+base64,/i,'')
-  }, function(data){
-    if(data){
-      callback(data.upload.links.original)
-    }else{
-      callback('error: could not upload to imgur')
-    }
+	getBinary(req, function(file){
+	  postJSON(https()+"api.imgur.com/2/upload.json", {
+      key: '390230bc94c4cc1354bcdb2dae0b9afd', /*should i invent a meaningless means of obfuscating this? no.*/
+      type: 'base64',
+      name: file.name,
+      image: btoa(file.data)
+    }, function(data){
+      if(data){
+        callback(data.upload.links.original)
+      }else{
+        callback('error: could not upload to imgur')
+      }
+    })
   })
 }

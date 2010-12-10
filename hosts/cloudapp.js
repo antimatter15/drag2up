@@ -1,3 +1,4 @@
+//uses multipart helper function.
 //does not support https
 function uploadCloudApp(file, callback){
   var xhr = new XMLHttpRequest();
