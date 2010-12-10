@@ -1,4 +1,6 @@
-[INSTALL HERE](https://chrome.google.com/extensions/detail/bjgjolhpdlgebodaapdafhdnikagbfll) ← probably what you want to do
+[INSTALL HERE](https://chrome.google.com/extensions/detail/bjgjolhpdlgebodaapdafhdnikagbfll) ← probably what you want to do 
+
+[FOLLOW ME ON TWITTER](http://twitter.com/antimatter15) (probably not as important, but a more significant motivation for improving this)
 
 
 Okay, so now I'm going to write a semblance of a readme file. Hopefully, there's really not that much to read about, this project is the source code behind the infinitely awesome drag2up extension (for lack of a better name). It was at one point up2drag/updrag and now lift/airfoil sounds like a pretty decent although undescriptive name. Either way, blah blah blah, here's a readme.
@@ -34,7 +36,7 @@ Here's some projects that have been incorperated into this:
 
 * https://github.com/bslatkin/clip-it-good (Picasa)
 * https://github.com/kenotron/chromepad (Dropbox)
-* http://jqueryui.com/ (Because [I was sick of using the html5 drag drop api](http://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html)
+* http://jqueryui.com/ (Because [I was sick of using the html5 drag drop api](http://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) and jquery ui had nice docs)
 * http://demos.hacks.mozilla.org/openweb/imageUploader/js/extends/xhr.js
 
 These sites had the documentation that I used to develop stuff.
