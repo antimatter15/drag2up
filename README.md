@@ -1,4 +1,4 @@
-[INSTALL HERE](https://chrome.google.com/extensions/detail/bjgjolhpdlgebodaapdafhdnikagbfll) <== probably what you want to do
+[INSTALL HERE](https://chrome.google.com/extensions/detail/bjgjolhpdlgebodaapdafhdnikagbfll) ← probably what you want to do
 
 
 Okay, so now I'm going to write a semblance of a readme file. Hopefully, there's really not that much to read about, this project is the source code behind the infinitely awesome drag2up extension (for lack of a better name). It was at one point up2drag/updrag and now lift/airfoil sounds like a pretty decent although undescriptive name. Either way, blah blah blah, here's a readme.
@@ -16,12 +16,12 @@ Dropbox, CloudApp, hotfile and Imageshack rely on a xhr.sendMultipart function t
 
 1. content script attaches to dragstart (or is it dragenter) event. test for if the event is a file drag based on properties of the types attribute on dataTransfer. when it's triggered, postMessage to window.top a message that says that dragging has begun.
 2. on the window.top content script instance, once the drag begin message is recieved, begin a "trickle" message where you postMessage to all immediately accessible frames to recursively attempt to do the trickle. Each node that receives the message sets the isDragging variable to true and loops through all elements on the page detecting which ones are droppable. render the targets.
-3. Rendered targets are divs with rounded corners and a translucent green background. On hover, it changes opacity. When it's dropped, the color becomes blue. A message is sent via postMessage to the page top first describing the file properties, name, size, type. Then the file is read and another message is sent including the base64-data url encoded file contents.
+3. Rendered targets are divs with rounded corners and a translucent green background. On hover, it changes opacity. When it's dropped, the color becomes blue. A message is sent via postMessage to the page top first describing the file properties, name, size, type. window.createObjectURL is run to create a blob uri and the blob uri is sent to the top window using postMessage.
 4. The page top uses chrome.extension.sendRequest to communicate with the background page
-5. __(instant)__ The background page requests stuff with the drag2up.appspot.com api in order to create a new upload, stores the nuclear launch codes that are returned, and sends the callback.
+5. decode/download the URL into a binary string with either a dataurl decoding scheme or a cross origin enabled privledged XHR.
+6. __(instant)__ The background page requests stuff with the drag2up.appspot.com api in order to create a new upload, stores the nuclear launch codes that are returned, and sends the callback.
 __(slow)__ The background page waits for the file, picks the appropriate host based on localStorage data and filetype guessing using mimetypes and other magic. The file is then uploaded to the server, and the response link is sent to the callback.
-6. the response is trickled down to all the frames where the appropriate listener is dispatched to add the url/link/image to an element. 
-
-7. __(instant)__ The background page gets the second message with the file contents, picks a host based on the data, filetype, and settings, uploads to the host, and gets the url.
-8. __(instant)__ The url from the file host is then sent through the drag2up.appspot.com api again to complete the upload where events on the channel api are dispatched to immediately notify listening downloaders that the file is available for download.
+7. the response is trickled down to all the frames where the appropriate listener is dispatched to add the url/link/image to an element. 
+8. __(instant)__ The background page gets the second message with the file contents, picks a host based on the data, filetype, and settings, uploads to the host, and gets the url.
+9. __(instant)__ The url from the file host is then sent through the drag2up.appspot.com api again to complete the upload where events on the channel api are dispatched to immediately notify listening downloaders that the file is available for download.
 
