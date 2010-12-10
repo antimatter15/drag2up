@@ -1,4 +1,4 @@
-[INSTALL HERE](https://chrome.google.com/extensions/detail/bjgjolhpdlgebodaapdafhdnikagbfll) ← probably what you want to do 
+[INSTALL HERE](https://chrome.google.com/webstore/detail/bjgjolhpdlgebodaapdafhdnikagbfll) ← probably what you want to do 
 
 [FOLLOW ME ON TWITTER](http://twitter.com/antimatter15) (probably not as important, but a more significant motivation for improving this)
 
