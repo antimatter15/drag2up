@@ -6,6 +6,9 @@
   "permissions": [
     "*://*/",
     "tabs",
+    "contextMenus",
+    "unlimitedStorage",
+    "cookies",
     "notifications"
   ],
   "page_action": {
