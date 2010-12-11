@@ -138,25 +138,6 @@ function initialize(){
         if(isDragging == false) trickleMessage('reactivate');
         lastDrag = (+new Date); //TODO; utilize the value that got passed
         
-        
-        
-        
-        
-        /*
-         * 
-         * 
-         * 
-         * TODO:
-         * TODO:
-         * 
-         * write a little box that appears that you use to get at settings
-         * 
-         * possibly: hover over me for 3 seconds and then it'll be done once you redirect?
-         * 
-         * i have no clue
-         * 
-         * 
-         * */
       }else if(cmd == 'root_deactivate'){
         var lastDeactivation = +new Date;
         setTimeout(function(){

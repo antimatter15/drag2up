@@ -9,5 +9,10 @@ function uploadFlickr(req, callback){
     params.api_sig = hex_md5(secret+Object.keys(params).sort().map(function(x){return x+params[x]})).join(''))
     return params;
   }
+  var xhr = new XMLHttpRequest();
+  xhr.open('get',"http://flickr.com/services/upload/");
+  var p = auth({auth_token: "blahblah"});
+  p.photo = req;
+  xhr.sendMultipart(p)
   
 }
