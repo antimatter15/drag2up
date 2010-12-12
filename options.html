@@ -80,6 +80,10 @@
 		border-radius: 10px;
 	}
 	
+	h3 {
+	  padding-right: 10px;
+	}
+	
 	.directions {
 		float: left;
 		width: 150px;
@@ -260,12 +264,7 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 </div>
 </div>
 <div style="margin-right:240px;">
-<p>
-  <h3 style="display:inline">Basic</h3>
-  
-  <input type="checkbox" id="instant"> <label for="instant">Instantly return URL while uploading occurs in the background.</label>
-  <input type="checkbox" id="insecure"> <label for="insecure">Prefer insecure http://.</label>
-</p>
+
 
 <div style="width: 100%;float:left;margin-bottom: 30px">
 <div class="directions">
@@ -273,7 +272,7 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <b>Drag hosts</b> to the slots on the right.
 </div>
 
-
+<!-- image hosts -->
 <div class="filehost image" name="imgur">
 	<img src="hosts/logo/imgur.png">
 </div>
@@ -286,7 +285,17 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/imageshack.png">
 </div>
 
+<div class="filehost image multipart login" name="flickr">
+	<img src="hosts/logo/flickr.png">
+</div>
 
+
+<div class="filehost image multipart login" name="picasa">
+	<img src="hosts/logo/picasa.jpg">
+</div>
+
+
+<!-- pastebins -->
 <div class="filehost text" name="gist">
 	<img src="hosts/logo/gist.png">
 </div>
@@ -295,6 +304,12 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/pastebin.png">
 </div>
 
+<div class="filehost text" name="tinypaste">
+	<img src="hosts/logo/tinypaste.png">
+</div>
+
+
+<!-- binary -->
 
 <div class="filehost binary image text multipart" name="hotfile">
 	<img src="hosts/logo/hotfile.png">
@@ -312,19 +327,18 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 
 
 
-<div class="filehost binary image text multipart login" name="flickr">
-	<img src="hosts/logo/flickr.png">
-</div>
-
-
-<div class="filehost binary image text multipart login" name="picasa">
-	<img src="hosts/logo/picasa.jpg">
-</div>
 
 
 </div>
 <p>
-  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. Totally irrelevant is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now, aware of that magical fact, you should <b>follow me on twitter</b> and share this extension with all your peers.
+  <h3 style="display:inline">Basic</h3>
+  
+  <input type="checkbox" id="instant"> <label for="instant">Instantly return URL while uploading occurs in the background.</label>
+  <input type="checkbox" id="insecure"> <label for="insecure">Prefer insecure http://.</label>
+</p>
+
+<p>
+  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. A totally irrelevant fact is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now, aware of that magical fact, you should <b>follow me on twitter</b> and share this extension with all your peers.
 </p>
 
 <p>
