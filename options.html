@@ -20,7 +20,7 @@
 		width: 210px;
 		position: fixed;		
 		top: 0;
-		z-index: -1;
+		z-index: 1;
 		padding: 10px;
 		right: 0;
 	}
@@ -73,6 +73,7 @@
 		width: 150px;
 		padding: 20px;
 		height: 100px;
+		z-index: 5;
 		background-color: hsl(120, 73%, 90%);
 		margin: 10px;
 		border: 1px solid hsl(120, 73%, 70%);
@@ -123,10 +124,14 @@
 	  if(!supports_binary()){
 	    $("body").addClass("unsupported");
 	    $(".unsupported .filehost.multipart").mousedown(function(){
-	      $('#not_suported').clearQueue().fadeIn();
+	      $('#not_suported').queue($('#not_suported').queue().slice(0,1))
+	      $('#not_suported').slideDown()
 	    })
 	    $("body").mouseup(function(){
-	      $('#not_suported').clearQueue().fadeOut();
+	      //$('#not_suported').clearQueue();
+	      $('#not_suported').queue($('#not_suported').queue().slice(0,1))
+	      //doesnt cause weird jumpyness like clearqueue does
+	      $('#not_suported').slideUp()
 	    })
 	  }
 	
@@ -141,6 +146,10 @@
 		$(".panel").droppable({
 		  accept: '.filehost',
 		  activate: function(){
+		    //btw future self and anyone else who happens to stumble on this code
+		    //the reason there's the weird semitransparent thing under things when you drag the text types
+		    //is because the dragging class. uh. 33% + padding makes something a bit more than 33% so thats
+		    //why it overlaps and when you change the opacity, poop happens.
 			  $('#panelcontainer').addClass('dragging')
 		  },
 		  deactivate: function(){
@@ -243,7 +252,7 @@
 	<p>image</p>
 </div>
 
-<div style="height:100%;top:0;padding:10px;position:fixed;width:210px;right:0;background-color:white;display:none" id="not_suported">
+<div style="top:0;padding:10px;position:fixed;width:210px;right:0;background-color:#eeeeee;display:none;z-index:42" id="not_suported">
 <p>Sorry! This host <b>isn't supported</b> by your browser. You will be able to use this file host <b>when Chrome 9 is stable</b>, or if you switch to a developer channel build.</p>
 <p>
 To upload certain types of files, chrome needs to upload binary data (that is, ones and zeroes), but before Chrome 9, there was no way to upload them properly (there were certain sequences of ones and zeroes that could not be uploaded).
