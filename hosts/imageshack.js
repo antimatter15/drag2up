@@ -6,7 +6,7 @@
 
 function uploadImageshack(file, callback){
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", https()+"www.imageshack.us/upload_api.php");  
+  xhr.open("POST", "http://www.imageshack.us/upload_api.php");  
   xhr.onload = function(){
     try{
       var link = xhr.responseXML.getElementsByTagName('image_link');
