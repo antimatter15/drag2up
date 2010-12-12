@@ -131,7 +131,7 @@ function getURL(type, request, callback){
   }else{
     var xhr = new XMLHttpRequest();
     xhr.open('GET', request.url, true);
-    if(type == 'binary'){
+    if(type == 'binary' || type == 'raw'){
       xhr.overrideMimeType('text/plain; charset=x-user-defined'); //should i loop through and do that & 0xff?
     }
     xhr.onload = function(){
@@ -157,6 +157,9 @@ function getURL(type, request, callback){
         };
         worker.postMessage(xhr.responseText);
         //*/
+      }else if(type == 'raw'){
+        var data = xhr.responseText;
+        callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
       }else{
         callback({id: request.id, data: raw, type: request.type, size: data.length, name: request.name});
       }
@@ -168,6 +171,10 @@ function getURL(type, request, callback){
 
 function getText(request, callback){
   getURL('text', request, callback);
+}
+
+function getRaw(request, callback){
+  getURL('raw', request, callback);
 }
 
 function getBinary(request, callback){
@@ -192,6 +199,7 @@ function fileType(file){
 	}else if(text_ext.indexOf(file.name.replace(/^.*\.(\w+?)$/,'$1')) != -1){
 	  return 'text'
 	}else if(file.size < 1024 * 1024) { //its rare for text files to be so huge
+	  /*
 	  var src = file.data;//atob(file.data.replace(/^data.+base64,/i,''));
 	  var txt = src.substr(0,512) + src.slice(-512);
 	  for(var i = 0, isAscii = true; i < 128; i++){
@@ -201,6 +209,7 @@ function fileType(file){
       }
     }
     if(isAscii && file.size < 1024 * 300) return 'text';
+    */
 	}
 	return 'binary'
 }

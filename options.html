@@ -111,7 +111,7 @@
 	  try{
 	    var bb = new BlobBuilder();
 	    var ui = new Uint8Array(42);
-	    bb.append(ui);
+	    bb.append(ui.buffer);
 	    var blob = bb.getBlob();
 	    if(blob.size == 42){
 	      return true

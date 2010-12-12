@@ -7,7 +7,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 	var _storagePrefix = "moderndropbox_";
 	var _isSandbox = false;
 	var _cache = true;
-	var _authCallback = "";
+	var _authCallback = "http://example.com/";
 	var _fileListLimit = 10000;
 	var _cookieTimeOut = 3650;
 	var _dropboxApiVersion = 0;
@@ -66,7 +66,8 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		for (i in keys) {
 			var key = keys[i];
 			
-			if (valueMap[key]) {
+			if (valueMap[key] !== undefined) {
+			
 				localStorage.setItem(_storagePrefix + key, valueMap[key]);
 				_tokens[key] = valueMap[key];
 			}
@@ -195,11 +196,27 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 							authTokens["requestTokenSecret"] = parsedTokenPairs["oauth_token_secret"];
 					
 							_storeAuth(authTokens);
-		
-							document.location = "http://api.getdropbox.com/" + _dropboxApiVersion + "/oauth/authorize?oauth_token=" 
+							var init = this.initialize;
+              chrome.tabs.create({
+				        url: "http://api.getdropbox.com/" + _dropboxApiVersion + "/oauth/authorize?oauth_token=" 
 								+ authTokens["requestToken"] 
 								+ "&oauth_callback=" 
-								+ _authCallback;
+								+ _authCallback
+				      }, function(tab){
+				        var poll = function(){
+			            chrome.tabs.get(tab.id, function(info){
+				            if(info.url.indexOf('uid=') != -1){
+					            chrome.tabs.remove(tab.id);
+					            //dropbox.setup();
+					            init();
+
+				            }else{
+					            setTimeout(poll, 100)
+				            }
+			            })
+		            };
+		            poll();
+		            })
 						}).bind(this)
 					});
 				} else {
@@ -228,6 +245,13 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 							authTokens["accessTokenSecret"] = parsedTokenPairs["oauth_token_secret"];
 							
 							_storeAuth(authTokens);
+						}).bind(this),
+						error: (function(data){
+						  _storeAuth({
+						    requestToken: '',
+						    requestTokenSecret: ''
+						  })
+						  this.initialize();
 						}).bind(this)
 					});
 				}
