@@ -5,6 +5,7 @@
 <title>Drag2Up Options</title>
 <script src="hosts/js/jquery.min.js"></script>
 <script src="hosts/js/jquery-ui.min.js"></script>
+<script src="hosts/shorten.js"></script>
 <body>
 	
 	<style>
@@ -227,6 +228,11 @@
 		}
 		
 		
+		for(var shortener in shortSvcList){
+		  $("#shorten").append("<option name="+shortener+">"+shortener+"</option>");
+		}
+		
+		
 	});
 	</script>
 
@@ -304,10 +310,18 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/pastebin.png">
 </div>
 
+
+
+<div class="filehost text" name="mysticpaste">
+	<img src="hosts/logo/mysticpaste.png">
+</div>
+
+<!-- API DOES NOT WORK -->
+<!--
 <div class="filehost text" name="tinypaste">
 	<img src="hosts/logo/tinypaste.png">
 </div>
-
+-->
 
 <!-- binary -->
 
@@ -333,8 +347,14 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <p>
   <h3 style="display:inline">Basic</h3>
   
-  <input type="checkbox" id="instant"> <label for="instant">Instantly return URL while uploading occurs in the background.</label>
-  <input type="checkbox" id="insecure"> <label for="insecure">Prefer insecure http://.</label>
+  <input type="checkbox" id="instant"  > <label for="instant">Background uploading.</label>
+  <input type="checkbox" id="insecure"  style="margin-left: 10px;"> <label for="insecure">Prefer insecure HTTP.</label>
+  
+  <label for="shorten" style="margin-left: 10px;">URL shortener</label>
+  
+  <select id="shorten" >
+    <option name="none">None</option>
+  </select> 
 </p>
 
 <p>

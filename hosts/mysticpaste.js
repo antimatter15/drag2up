@@ -8,6 +8,6 @@ function uploadMysticpaste(req, callback){
 	  callback("http://www.mysticpaste.com/view/"+xhr.responseText);
 	}
 	getText(req, function(file){
-  	xhr.send("content="+encodeURIComponent( file.data  ));
+  	xhr.send("type="+file.type+"&content="+encodeURIComponent( file.data  ));
 	})
 }

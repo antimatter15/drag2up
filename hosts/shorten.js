@@ -1,8 +1,7 @@
 //based on ChromeMuse GPLv3
 
 
-function shorten(url, func){
-  var svc = 'goo.gl'; 
+function shorten(svc, url, func){
   var shortSvc = shortSvcList[svc];
   var param = (typeof(shortSvc.param) == "string" ? shortSvc.param : shortSvc.param(url))+encodeURIComponent(url);
 
@@ -39,60 +38,6 @@ function shorten(url, func){
 
 
 var shortSvcList = {
-        "0rz.tw": {
-                method: "GET",
-                s_url: "http://0rz.tw/createget",
-                param: "url=",
-                dataType: "text",
-                s_proc: function(r,f) {
-                        // need to check for error code?
-                        f({status: "ok", url: r});
-        }},
-        "3.ly": {
-                method: "GET",
-                s_url: "http://3.ly/",
-                param: "api=em5893833&u=",
-                dataType: "text",
-                s_proc: function(r,f) {
-                        // need to check for error code?
-                        f({status: "ok", url: r});
-        }},
-        "bit.ly": {
-                method: "GET",
-                s_url: "http://api.bit.ly/shorten",
-                param: "version=2.0.1&history=1&login=%API Login%&apiKey=%API Key%&longUrl=",
-                cred: ["API Login", "API Key"],
-                defcred: ["drag2up", "R_4eabbd16b41219259f86122d74d1c5e0"],
-                reg_url: "http://bit.ly/account/register",
-                dataType: "json",
-                s_proc: function(r,f) {
-                        for (var r1 in r.results) {
-                                var r2 = r.results[r1];
-                                break;
-                        }
-                        f(r2 ? {status: "ok", url: r2.shortUrl}: {status: "error", error: r.errorMessage});
-        }},
-        "chilp.it": {
-                method: "GET",
-                s_url: "http://chilp.it/api.php",
-                param: "url=",
-                dataType: "text",
-                s_proc: function(r,f) {
-                        // need to check for error code?
-                        f({status: "ok", url: r});
-        }},
-        "cli.gs": {
-                method: "GET",
-                s_url: "http://cli.gs/api/v1/cligs/create",
-                param: "appid=drag2up&key=%API Key%&url=",
-                cred: ["API Key"],
-                defcred: [""],
-                reg_url: "http://cli.gs/user/new",
-                dataType: "text",
-                s_proc: function(r,f) {
-                        // need to check for error code?
-                        f({status: "ok", url: r});
-        }},
         "goo.gl": {
                 method: "POST",
                 s_url: "http://goo.gl/api/url",
@@ -174,16 +119,22 @@ var shortSvcList = {
                 s_proc: function(r,f) {
                         f((r.short_url !== undefined) ? {status: "ok", url: r.short_url} : {status: "error", error: r.error_message});
         }},
-        "iKr.me": {
+        "bit.ly": {
                 method: "GET",
-                s_url: "http://ikr.me/api/",
-                param: "url=",
-                dataType: "text",
+                s_url: "http://api.bit.ly/shorten",
+                param: "version=2.0.1&history=1&login=%API Login%&apiKey=%API Key%&longUrl=",
+                cred: ["API Login", "API Key"],
+                defcred: ["drag2up", "R_4eabbd16b41219259f86122d74d1c5e0"],
+                reg_url: "http://bit.ly/account/register",
+                dataType: "json",
                 s_proc: function(r,f) {
-                        // need to check for error code?
-                        f({status: "ok", url: r});
+                        for (var r1 in r.results) {
+                                var r2 = r.results[r1];
+                                break;
+                        }
+                        f(r2 ? {status: "ok", url: r2.shortUrl}: {status: "error", error: r.errorMessage});
         }},
-        "is.gd": {
+"is.gd": {
                 method: "GET",
                 s_url: "http://is.gd/api.php",
                 param: "longurl=",
@@ -206,7 +157,7 @@ var shortSvcList = {
                                 break;
                         }
                         f(r2 ? {status: "ok", url: r2.shortUrl}: {status: "error", error: r.errorMessage});
-        }},
+        }},/*
         "ow.ly": {
                 method: "GET",
                 s_url: "http://slki.ru/api/add/",
@@ -215,17 +166,8 @@ var shortSvcList = {
                 s_proc: function(r,f) {
                         // need to check for error code?
                         f({status: "ok", url: r});
-        }},
-        "slki.ru": {
-                method: "GET",
-                s_url: "http://slki.ru/api/add/",
-                param: "url=",
-                dataType: "text",
-                s_proc: function(r,f) {
-                        // need to check for error code?
-                        f({status: "ok", url: r});
-        }},
-        "TinyURL": {
+        }},*/
+        "tinyurl": {
                 method: "GET",
                 s_url: "http://tinyurl.com/api-create.php",
                 param: "url=",
@@ -234,6 +176,45 @@ var shortSvcList = {
                         // need to check for error code?
                         f({status: "ok", url: r});
         }},
+        "0rz.tw": {
+                method: "GET",
+                s_url: "http://0rz.tw/createget",
+                param: "url=",
+                dataType: "text",
+                s_proc: function(r,f) {
+                        // need to check for error code?
+                        f({status: "ok", url: r});
+        }},
+        "3.ly": {
+                method: "GET",
+                s_url: "http://3.ly/",
+                param: "api=em5893833&u=",
+                dataType: "text",
+                s_proc: function(r,f) {
+                        // need to check for error code?
+                        f({status: "ok", url: r});
+        }},
+        
+        "chilp.it": {
+                method: "GET",
+                s_url: "http://chilp.it/api.php",
+                param: "url=",
+                dataType: "text",
+                s_proc: function(r,f) {
+                        // need to check for error code?
+                        f({status: "ok", url: r});
+        }},
+        
+        "iKr.me": {
+                method: "GET",
+                s_url: "http://ikr.me/api/",
+                param: "url=",
+                dataType: "text",
+                s_proc: function(r,f) {
+                        // need to check for error code?
+                        f({status: "ok", url: r});
+        }},
+        
         "tllg.net": {
                 method: "GET",
                 s_url: "http://tllg.net/",
@@ -242,14 +223,6 @@ var shortSvcList = {
                 s_proc: function(r,f) {
                         // need to check for error code?
                         f({status: "ok", url: r});
-        }},
-        "u.nu": {
-                method: "GET",
-                s_url: "http://u.nu/unu-api-simple",
-                param: "url=",
-                dataType: "text",
-                s_proc: function(r,f) {
-                        f(r.substr(0,4) == "http" ? {status: "ok", url: r} : {status: "error", error: r});
         }},
         "ur1.ca": {
                 method: "POST",

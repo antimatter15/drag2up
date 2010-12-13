@@ -55,3 +55,10 @@ These sites had the documentation that I used to develop stuff.
 * http://www.flickr.com/services/api/
 * http://tinypaste.com/70c90ce
 * http://tinypaste.com/api/doc/
+* https://github.com/kinabalu/mysticpaste/blob/master/idea-plugin/src/com/mysticcoders/mysticpaste/plugin/PastebinAction.java
+* https://github.com/kinabalu/mysticpaste/blob/master/eclipse-plugin/plugin.properties
+* http://mysticpaste.com/plugin
+* http://en.wikipedia.org/wiki/Pastebin
+* http://en.wikipedia.org/wiki/Comparison_of_pastebins
+* https://chrome.google.com/extensions/detail/digfdjelalmeldlplgcapchelgnlkomc
+* http://code.google.com/p/chromemuse/wiki/SupportedServices
