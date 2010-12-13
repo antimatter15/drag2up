@@ -229,8 +229,13 @@
 		
 		
 		for(var shortener in shortSvcList){
-		  $("#shorten").append("<option name="+shortener+">"+shortener+"</option>");
+		  $("#shorten").append("<option>"+shortener+"</option>");
 		}
+		$("#shorten").val(shortSvcList[localStorage.url_shortener]?localStorage.url_shortener:"None");
+		
+		$("#shorten").change(function(){
+		  localStorage.url_shortener = $("#shorten").val();
+    })
 		
 		
 	});
@@ -353,7 +358,7 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
   <label for="shorten" style="margin-left: 10px;">URL shortener</label>
   
   <select id="shorten" >
-    <option name="none">None</option>
+    <option>None</option>
   </select> 
 </p>
 

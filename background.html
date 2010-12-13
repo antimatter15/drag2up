@@ -6,10 +6,13 @@
 <script src="files.js"></script>
 <!--<script src="misc/testing.js"></script>-->
 
+<script src="hosts/shorten.js"></script>
+
 
 <script src="hosts/imageshack.js"></script>
 <script src="hosts/gist.js"></script>
 <script src="hosts/pastebin.js"></script>
+<script src="hosts/mysticpaste.js"></script>
 <script src="hosts/imgur.js"></script>
 <script src="hosts/hotfile.js"></script>
 <script src="hosts/cloudapp.js"></script>
@@ -24,6 +27,32 @@
 <script src="hosts/dropbox/modern_dropbox.js"></script>
 <script src="hosts/dropbox/dropbox.js"></script>
 <script>
+
+function uploadData(file, callback){
+  var hostfn = {
+    hotfile: uploadHotfile,
+    gist: uploadGist,
+    imgur: uploadImgur,
+    imageshack: uploadImageshack,
+    dropbox: uploadDropbox,
+    pastebin: uploadPastebin,
+    cloudapp: uploadCloudApp,
+    flickr: uploadFlickr,
+    immio: uploadImmio,
+    picasa: uploadPicasa,
+    mysticpaste: uploadMysticpaste
+  };
+  
+  var fn = hostfn[hostName(file)];
+  if(fn){
+    fn(file, callback);
+  }else{
+    callback('error: no host function for type '+hostName(file)+' for file type '+fileType(file));
+  }
+  
+  //uploadDataURL(file, callback);
+}
+
 
 
 var filetable = {};
@@ -47,6 +76,25 @@ function https(){
 function handleRequest(request, sender, sendResponse){
   console.log(request)
   console.log('handle request', +new Date);
+  
+  function returned_link(obj){
+    //here you apply the shorten methods before sending response
+    var shortener = localStorage.url_shortener;
+    if(shortSvcList[shortener]){ //if there's a url shortener selected
+      var orig = obj.url;
+      shorten(shortener, orig, function(res){
+        if(res.status == 'ok'){
+          obj.url = res.url;
+        }else{
+          obj.url = 'error: the url shortener '+shortener+' is broken. The original URL was '+orig;
+        }
+        sendResponse(obj); //yay returned call! albeit slightly delayed
+      })
+    }else{
+      sendResponse(obj); //yay returned call!
+    }
+  }
+  
   var instant = (localStorage.instant || 'on') == 'on'; //woot. its called instant because google made google instant.
 
   if(instant){
@@ -59,7 +107,7 @@ function handleRequest(request, sender, sendResponse){
     instantInit({name:request.name || 'unknown.filetype', type: request.type || 'application/octet-stream', size: request.size || -1, data: '\xff'}, function(parts){
       car.done();
       console.log('finished initializing instant', +new Date);
-      sendResponse({
+      returned_link({
         callback: request.callback,
         url: https()+'drag2up.appspot.com/'+parts[0]
       })
@@ -75,7 +123,7 @@ function handleRequest(request, sender, sendResponse){
     if(instant){
       car.done({url: url});
     }else if(filetable[request.id]){ //non-instant
-      sendResponse({callback: request.callback, url: url})
+      returned_link({callback: request.callback, url: url})
     }
     tabqueue[tab]--;
     chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
@@ -184,7 +232,7 @@ function getBinary(request, callback){
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   setTimeout(function(){
     handleRequest(request, sender, sendResponse)
-  }, 0);
+  }, 0); //chrome has weird event handling things that make debugging stuff harder
 });
 
 
@@ -198,6 +246,10 @@ function fileType(file){
 	  return 'text'
 	}else if(text_ext.indexOf(file.name.replace(/^.*\.(\w+?)$/,'$1')) != -1){
 	  return 'text'
+	}else if(file.type.indexOf('script') != -1 || file.type.indexOf('xml') != -1){
+	  return 'text'; //scripts or xml usually means code which usually means text
+	}else if(file.type.indexOf('script') != -1){
+	  return 'text'; //scripts usually means code which usually means text
 	}else if(file.size < 1024 * 1024) { //its rare for text files to be so huge
 	  /*
 	  var src = file.data;//atob(file.data.replace(/^data.+base64,/i,''));
@@ -227,33 +279,6 @@ function hostName(file){
 }
 
 
-function uploadData(file, callback){
-  //segregate data types, choose blah blah, etc.
-
-	
-  var hostfn = {
-    hotfile: uploadHotfile,
-    gist: uploadGist,
-    imgur: uploadImgur,
-    imageshack: uploadImageshack,
-    dropbox: uploadDropbox,
-    pastebin: uploadPastebin,
-    cloudapp: uploadCloudApp,
-    flickr: uploadFlickr,
-    immio: uploadImmio,
-    picasa: uploadPicasa
-    
-  };
-  
-  var fn = hostfn[hostName(file)];
-  if(fn){
-    fn(file, callback);
-  }else{
-    callback('error: no host function for type '+hostName(file)+' for file type '+fileType(file));
-  }
-  
-  //uploadDataURL(file, callback);
-}
 
 
 function uploadDataURL(file, callback){
