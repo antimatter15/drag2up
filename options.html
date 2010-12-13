@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset=utf-8 />
-<title>Drag2Up Options</title>
+<title>drag2up settings</title>
 <script src="hosts/js/jquery.min.js"></script>
 <script src="hosts/js/jquery-ui.min.js"></script>
 <script src="hosts/shorten.js"></script>
@@ -69,11 +69,15 @@
 	.text .text { display: inline; }
 	.image .image { display: inline;}
 	
-	.filehost {
+	.directions, .filehost {
 		float: left;
 		width: 150px;
-		padding: 20px;
-		height: 100px;
+		padding: 15px;
+		height: 85px;
+	}
+	
+	.filehost {
+
 		z-index: 5;
 		background-color: hsl(120, 73%, 90%);
 		margin: 10px;
@@ -86,10 +90,6 @@
 	}
 	
 	.directions {
-		float: left;
-		width: 150px;
-		padding: 20px;
-		height: 100px;
 		background-color: hsl(240, 73%, 90%);
 		border: 1px solid hsl(240, 73%, 70%);
 		margin: 10px;
@@ -297,7 +297,7 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 
 
 <div class="filehost image multipart login" name="picasa">
-	<img src="hosts/logo/picasa.jpg">
+	<img src="hosts/logo/picasa.png">
 </div>
 
 
