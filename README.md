@@ -52,3 +52,6 @@ These sites had the documentation that I used to develop stuff.
 * http://imageshack.us/content.php?page=developer
 * http://api.hotfile.com/?c=getuploadserver
 * http://support.getcloudapp.com/faqs/developers/api
+* http://www.flickr.com/services/api/
+* http://tinypaste.com/70c90ce
+* http://tinypaste.com/api/doc/

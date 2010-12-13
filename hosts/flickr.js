@@ -79,13 +79,29 @@ function uploadFlickr(req, uploaded_fn){
         var photoid = resX.getElementsByTagName('photoid')[0];
         console.log(photoid)
         var pid = photoid.firstChild.nodeValue;
-        window.PID = photoid;
+        //window.PID = photoid;
+        console.log('flickr photo id', photoid);
+        
+        var xt = new XMLHttpRequest();
+            xt.open("get", base+'/rest?'+params(auth({
+              method: 'flickr.photos.getSizes',
+              photo_id: pid,
+              nojsoncallback: 1,
+              format: 'json'
+            })))
+            xt.onload = function(){
+              var json = JSON.parse(xt.responseText);
+              var url = json.sizes.size.slice(-1)[0].source;
+              console.log(json);
+              uploaded_fn(url);
+            }
+            xt.send()
+        
+        
       }
     }
     xhr.sendMultipart(p)
-    5255919773
-  }[url=http://www.flickr.com/photos/56903976@N07/5255919773/][img]http://farm6.static.flickr.com/5290/5255919773_cb1f78118d_s.jpg[/img][/url]
-[url=http://www.flickr.com/photos/56903976@N07/5255919773/]tinypaste[/url] by [url=http://www.flickr.com/people/56903976@N07/]antimatter15[/url], on Flickr
+  }
   
   uploadPhoto();
 }
