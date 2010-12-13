@@ -242,6 +242,9 @@
 	</script>
 
 <h1>drag2up settings</h1>
+
+
+
 <div style="display:none">
 	<div class="has">
 		<span class="text">Text</span>
@@ -251,6 +254,10 @@
 	</div>	
 </div>
 <div id="panelcontainer">
+
+
+
+
 <div class="binary panel">
 	Current <b>Binary</b> File  Host
 	<p>binary</p>
@@ -276,6 +283,18 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 </div>
 <div style="margin-right:240px;">
 
+<p>
+  <h3 style="display:inline">Basic</h3>
+  
+  <input type="checkbox" id="instant"  > <label for="instant">Background uploading.</label>
+  <input type="checkbox" id="insecure"  style="margin-left: 10px;"> <label for="insecure">Prefer insecure HTTP.</label>
+  
+  <label for="shorten" style="margin-left: 10px;">URL shortener</label>
+  
+  <select id="shorten" >
+    <option>None</option>
+  </select> 
+</p>
 
 <div style="width: 100%;float:left;margin-bottom: 30px">
 <div class="directions">
@@ -348,20 +367,8 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 
 
 
-</div>
-<p>
-  <h3 style="display:inline">Basic</h3>
-  
-  <input type="checkbox" id="instant"  > <label for="instant">Background uploading.</label>
-  <input type="checkbox" id="insecure"  style="margin-left: 10px;"> <label for="insecure">Prefer insecure HTTP.</label>
-  
-  <label for="shorten" style="margin-left: 10px;">URL shortener</label>
-  
-  <select id="shorten" >
-    <option>None</option>
-  </select> 
-</p>
 
+</div>
 <p>
   <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. A totally irrelevant fact is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now, aware of that magical fact, you should <b>follow me on twitter</b> and share this extension with all your peers.
 </p>
