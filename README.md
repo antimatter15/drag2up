@@ -38,6 +38,7 @@ Here's some projects that have been incorperated into this:
 * https://github.com/kenotron/chromepad (Dropbox)
 * http://jqueryui.com/ (Because [I was sick of using the html5 drag drop api](http://www.quirksmode.org/blog/archives/2009/09/the_html5_drag.html) and jquery ui had nice docs)
 * http://demos.hacks.mozilla.org/openweb/imageUploader/js/extends/xhr.js
+* http://code.google.com/p/chromemuse/wiki/SupportedServices
 
 These sites had the documentation that I used to develop stuff.
 
@@ -61,4 +62,6 @@ These sites had the documentation that I used to develop stuff.
 * http://en.wikipedia.org/wiki/Pastebin
 * http://en.wikipedia.org/wiki/Comparison_of_pastebins
 * https://chrome.google.com/extensions/detail/digfdjelalmeldlplgcapchelgnlkomc
-* http://code.google.com/p/chromemuse/wiki/SupportedServices
+* https://chrome.google.com/extensions/detail/gcfajadhhjjcpkbhdphfefbdnffochho
+* https://chrome.google.com/extensions/detail/eclilalbnmdonojgjmkekinflhodgoii
+* https://github.com/harpyon/miniscurl

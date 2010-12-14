@@ -30,8 +30,7 @@ function ChromeExOAuth(url_request_token, url_auth_token, url_access_token,
       "ChromeExOAuth Library";
   this.key_token = "oauth_token";
   this.key_token_secret = "oauth_token_secret";
-  this.callback_page = opt_args && opt_args['callback_page'] ||
-      "chrome_ex_oauth.html";
+  this.callback_page = "http://example.com/";
   this.auth_params = {};
   if (opt_args && opt_args['auth_params']) {
     for (key in opt_args['auth_params']) {
@@ -70,19 +69,6 @@ ChromeExOAuth.initBackgroundPage = function(oauth_config) {
   window.chromeExOAuthRedirectStarted = false;
   window.chromeExOAuthRequestingAccess = false;
 
-  var url_match = chrome.extension.getURL(window.chromeExOAuth.callback_page);
-  var tabs = {};
-  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (changeInfo.url &&
-        changeInfo.url.substr(0, url_match.length) === url_match &&
-        changeInfo.url != tabs[tabId] &&
-        window.chromeExOAuthRequestingAccess == false) {
-      chrome.tabs.create({ 'url' : changeInfo.url }, function(tab) {
-        tabs[tab.id] = tab.url;
-        chrome.tabs.remove(tabId);
-      });
-    }
-  });
 
   return window.chromeExOAuth;
 };
@@ -102,7 +88,46 @@ ChromeExOAuth.prototype.authorize = function(callback) {
     window.chromeExOAuthOnAuthorize = function(token, secret) {
       callback(token, secret);
     };
-    chrome.tabs.create({ 'url' :chrome.extension.getURL(this.callback_page) });
+    
+    var request_params = {
+        'url_callback_param' : 'chromeexoauthcallback'
+      }
+      
+      
+      
+    this.getRequestToken(function(url) {
+
+
+  function list(tabId, changeInfo, tab) {
+    if (changeInfo.url && changeInfo.url.indexOf('chromeexoauthcallback') != -1) {
+        chrome.tabs.remove(tabId);
+
+
+
+      var urlparts = changeInfo.url.split("?");
+
+    var querystring = urlparts.slice(1).join("?");
+    var params = ChromeExOAuth.formDecode(querystring);
+
+      
+      var oauth_token = params['oauth_token'];
+      var oauth_verifier = params['oauth_verifier']
+      console.log(params);
+      chromeExOAuth.getAccessToken(oauth_token, oauth_verifier, function (token, secret) {
+        chromeExOAuthOnAuthorize(token, secret);
+        chromeExOAuthRedirectStarted = false;
+      })
+      chrome.tabs.onUpdated.removeListener(list);
+    }
+  }
+  chrome.tabs.onUpdated.addListener(list);
+
+        chrome.tabs.create({ 'url' : url });
+      
+      
+      }, request_params);
+    
+
   }
 };
 
@@ -473,9 +498,7 @@ ChromeExOAuth.prototype.getRequestToken = function(callback, opt_args) {
   if (typeof callback !== "function") {
     throw new Error("Specified callback must be a function.");
   }
-  var url = opt_args && opt_args['url_callback'] ||
-            window && window.top && window.top.location &&
-            window.top.location.href;
+  var url = "http://example.com/";
 
   var url_param = opt_args && opt_args['url_callback_param'] ||
                   "chromeexoauthcallback";
