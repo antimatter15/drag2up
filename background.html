@@ -239,17 +239,19 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
 function fileType(file){
   var text_ext = 'log,less,sass,coffee,yaml,json,md,css,cfm,yaws,html,htm,xhtml,js,pl,php,php4,php3,phtml,py,rb,rhtml,xml,rss,svg,cgi'.split(',');
+  var ext = file.name.replace(/^.*\.(\w+?)$/,'$1').toLowerCase();
+  var image_ext = 'jpg,jpeg,tiff,raw,png,gif,bmp,ppm,pgm,pbm,pnm,webp'.split(','); //woot webp
+  if(image_ext.indexOf(ext) != -1) file.type = 'image/'+ (ext == 'jpg'?'jpeg':ext);
+  if(!file.type) file.type = 'application/octet-stream';
   if(file.type.indexOf('image/') == 0){
 	  //image type
 	  return 'image'
 	}else if(file.type.indexOf('text/') == 0){
 	  return 'text'
-	}else if(text_ext.indexOf(file.name.replace(/^.*\.(\w+?)$/,'$1')) != -1){
+	}else if(text_ext.indexOf(ext) != -1){
 	  return 'text'
 	}else if(file.type.indexOf('script') != -1 || file.type.indexOf('xml') != -1){
 	  return 'text'; //scripts or xml usually means code which usually means text
-	}else if(file.type.indexOf('script') != -1){
-	  return 'text'; //scripts usually means code which usually means text
 	}else if(file.size < 1024 * 1024) { //its rare for text files to be so huge
 	  /*
 	  var src = file.data;//atob(file.data.replace(/^data.+base64,/i,''));

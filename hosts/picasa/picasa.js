@@ -1,5 +1,6 @@
 /*
   do not venture below, i hate this.
+  wont bother seeing if https works
 */
 var PicasaOAUTH = ChromeExOAuth.initBackgroundPage({
   'request_url' : 'https://www.google.com/accounts/OAuthGetRequestToken',

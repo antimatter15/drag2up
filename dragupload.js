@@ -343,7 +343,7 @@ function initialize(){
       }
       
       if(files.length == 0 && (url = e.dataTransfer.getData('url'))){
-        uploadFile({url: url});
+        uploadFile({url: url, name: url.replace(/^.+\/(.+)$/,'$1') });
       }else if(files.length > 0){
         for(var i = 0; i < files.length; i++){
           var file = files[i];
