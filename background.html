@@ -28,6 +28,8 @@
 <script src="hosts/dropbox/dropbox.js"></script>
 <script>
 
+var instant_host = 'localhost:8080/'
+
 function uploadData(file, callback){
   var hostfn = {
     hotfile: uploadHotfile,
@@ -109,7 +111,7 @@ function handleRequest(request, sender, sendResponse){
       console.log('finished initializing instant', +new Date);
       returned_link({
         callback: request.callback,
-        url: https()+'drag2up.appspot.com/'+parts[0]
+        url: https()+instant_host+''+parts[0]
       })
     })
   }
@@ -147,7 +149,7 @@ racer.prototype.done = function(data){
 
 function instantInit(file, callback){
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'https://drag2up.appspot.com/new?'+params({
+  xhr.open('GET', https()+instant_host+'new?'+params({
     host: hostName(file),
     size: file.size,
     name: file.name
@@ -297,7 +299,7 @@ function uploadDataURL(file, callback){
 
 function linkData(id, url){
   var xhr = new XMLHttpRequest();
-  xhr.open('GET',https()+'drag2up.appspot.com/update/'+filetable[id][0]+'/'+filetable[id][1]+'?'+params({
+  xhr.open('GET',https()+instant_host+'update/'+filetable[id][0]+'/'+filetable[id][1]+'?'+params({
     url: url
   }), true);
   xhr.onload = function(e){

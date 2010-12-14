@@ -102,6 +102,7 @@ class LinkHandler(webapp.RequestHandler):
       'host': entity.host,
       'key': name,
       'name': entity.name,
+      'nowdate': time.time(),
       'date': entity.date,
       'timestamp': time.mktime(entity.date.timetuple()),
       'size': entity.size,

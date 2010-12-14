@@ -2,7 +2,6 @@
 <html>
   <head>
     <title>{{name}}</title>
-    <script src='/_ah/channel/jsapi'></script>
     <style>
       body {
         font-family: sans-serif, helvetica, arial;
@@ -16,9 +15,38 @@
         font-weight: bold;
       }
     </style>
+   
+  </head>
+  <body>
+    <h2 id="progress">Still uploading!</h2>
+    <p>
+      The file <tt>{{name|escape}}</tt> ({{size|filesizeformat}}) has been uploading to {{host|escape}} for <span id="since">{{date|timesince}}</span>, and will hopefully finish soon. 
+      <b>When the file is done uploading, a link will appear below.</b> There is no need to refresh as the upload status is being streamed in real time.
+    </p>
+    <p>
+    <input type="checkbox" id="annoy"> <label for="annoy">Alert me when it's done.</label> 
+    <input type="checkbox" id="autodown"> <label for="autodown">Automatically begin downloading when it's done.</label>  <i>(Keep this page open!)</i>
+    </p>
+
+    
+    <div id="link" style="display:none">
+      <h1><a href="/{{key}}" id="dlink">{{name|escape}}</a></h1>
+    </div>
+    <hr>
+    <div style="font-size: small">
+      Part of the <a href="https://github.com/antimatter15/drag2up">Drag2Up project</a>. Written by <a href="http://twitter.com/antimatter15">@antimatter15</a> (please follow me on twitter). Email comments and concerns to antimatter15@gmail.com.
+    </div>
+ <script src='/_ah/channel/jsapi'></script>
     <script>
+    
+    var timedelta = new Date();
+    timedelta.setTime(1000 * parseInt("{{nowdate}}")); //cant trust the current computer to be synced with appengine
+    
     var uploaded = new Date();
-    uploaded.setTime(1000 * parseInt("{{timestamp}}"))
+    uploaded.setTime(1000 * parseInt("{{timestamp}}") - (+timedelta - new Date));
+    
+    
+    
     function relative(time){
       if(time < 60) return time + ' seconds';
       if(time < 60 * 60) return Math.floor(time/60) + ' minutes ' + (time%60) + ' seconds';
@@ -52,25 +80,5 @@
     },500)
     
     </script>
-  </head>
-  <body>
-    <h2 id="progress">Still uploading!</h2>
-    <p>
-      The file <tt>{{name|escape}}</tt> ({{size|filesizeformat}}) has been uploading to {{host|escape}} for <span id="since">{{date|timesince}}</span>, and will hopefully finish soon. 
-      <b>When the file is done uploading, a link will appear below.</b> There is no need to refresh as the upload status is being streamed in real time.
-    </p>
-    <p>
-    <input type="checkbox" id="annoy"> <label for="annoy">Alert me when it's done.</label> 
-    <input type="checkbox" id="autodown"> <label for="autodown">Automatically begin downloading when it's done.</label>  <i>(Keep this page open!)</i>
-    </p>
-
-    
-    <div id="link" style="display:none">
-      <h1><a href="/{{key}}" id="dlink">{{name|escape}}</a></h1>
-    </div>
-    <hr>
-    <div style="font-size: small">
-      Part of the <a href="https://github.com/antimatter15/drag2up">Drag2Up project</a>. Written by <a href="http://twitter.com/antimatter15">@antimatter15</a> (please follow me on twitter). Email comments and concerns to antimatter15@gmail.com.
-    </div>
   </body>
 </html>
