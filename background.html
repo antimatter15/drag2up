@@ -239,7 +239,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
 function fileType(file){
   var text_ext = 'log,less,sass,coffee,yaml,json,md,css,cfm,yaws,html,htm,xhtml,js,pl,php,php4,php3,phtml,py,rb,rhtml,xml,rss,svg,cgi'.split(',');
-  var ext = file.name.replace(/^.*\.(\w+?)$/,'$1').toLowerCase();
+  var ext = file.name.toLowerCase().replace(/^.*\.(\w+?)(\#|\?)?.*$/,'$1');
   var image_ext = 'jpg,jpeg,tiff,raw,png,gif,bmp,ppm,pgm,pbm,pnm,webp'.split(','); //woot webp
   if(image_ext.indexOf(ext) != -1) file.type = 'image/'+ (ext == 'jpg'?'jpeg':ext);
   if(!file.type) file.type = 'application/octet-stream';
