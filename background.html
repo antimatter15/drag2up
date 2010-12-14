@@ -160,6 +160,7 @@ function instantInit(file, callback){
 
 
 function getURL(type, request, callback){
+  if(request.data) return callback(request); //no need reconverting!
   if(/^data:/.test(request.url)){
     console.log('opened via data url');
     var parts = request.url.match(/^data:(.+),/)[1].split(';');
@@ -242,28 +243,29 @@ function fileType(file){
   var ext = file.name.toLowerCase().replace(/^.*\.(\w+?)(\#|\?)?.*$/,'$1');
   var image_ext = 'jpg,jpeg,tiff,raw,png,gif,bmp,ppm,pgm,pbm,pnm,webp'.split(','); //woot webp
   if(image_ext.indexOf(ext) != -1) file.type = 'image/'+ (ext == 'jpg'?'jpeg':ext);
-  if(!file.type) file.type = 'application/octet-stream';
-  if(file.type.indexOf('image/') == 0){
-	  //image type
-	  return 'image'
-	}else if(file.type.indexOf('text/') == 0){
-	  return 'text'
-	}else if(text_ext.indexOf(ext) != -1){
-	  return 'text'
-	}else if(file.type.indexOf('script') != -1 || file.type.indexOf('xml') != -1){
-	  return 'text'; //scripts or xml usually means code which usually means text
-	}else if(file.size < 1024 * 1024) { //its rare for text files to be so huge
-	  /*
-	  var src = file.data;//atob(file.data.replace(/^data.+base64,/i,''));
-	  var txt = src.substr(0,512) + src.slice(-512);
-	  for(var i = 0, isAscii = true; i < 128; i++){
-	    if((txt.charCodeAt(i) & 0xff) > 128){
-	     isAscii = false;
-	     continue
+  if(file.type){
+    if(file.type.indexOf('image/') == 0){
+	    //image type
+	    return 'image'
+	  }else if(file.type.indexOf('text/') == 0){
+	    return 'text'
+	  }else if(text_ext.indexOf(ext) != -1){
+	    return 'text'
+	  }else if(file.type.indexOf('script') != -1 || file.type.indexOf('xml') != -1){
+	    return 'text'; //scripts or xml usually means code which usually means text
+	  }else if(file.size < 1024 * 1024) { //its rare for text files to be so huge
+	    /*
+	    var src = file.data;//atob(file.data.replace(/^data.+base64,/i,''));
+	    var txt = src.substr(0,512) + src.slice(-512);
+	    for(var i = 0, isAscii = true; i < 128; i++){
+	      if((txt.charCodeAt(i) & 0xff) > 128){
+	       isAscii = false;
+	       continue
+        }
       }
-    }
-    if(isAscii && file.size < 1024 * 300) return 'text';
-    */
+      if(isAscii && file.size < 1024 * 300) return 'text';
+      */
+	  }
 	}
 	return 'binary'
 }
