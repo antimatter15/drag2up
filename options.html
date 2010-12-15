@@ -202,7 +202,7 @@
 		})
 		
 		$('.filehost, .panel').disableSelection();
-		var bname = localStorage.binhost || 'hotfile';
+		var bname = localStorage.binhost || 'chemical';
 		var tname = localStorage.texhost || 'gist';
 		var iname = localStorage.imghost || 'imgur';
 		
@@ -348,6 +348,11 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 -->
 
 <!-- binary -->
+
+<div class="filehost binary image text" name="chemical">
+	<img src="hosts/logo/chemical.png">
+</div>
+
 
 <div class="filehost binary image text multipart" name="hotfile">
 	<img src="hosts/logo/hotfile.png">
