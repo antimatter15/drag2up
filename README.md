@@ -5,6 +5,10 @@
 
 Okay, so now I'm going to write a semblance of a readme file. Hopefully, there's really not that much to read about, this project is the source code behind the infinitely awesome drag2up extension (for lack of a better name). It was at one point up2drag/updrag and now lift/airfoil sounds like a pretty decent although undescriptive name. Either way, blah blah blah, here's a readme.
 
+### License
+
+I probably have to license this as GPLv3 because of all the code that it's building on that's gpl.
+
 ### drag2up v2
 
 drag2up v2 is a major rewrite of the drag2up codebase. The content script has been rewritten with a new, more reliable, controlled, and logical design. It is now consistent across frames and editable frames. It's been changed to support the new instant architecture, a broad range of web apps, animations and more. 
@@ -65,3 +69,4 @@ These sites had the documentation that I used to develop stuff.
 * https://chrome.google.com/extensions/detail/gcfajadhhjjcpkbhdphfefbdnffochho
 * https://chrome.google.com/extensions/detail/eclilalbnmdonojgjmkekinflhodgoii
 * https://github.com/harpyon/miniscurl
+* Chemical Servers are awesome! http://chemicalservers.com
