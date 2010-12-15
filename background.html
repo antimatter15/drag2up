@@ -31,6 +31,12 @@
 <script src="hosts/dropbox/dropbox.js"></script>
 <script>
 
+if(localStorage.currentVersion == '1.0.3'){
+  chrome.tabs.create({url: "options.html", selected: true});
+}
+
+localStorage.currentVersion = '2.0';
+
 var instant_host = 'drag2up.appspot.com/'//'localhost:8080/'
 
 function uploadData(file, callback){
