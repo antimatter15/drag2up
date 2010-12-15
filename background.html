@@ -88,7 +88,7 @@ function https(){
 
 function handleRequest(request, sender, sendResponse){
   console.log(request)
-  console.log('handle request', +new Date);
+  console.log('handle request', +new Date, request.id);
   
   function returned_link(obj){
     //here you apply the shorten methods before sending response
@@ -117,11 +117,17 @@ function handleRequest(request, sender, sendResponse){
   }
   
   if(instant){
-    instantInit({name:request.name || 'unknown.filetype', type: request.type || 'application/octet-stream', size: request.size || -1, data: '\xff'}, function(parts){
+    instantInit({
+        id: request.id,
+        name:request.name || 'unknown.filetype', 
+        type: request.type || 'application/octet-stream', 
+        size: request.size || -1, 
+        data: '\xff'
+      }, function(parts){
       car.done();
       console.log('finished initializing instant', +new Date);
       returned_link({
-        callback: request.callback,
+        callback: request.id,
         url: https()+instant_host+''+parts[0]
       })
     })
@@ -136,7 +142,7 @@ function handleRequest(request, sender, sendResponse){
     if(instant){
       car.done({url: url});
     }else if(filetable[request.id]){ //non-instant
-      returned_link({callback: request.callback, url: url})
+      returned_link({callback: request.id, url: url})
     }
     tabqueue[tab]--;
     chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
@@ -150,11 +156,11 @@ function racer(num, callback){
   this.num = num;
   this._done = 0;
   this.data = {};
-  this.callback = callback;
+  this.id = callback;
 }
 racer.prototype.done = function(data){
   if(data) for(var i in data) this.data[i] = data[i];
-  if(++this._done >= this.num) this.callback(this.data);
+  if(++this._done >= this.num) this.id(this.data);
 }
 
 

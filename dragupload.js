@@ -337,7 +337,7 @@ function initialize(){
           if(numleft == 0) mask.parentNode.removeChild(mask);
           delete callbacks[cb];
         }
-        file.callback = cb;
+        file.id = cb;
         console.log('sent upload msg', +new Date);
         propagateMessage('background'+JSON.stringify(file))
       }
