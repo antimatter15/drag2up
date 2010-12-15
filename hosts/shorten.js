@@ -185,6 +185,7 @@ var shortSvcList = {
                         // need to check for error code?
                         f({status: "ok", url: r});
         }},
+		/*
         "3.ly": {
                 method: "GET",
                 s_url: "http://3.ly/",
@@ -194,7 +195,7 @@ var shortSvcList = {
                         // need to check for error code?
                         f({status: "ok", url: r});
         }},
-        
+        */
         "chilp.it": {
                 method: "GET",
                 s_url: "http://chilp.it/api.php",
