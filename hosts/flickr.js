@@ -5,6 +5,11 @@
 //http://api.flickr.com/services
 function uploadFlickr(req, uploaded_fn){
   var base = "http://flickr.com/services" //https://secure.flickr.com/services
+  //wooot security!
+  if(https() == "https://"){
+    base = "https://secure.flickr.com/services";
+  }
+  
   function auth(params){
     params.api_key = "19d4df95a040e50112bd8e49a6096b59";
     var secret = 'edc13066151f70ed';
