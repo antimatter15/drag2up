@@ -2,6 +2,7 @@
   Thanks so much to the chemical servers hosting for this!
   Designed the API myself, wrote the hosting code too.
 */
+//no https
 function uploadChemical(req, callback){
   //http://files.chemicalservers.com/api.php
   var api_url = "http://files.chemicalservers.com/api.php";
@@ -18,8 +19,8 @@ function uploadChemical(req, callback){
   xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
   
   getBinary(req, function(file){
-    if(file.size * 1.5 > 23000000){
-      return callback("error: file exceeds maximum size for host. Files must be less than 15MB.");
+    if(file.size > 10 * 1000 * 1000){ //this is actually less than the limit of 15, but lets be nice to the server.
+      return callback("error: file exceeds maximum size for host. Files must be less than 10MB.");
     }
   
     xhr.onload = function(){
