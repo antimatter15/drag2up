@@ -234,7 +234,7 @@ function initialize(){
     mask.style.borderRadius = '5px';
     mask.style.webkitBorderRadius = '5px';
     mask.style.fontFamily = 'sans-serif, arial, helvetica'
-    mask.innerHTML = 'Drop file here';
+    mask.innerHTML = 'Drop files here';
     mask.hasDropped = false;
     
     mask.contentEditable = 'false'; //hey - everyone who is bored by waiting long durations can have fun editing it
@@ -357,7 +357,12 @@ function initialize(){
       //clearTargets();
       
       mask.style.backgroundColor = '#007fff';
-      mask.innerHTML = 'Uploading '+numleft+' file(s)';
+      if(numleft == 1){
+        mask.innerHTML = 'Uploading file';
+      }else{
+        mask.innerHTML = 'Uploading '+numleft+' file';
+      }
+      
       //var numleft = files.length;
 
 
