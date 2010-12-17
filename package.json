@@ -5,6 +5,7 @@
   "author": "antimatter15",
   "version": "2.0.0",
   "keywords": [],
+  "icon": "icon/128.png",
   "description": "Drag files to text boxes on any site to upload and share.",
   "id": "drag2up"
 }
