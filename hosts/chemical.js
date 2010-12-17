@@ -18,6 +18,10 @@ function uploadChemical(req, callback){
   xhr.open('POST', api_url);
   xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
   
+  xhr.oneror = function(){
+    callback('error: some error happened when uploading to chemical servers')
+  }
+  
   getBinary(req, function(file){
     if(file.size > 10 * 1000 * 1000){ //this is actually less than the limit of 15, but lets be nice to the server.
       return callback("error: file exceeds maximum size for host. Files must be less than 10MB.");
@@ -31,6 +35,8 @@ function uploadChemical(req, callback){
         fn: file.name
       }))
     }
+    
+    
     xhr.send('file='+encodeURIComponent(btoa(file.data)))
   });
 }
