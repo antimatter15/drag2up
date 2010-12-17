@@ -2,7 +2,7 @@
   "name": "drag2up",
   "version": "2.0.0",
   "description": "Drag files to text boxes on any site to upload and share.",
-	"background_page": "background.html",
+	"background_page": "data/background.html",
   "permissions": [
     "*://*/",
     "tabs",
@@ -13,11 +13,11 @@
   "page_action": {
     "default_icon": "icon/22.png"
   },
-  "options_page": "options.html",
+  "options_page": "data/options.html",
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["dragupload.js"],
+      "js": ["data/drag2up.js"],
       "all_frames": true
     }
   ],

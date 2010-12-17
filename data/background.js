@@ -1,35 +1,3 @@
-<script src="hosts/js/sha1.js"></script>
-<script src="hosts/js/md5.js"></script>
-<script src="hosts/js/jquery.min.js"></script>
-
-
-<script src="files.js"></script>
-<!--<script src="misc/testing.js"></script>-->
-
-<script src="hosts/shorten.js"></script>
-
-
-<script src="hosts/imageshack.js"></script>
-<script src="hosts/gist.js"></script>
-<script src="hosts/pastebin.js"></script>
-<script src="hosts/mysticpaste.js"></script>
-<script src="hosts/imgur.js"></script>
-<script src="hosts/hotfile.js"></script>
-<script src="hosts/cloudapp.js"></script>
-<script src="hosts/immio.js"></script>
-<script src="hosts/flickr.js"></script>
-<script src="hosts/chemical.js"></script>
-<script src="hosts/dafk.js"></script>
-
-
-<script src="hosts/picasa/chrome_ex_oauthsimple.js"></script>
-<script src="hosts/picasa/chrome_ex_oauth.js"></script>
-<script src="hosts/picasa/picasa.js"></script>
-
-<script src="hosts/dropbox/oauth.js"></script>
-<script src="hosts/dropbox/modern_dropbox.js"></script>
-<script src="hosts/dropbox/dropbox.js"></script>
-<script>
 
 if(localStorage.currentVersion == '1.0.3'){
   chrome.tabs.create({url: "options.html", selected: true});
@@ -337,5 +305,3 @@ chrome.pageAction.onClicked.addListener(function(tab) {
   chrome.tabs.create({url: "options.html", selected: true});
 });
 
-
-</script>
