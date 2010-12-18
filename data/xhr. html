@@ -1,0 +1,13 @@
+<script>
+//this is a demo for testing if worker pages still get magic powers.
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'http://antimatter15.com', true);
+xhr.send(null);
+xhr.onload = function(){
+  postMessage(xhr.responseText);
+}
+xhr.onerror = function(){
+  postMessage('error this sucks');
+}
+postMessage('loaded xhr and stuff happened');
+</script>
