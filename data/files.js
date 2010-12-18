@@ -31,7 +31,7 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
   
   append(rn + "Content-Disposition: form-data; name=\"" + i + "\"");
   
-  getRaw(params[i], function(file){
+  getURL(binxhr?'binary':'raw',params[i], function(file){ //Uint8 does clamping, but sendAsBinary doesn't
     console.log('actual data entity', file);
     
 

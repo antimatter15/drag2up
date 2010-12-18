@@ -49,6 +49,9 @@ function initialize(){
   function isDroppable(el){
     if(!el) return false;
     var tag = 'unknown', A;
+    
+    if(el.offsetWidth * el.offsetHeight < 100) return false;
+    
     if(el.tagName && typeof el.tagName.toLowerCase == 'function') tag = el.tagName.toLowerCase();
     
     //if(tag == 'div' && dropTargets.indexOf(el) != -1) return 3;
@@ -59,14 +62,15 @@ function initialize(){
     if(A == 2){
       return A;
     }else if(A == 1 || A == 2.5){
-      
+      //console.log('got close to soemthign');
+      //return true
       var pos = findPos(el); //oh crap this is hacky
       //for fixed positioned elements
-      var over_el = el.ownerDocument.elementFromPoint(pos[0]+1, pos[1]+1);
+      var over_el = el.ownerDocument.elementFromPoint(pos[0]+4, pos[1]+4);
       if(over_el == el) return ~~A;
       if(over_el && over_el.tagName.toLowerCase() == 'label') return ~~A;
       //for absolutely positioned elements
-    var over_mid = el.ownerDocument.elementFromPoint(pos[0]+1 - scrollX, pos[1]+1-scrollY);
+      var over_mid = el.ownerDocument.elementFromPoint(pos[0]+4 - scrollX, pos[1]+4-scrollY);
       if(over_mid == el) return ~~A;
       
       if(over_mid && over_mid.tagName.toLowerCase() == 'label') return ~~A;
@@ -100,6 +104,22 @@ function initialize(){
     window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'trickle_' + msg, '*');
     //console.log('trikling', window.top, window.top.postMessage);
   }
+  
+  
+  var rootSearching = false;
+  function testDragRoot(){
+    rootSearching = true;
+    if(lastDrag < +new Date - 500){
+      trickleMessage('deactivate');
+    }
+    
+    if(isDragging){
+      setTimeout(testDragRoot, 100);
+    }else{
+      rootSearching = false
+    }
+  }
+  
 
   window.addEventListener('message', function(e){
     if(e.data.substr(0, postMessageHeader.length) != postMessageHeader) return;
@@ -141,18 +161,17 @@ function initialize(){
       }else if(cmd == 'root_deactivate'){
         var lastDeactivation = +new Date;
         setTimeout(function(){
-          console.log('check deact', lastDrag - lastDeactivation);
+          //console.log('check deact', lastDrag - lastDeactivation);
           if(lastDrag < lastDeactivation){
           
             trickleMessage('deactivate');
             //console.warn('fuh reeelz!',lastDeactivation - lastDrag)
             
           }
-          if(lastDrag < +new Date - 240){
-            trickleMessage('deactivate');
-          }
         },300);
-        
+        if(rootSearching == false){
+          testDragRoot();
+        }
       }else if(cmd == 'root_forcedkill'){ //woot, same length!
         trickleMessage('deactivate');
         
@@ -354,11 +373,7 @@ function initialize(){
       
       var files = e.dataTransfer.files;
       
-      //console.log(e.dataTransfer.getData('text/html'))
-      //console.log(e.dataTransfer.getData('url'))
-      //console.log(e.dataTransfer.getData('text/uri-list'))
-
-      console.log(files);
+      console.log(files.length);
       var url, numleft = 0;
       
       function uploadFile(file){
@@ -376,8 +391,10 @@ function initialize(){
       }
       
       if(files.length == 0 && (url = e.dataTransfer.getData('url'))){
+        console.log('uploading URL', url);
         uploadFile({url: url, name: url.replace(/^.+\/([^\?\#]+).*$/,'$1'), type: "image/png" /*more or less all iamges dropped this way for now are going to be images*/ });
       }else if(files.length > 0){
+        console.log('uploading actual files', files.length);
         for(var i = 0; i < files.length; i++){
           var file = files[i];
           console.log('found file', file);
@@ -403,20 +420,19 @@ function initialize(){
         }
       }
       
-      mask.hasDropped = true;
-      //clearTargets();
-      
-      mask.style.backgroundColor = '#007fff';
-      if(numleft == 1){
-        mask.innerHTML = 'Uploading file';
+      if(numleft != 0){
+        mask.hasDropped = true;
+        
+        mask.style.backgroundColor = '#007fff';
+        if(numleft == 1){
+          mask.innerHTML = 'Uploading file';
+        }else{
+          mask.innerHTML = 'Uploading '+numleft+' files';
+        }
       }else{
-        mask.innerHTML = 'Uploading '+numleft+' files';
+        mask.parentNode.removeChild(mask);
+        
       }
-      
-      //var numleft = files.length;
-
-
-
     }, true);
   }
 
@@ -480,7 +496,7 @@ function initialize(){
   var lastFrameLength = 0;
   window.setInterval(function(){
     if(frames.length > lastFrameLength){
-    console.log('found a new frame');
+    //console.log('found a new frame');
       var init = function(){
         for(var l = 0; l < frames.length; l++){
           try{
