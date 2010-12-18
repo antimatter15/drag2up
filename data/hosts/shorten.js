@@ -13,6 +13,26 @@ function shorten(svc, url, func){
           }
   }
 
+  var xhr = new XMLHttpRequest();
+  xhr.open(shortSvc.method, shortSvc.s_url, true);
+  
+  if(shortSvc.method.toLowerCase() == 'post'){
+  	xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+  }
+
+  xhr.onerror = function(){
+   func({status: "error", error: "HTTP Status Code: "+xhr.status})
+  }
+  
+  xhr.onload = function(){
+      var r = xhr.responseText;
+      if(shortSvc.dataType == 'json'){
+        r = JSON.parse(r);
+      }
+     shortSvc.s_proc(r, func);
+  }
+  xhr.send(param);
+  /*
   $.ajax({
           type: shortSvc.method,
           url: shortSvc.s_url,
@@ -30,7 +50,7 @@ function shorten(svc, url, func){
                   shortSvc.s_proc(r, func);
           }
   });
-
+  */
 }
 
 
