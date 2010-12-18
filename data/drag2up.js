@@ -141,22 +141,38 @@ function initialize(){
       }else if(cmd == 'root_deactivate'){
         var lastDeactivation = +new Date;
         setTimeout(function(){
+          console.log('check deact', lastDrag - lastDeactivation);
           if(lastDrag < lastDeactivation){
+          
             trickleMessage('deactivate');
             //console.warn('fuh reeelz!',lastDeactivation - lastDrag)
             
           }
+          if(lastDrag < +new Date - 240){
+            trickleMessage('deactivate');
+          }
         },300);
+        
       }else if(cmd == 'root_forcedkill'){ //woot, same length!
         trickleMessage('deactivate');
+        
       //}else if(cmd == 'root_initupload' || cmd == 'root_uploaddata'){
       }else if(cmd == 'root_background'){
-        chrome.extension.sendRequest(JSON.parse(data.substr(15)), function(data){
-          trickleMessage('docallback'+JSON.stringify(data));
-        });
+        var json = JSON.parse(data.substr(15));
+        try{
+          chrome.extension.sendRequest(json, function(data){
+            trickleMessage('docallback'+JSON.stringify(data));
+          });
+        }catch(err){
+          console.log('could not transmit');
+          trickleMessage('docallback'+JSON.stringify({
+            callback: json.id,
+            url: 'error: could not send chrome request'
+          }))
+        }
       }
     }
-  })
+  }, true)
 
   function insertLink(el, url, type){
     console.log('insertLink',iId, el, url, type);
@@ -219,7 +235,11 @@ function initialize(){
     var opacity_normal = '0.84', opacity_hover = '0.42';
     var mask = document.createElement('div'); //this is what we're making!
     mask.style.opacity = '0'; //set to zero initially, for nice fade in
-    setTimeout(function(){ mask.style.opacity = opacity_normal;},0);
+
+    document.body.appendChild(mask);
+    dropTargets.push(mask);
+    
+    setTimeout(function(){ mask.style.opacity = opacity_normal;},10);
     
     mask.style.backgroundColor = "rgb(50,150,50)"; //a shade of green
     mask.dropTarget = el; //reference original element
@@ -229,6 +249,7 @@ function initialize(){
     
     mask.style.zIndex = 9007199254740991;
     mask.style.webkitTransition = 'opacity 0.5s ease'
+    mask.style.MozTransition = 'opacity 0.5s ease'
     mask.style.textAlign = 'center';
     mask.style.color = 'white';
     mask.style.borderRadius = '5px';
@@ -290,7 +311,7 @@ function initialize(){
     mask.addEventListener('dragover', function(e){ 
       if(isDragging) propagateMessage('reactivate');
       e.preventDefault();
-      e.stopImmediatePropagation();
+      e.stopPropagation();
       e.stopPropagation();
       return false;
     }, true);
@@ -299,6 +320,7 @@ function initialize(){
       setTimeout(function(){
         if(mask.parentNode){
           mask.style.webkitTransition = 'opacity 2.5s ease'
+          mask.style.MozTransition = 'opacity 2.5s ease'
           var opacity_breathe = "0.2"
           mask.style.opacity = (mask.style.opacity == opacity_breathe)?opacity_normal:opacity_breathe;
           setTimeout(arguments.callee, 2500);
@@ -313,8 +335,9 @@ function initialize(){
         leaveEvent.initEvent('drop', true, true);
         el.dispatchEvent(leaveEvent);
       },0);
+      
       e.preventDefault();
-      e.stopImmediatePropagation();
+      e.stopPropagation();
 
     
       console.log('drop event', +new Date);
@@ -325,7 +348,7 @@ function initialize(){
       //console.log(e.dataTransfer.getData('url'))
       //console.log(e.dataTransfer.getData('text/uri-list'))
 
-      
+      console.log(files);
       var url, numleft = 0;
       
       function uploadFile(file){
@@ -347,9 +370,26 @@ function initialize(){
       }else if(files.length > 0){
         for(var i = 0; i < files.length; i++){
           var file = files[i];
+          console.log('found file', file);
           //10MB is the new limit. why? it's yet another random number. drag2up crashed with a 20MB file.
           if(file.size > 1024 * 1024 * 10 && !confirm('The file "'+file.name+'" is over 10MB. Are you sure you want to upload it?')) continue;
-          uploadFile({url: createObjectURL(file), name: file.name, size: file.size, type: file.type});
+          var url;
+          if(window.createObjectURL){
+            url = window.createObjectURL(file)
+          }else if(window.createBlobURL){
+            url = window.createBlobURL(file)
+          }else if(window.URL && window.URL.createObjectURL){
+            url = window.URL.createObjectURL(file)
+          }
+          if(url){
+            uploadFile({url: url, name: file.name, size: file.size, type: file.type});
+          }else{
+            var fr = new FileReader();
+            fr.onload = function(){
+              uploadFile({url: fr.result, name: file.name, size: file.size, type: file.type});
+            }
+            fr.readAsDataURL(file);
+          }
         }
       }
       
@@ -368,9 +408,6 @@ function initialize(){
 
 
     }, true);
-    document.body.appendChild(mask);
-
-    dropTargets.push(mask);
   }
 
 
@@ -390,10 +427,10 @@ function initialize(){
 
   document.documentElement.addEventListener('dragenter', function(e){
     //console.log(e.dataTransfer.types, e)
-
-    if(e.dataTransfer.types.indexOf('Files') != -1 && e.dataTransfer.types.indexOf('text/uri-list') == -1){
+    var types = Array.prototype.slice.call(e.dataTransfer.types, 0);
+    if(types.indexOf('Files') != -1 && types.indexOf('text/uri-list') == -1){
       propagateMessage('reactivate');
-    }else if(e.dataTransfer.types.join(',') == 'text/html,text/uri-list,url'){ //images from other pages
+    }else if(types.join(',') == 'text/html,text/uri-list,url'){ //images from other pages
       propagateMessage('reactivate');
     }
     
@@ -411,6 +448,9 @@ function initialize(){
   }, false);
 
   document.documentElement.addEventListener('dragleave', function(e){
+    //console.log('leaving dragging');
+    
+    //go ahed
     isDragging && propagateMessage('deactivate');
   }, false);
 
@@ -428,7 +468,7 @@ function initialize(){
 
   //*
   var lastFrameLength = 0;
-  setInterval(function(){
+  window.setInterval(function(){
     if(frames.length > lastFrameLength){
     console.log('found a new frame');
       var init = function(){
