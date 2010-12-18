@@ -64,13 +64,13 @@ function ChromeExOAuth(url_request_token, url_auth_token, url_access_token,
  * @return {ChromeExOAuth} An initialized ChromeExOAuth object.
  */
 ChromeExOAuth.initBackgroundPage = function(oauth_config) {
-  window.chromeExOAuthConfig = oauth_config;
-  window.chromeExOAuth = ChromeExOAuth.fromConfig(oauth_config);
-  window.chromeExOAuthRedirectStarted = false;
-  window.chromeExOAuthRequestingAccess = false;
+  chromeExOAuthConfig = oauth_config;
+  chromeExOAuth = ChromeExOAuth.fromConfig(oauth_config);
+  chromeExOAuthRedirectStarted = false;
+  chromeExOAuthRequestingAccess = false;
 
 
-  return window.chromeExOAuth;
+  return chromeExOAuth;
 };
 
 /**
@@ -85,7 +85,7 @@ ChromeExOAuth.prototype.authorize = function(callback) {
   if (this.hasToken()) {
     callback(this.getToken(), this.getTokenSecret());
   } else {
-    window.chromeExOAuthOnAuthorize = function(token, secret) {
+    chromeExOAuthOnAuthorize = function(token, secret) {
       callback(token, secret);
     };
     
@@ -352,7 +352,7 @@ ChromeExOAuth.formDecode = function(encoded) {
  *     current window's querystring.
  */
 ChromeExOAuth.getQueryStringParams = function() {
-  var urlparts = window.location.href.split("?");
+  var urlparts = location.href.split("?");
   if (urlparts.length >= 2) {
     var querystring = urlparts.slice(1).join("?");
     return ChromeExOAuth.formDecode(querystring);
@@ -473,7 +473,7 @@ ChromeExOAuth.prototype.initOAuthFlow = function(callback) {
         'url_callback_param' : 'chromeexoauthcallback'
       }
       this.getRequestToken(function(url) {
-        window.location.href = url;
+        location.href = url;
       }, request_params);
     }
   } else {
