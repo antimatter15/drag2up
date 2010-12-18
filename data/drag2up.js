@@ -37,7 +37,7 @@ function initialize(){
         (function(target){
           target.style.opacity = '0';
           setTimeout(function(){
-            target.parentNode.removeChild(target);
+            if(target.parentNode) target.parentNode.removeChild(target);
           },500);
         })(dropTargets[i]);
       }
@@ -160,19 +160,29 @@ function initialize(){
       }else if(cmd == 'root_background'){
         var json = JSON.parse(data.substr(15));
         try{
-          chrome.extension.sendRequest(json, function(data){
-            trickleMessage('docallback'+JSON.stringify(data));
-          });
+          if(window.chrome && chrome.extension && chrome.extension.sendRequest){
+            chrome.extension.sendRequest(json, function(data){
+              trickleMessage('docallback'+JSON.stringify(data));
+            });
+          }else{
+            console.log('used postMessage trickle');
+            onMessage = function(msg) {
+              trickleMessage('docallback'+msg);
+            }
+            postMessage(JSON.stringify(json)); //TODO: make it more efficient. don't decode and reencode json
+          }
         }catch(err){
           console.log('could not transmit');
           trickleMessage('docallback'+JSON.stringify({
             callback: json.id,
-            url: 'error: could not send chrome request'
+            url: 'error: could not send request to background page'
           }))
         }
       }
     }
   }, true)
+
+  
 
   function insertLink(el, url, type){
     console.log('insertLink',iId, el, url, type);
@@ -400,7 +410,7 @@ function initialize(){
       if(numleft == 1){
         mask.innerHTML = 'Uploading file';
       }else{
-        mask.innerHTML = 'Uploading '+numleft+' file';
+        mask.innerHTML = 'Uploading '+numleft+' files';
       }
       
       //var numleft = files.length;
