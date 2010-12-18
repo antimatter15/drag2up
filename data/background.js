@@ -1,6 +1,8 @@
 
 if(localStorage.currentVersion == '1.0.3'){
-  chrome.tabs.create({url: "options.html", selected: true});
+  if(typeof chrome != 'undefined'){
+    chrome.tabs.create({url: "options.html", selected: true});
+  }
 }
 
 localStorage.currentVersion = '2.0';
@@ -8,6 +10,7 @@ localStorage.currentVersion = '2.0';
 var instant_host = 'drag2up.appspot.com/'//'localhost:8080/'
 
 function uploadData(file, callback){
+  console.log('uploading data');
   var hostfn = {
     hotfile: uploadHotfile,
     gist: uploadGist,
@@ -23,8 +26,9 @@ function uploadData(file, callback){
     mysticpaste: uploadMysticpaste,
     dafk: uploadDAFK
   };
-  
-  var fn = hostfn[hostName(file)];
+  var hostname = hostName(file);
+  console.log('selecte dhostname',hostname);
+  var fn = hostfn[hostname];
   if(fn){
     fn(file, callback);
   }else{
@@ -54,7 +58,7 @@ function https(){
   return 'https://';
 }
 
-function handleRequest(request, sender, sendResponse){
+function handleRequest(request, tab, sendResponse){
   console.log(request)
   console.log('handle request', +new Date, request.id);
   
@@ -84,7 +88,10 @@ function handleRequest(request, sender, sendResponse){
     });
   }
   
+  console.log('progress of instant',instant);
+  
   if(instant){
+    console.log('initializing instnat');
     instantInit({
         id: request.id,
         name:request.name || 'unknown.filetype', 
@@ -101,20 +108,25 @@ function handleRequest(request, sender, sendResponse){
     })
   }
   console.log('read file', +new Date);
-  var tab = sender.tab.id;
-  chrome.pageAction.show(tab);
-  tabqueue[tab] = (tabqueue[tab] || 0) + 1;
-  chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
-  
+
+  console.log('set queue');
+  if(typeof chrome != 'undefined'){
+    tabqueue[tab] = (tabqueue[tab] || 0) + 1;
+    chrome.pageAction.show(tab);  
+    chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
+  }
+  console.log('going to upload');
   uploadData(request, function(url){
     if(instant){
       car.done({url: url});
     }else if(filetable[request.id]){ //non-instant
       returned_link({callback: request.id, url: url})
     }
-    tabqueue[tab]--;
-    chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
-    if(tabqueue[tab] == 0) chrome.pageAction.hide(tab);
+    if(typeof chrome != 'undefined'){
+      tabqueue[tab]--;
+      chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
+      if(tabqueue[tab] == 0) chrome.pageAction.hide(tab);
+    }
   });
   
 }
@@ -134,15 +146,20 @@ racer.prototype.done = function(data){
 
 function instantInit(file, callback){
   var xhr = new XMLHttpRequest();
+  console.log('created xhr')
   xhr.open('GET', https()+instant_host+'new?'+params({
     host: hostName(file),
     size: file.size,
     name: file.name
-  }));
+  }), true);
+  console.log('getted things');
   xhr.onload = function(){
+    console.log('done initializing instnat', xhr.responseText)
     callback(filetable[file.id] = xhr.responseText.split(','));
   }
+
   xhr.send();
+    console.log('sent');
 }
 
 
@@ -217,11 +234,17 @@ function getBinary(request, callback){
   getURL('binary', request, callback);
 }
 
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-  setTimeout(function(){
-    handleRequest(request, sender, sendResponse)
-  }, 0); //chrome has weird event handling things that make debugging stuff harder
-});
+if(typeof chrome != 'undefined'){
+  chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+    setTimeout(function(){
+      handleRequest(request, sender.tab.id, sendResponse)
+    }, 0); //chrome has weird event handling things that make debugging stuff harder
+  });
+  
+  chrome.pageAction.onClicked.addListener(function(tab) {
+    chrome.tabs.create({url: "options.html", selected: true});
+  });
+}
 
 
 
@@ -301,7 +324,5 @@ function linkData(id, url){
 }
 
 
-chrome.pageAction.onClicked.addListener(function(tab) {
-  chrome.tabs.create({url: "options.html", selected: true});
-});
+
 

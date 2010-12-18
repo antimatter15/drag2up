@@ -5,8 +5,15 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
   var BOUNDARY = "---------------------------1966284435497298061834782736";
   var rn = "\r\n";
   console.log(params)
-  var req = new BlobBuilder();
-  req.append("--" + BOUNDARY);
+  
+  var binxhr = !!this.sendAsBinary;
+  if(binxhr){
+    var req = '', append = function(data){req += data}
+  }else{
+    var req = new BlobBuilder(), append = function(data){req.append(data)}
+  }
+  
+  append("--" + BOUNDARY);
   
   var file_param = -1;
   var xhr = this;
@@ -15,39 +22,45 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
     if (typeof params[i] == "object") {
       file_param = i;
     } else {
-      req.append(rn + "Content-Disposition: form-data; name=\"" + i + "\"");
-      req.append(rn + rn + params[i] + rn + "--" + BOUNDARY);
+      append(rn + "Content-Disposition: form-data; name=\"" + i + "\"");
+      append(rn + rn + params[i] + rn + "--" + BOUNDARY);
     }
   }
   
-    var i = file_param;
+  var i = file_param;
+  
+  append(rn + "Content-Disposition: form-data; name=\"" + i + "\"");
+  
+  getRaw(params[i], function(file){
+    console.log('actual data entity', file);
     
-    req.append(rn + "Content-Disposition: form-data; name=\"" + i + "\"");
-    
-    getRaw(params[i], function(file){
-      console.log('actual data entity', file);
-      
-      //file.data = 'blah blah'
-      
+
+    append("; filename=\""+file.name+"\"" + rn + "Content-type: "+file.type);
+
+    append(rn + rn);
+
+    if(binxhr){
+      append(file.data);
+    }else{
       var bin = file.data
       var arr = new Uint8Array(bin.length);
-      for(var i = 0, l = bin.length; i < l; i++){
-        arr[i] = bin.charCodeAt(i)
-      }
+      for(var i = 0, l = bin.length; i < l; i++)
+        arr[i] = bin.charCodeAt(i);
+      
+      append(arr.buffer)
+    }
+    append(rn + "--" + BOUNDARY);
+  
+    append("--");
 
-      //bb.append(arr.buffer)
-      //var blob = bb.getBlob(file.type);
-      req.append("; filename=\""+file.name+"\"" + rn + "Content-type: "+file.type);
 
-      req.append(rn + rn);
-      req.append(arr.buffer)
-      req.append(rn + "--" + BOUNDARY);
+    xhr.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
     
-      req.append("--");
-
-
-      xhr.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
+    if(binxhr){
+      xhr.sendAsBinary(req);
+    }else{
       superblob = req.getBlob();
       xhr.send(req.getBlob());
-    });
+    }
+  });
 };
