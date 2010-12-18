@@ -201,6 +201,13 @@ function getURL(type, request, callback){
 
       if(type == 'binary'){
         //*
+        if(typeof BlobBuilder == 'undefined'){
+        
+          for(var raw = xhr.responseText, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff);
+          
+          callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
+        }else{
+        
         var bb = new BlobBuilder();//this webworker is totally overkill
         bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
         var worker = new Worker(createObjectURL(bb.getBlob()));
@@ -208,7 +215,10 @@ function getURL(type, request, callback){
           var data = e.data;
           callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
         };
+        
         worker.postMessage(xhr.responseText);
+        }
+        
         //*/
       }else if(type == 'raw'){
         var data = xhr.responseText;
