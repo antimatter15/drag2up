@@ -29,6 +29,7 @@ function initialize(){
   //console.log('initialized ',iId,' at', location.href);
 
   function clearTargets(){
+  console.log('clear targets');
   //return;
     isDragging = false;
     for(var i = dropTargets.length; i--;){
@@ -155,9 +156,15 @@ function initialize(){
     }else if(data.substr(0, 4) == 'root'){
       var cmd = data.substr(0,15);
       if(cmd == 'root_reactivate'){
-        if(isDragging == false) trickleMessage('reactivate');
+        if(isDragging == false){
+          addSettingsDropper()
+          trickleMessage('reactivate');
+        }
         lastDrag = (+new Date); //TODO; utilize the value that got passed
         
+        if(rootSearching == false){
+          testDragRoot();
+        }
       }else if(cmd == 'root_deactivate'){
         var lastDeactivation = +new Date;
         setTimeout(function(){
@@ -169,9 +176,6 @@ function initialize(){
             
           }
         },300);
-        if(rootSearching == false){
-          testDragRoot();
-        }
       }else if(cmd == 'root_forcedkill'){ //woot, same length!
         trickleMessage('deactivate');
         
@@ -248,6 +252,46 @@ function initialize(){
   }
 
 
+  function addSettingsDropper(){
+    console.log('showing magic thing');
+    var mask = document.createElement('div'); //this is what we're making!
+    document.body.appendChild(mask);
+    dropTargets.push(mask);
+    
+    var opacity_normal = '0.84', opacity_hover = '0.42';
+    mask.style.opacity = opacity_normal;
+    mask.style.backgroundColor = "rgb(224,167,67)"; //a shade of orange
+    mask.style.position = 'absolute';
+    mask.style.zIndex = 9007199254740991;
+    mask.style.webkitTransition = 'opacity 0.5s ease'
+    mask.style.MozTransition = 'opacity 0.5s ease'
+    mask.style.textAlign = 'center';
+    mask.style.color = 'white';
+    mask.style.borderRadius = '5px';
+    mask.style.webkitBorderRadius = '5px';
+    mask.style.MozBorderRadius = '5px';
+    mask.style.fontFamily = 'sans-serif, arial, helvetica'
+    mask.innerHTML = 'drag2up <b>settings</b>';
+    mask.hasDropped = false;
+    
+    mask.style.bottom = '20px';
+    mask.style.right = '20px';
+    mask.style.padding = '7px';
+    mask.style.paddingTop = '10px';
+    mask.style.paddingBottom = '10px';
+    mask.style.fontSize = '16px';
+
+    mask.addEventListener('dragenter', function(e){ mask.style.opacity = opacity_hover; }, false);
+    mask.addEventListener('dragleave', function(e){ mask.style.opacity = opacity_normal;}, false);
+    //
+    mask.addEventListener('dragover', function(e){ 
+      if(isDragging) propagateMessage('reactivate');
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }, true);
+  }
+
 
   function renderTarget(el){
     for(var i = dropTargets.length; i-- && dropTargets[i].dropTarget != el;){};
@@ -258,7 +302,7 @@ function initialize(){
     var pos = findPos(el), width = el.offsetWidth, height = el.offsetHeight;
     if(!width && !height) return; //no zero widther
     
-    console.log('renderTarget',iId, el);
+    console.log('render drop target',iId, el);
     
     
     var opacity_normal = '0.84', opacity_hover = '0.42';
@@ -285,7 +329,7 @@ function initialize(){
     mask.style.webkitBorderRadius = '5px';
     mask.style.MozBorderRadius = '5px';
     mask.style.fontFamily = 'sans-serif, arial, helvetica'
-    mask.innerHTML = 'Drop files here';
+    mask.innerHTML = '<b>drop files</b> here';
     mask.hasDropped = false;
     
     mask.contentEditable = 'false'; //hey - everyone who is bored by waiting long durations can have fun editing it
@@ -426,15 +470,15 @@ function initialize(){
         
         mask.style.backgroundColor = '#007fff';
         if(numleft == 1){
-          mask.innerHTML = 'Uploading file';
+          mask.innerHTML = 'uploading file';
         }else{
-          mask.innerHTML = 'Uploading '+numleft+' files';
+          mask.innerHTML = 'uploading '+numleft+' files';
         }
       }else{
         mask.parentNode.removeChild(mask);
-        
       }
     }, true);
+    
   }
 
 
@@ -447,6 +491,8 @@ function initialize(){
         if(isDroppable(all[l])) renderTarget(all[l]);
       }
     }
+    
+
   }
 
 

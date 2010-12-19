@@ -64,7 +64,12 @@
 	}
 		
 	
-	.has span {display: none; border-radius: 4px; padding: 3px}
+	.has span {
+	  display: none; 
+	  border-radius: 4px; 
+	  -moz-border-radius: 4px;
+	  padding: 3px
+  }
 	.binary .binary { display: inline; }
 	.text .text { display: inline; }
 	.image .image { display: inline;}
@@ -83,6 +88,7 @@
 		margin: 10px;
 		border: 1px solid hsl(120, 73%, 70%);
 		border-radius: 10px;
+	  -moz-border-radius: 10px;
 	}
 	
 	h3 {
@@ -94,6 +100,7 @@
 		border: 1px solid hsl(240, 73%, 70%);
 		margin: 10px;
 		border-radius: 10px;
+	  -moz-border-radius: 10px;
 	}
 	
 	.filehost img {
@@ -109,6 +116,8 @@
 	</style>
 	<script>
 	function supports_binary(){
+	  var xhr = new XMLHttpRequest();
+	  if(xhr.sendAsBinary) return true; //firefox uses this instead
 	  try{
 	    var bb = new BlobBuilder();
 	    var ui = new Uint8Array(42);

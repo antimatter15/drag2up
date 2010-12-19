@@ -1,6 +1,8 @@
 //stolen from mozilla http://demos.hacks.mozilla.org/openweb/imageUploader/js/extends/xhr.js
 //http://code.google.com/p/chromium/issues/detail?id=35705#c6
 //http://efreedom.com/Question/1-3743047/Uploading-Binary-String-WebKit-Chrome-Using-XHR-Equivalent-Firefoxs-SendAsBinary
+//this is a mutilated sendMultipart function. BEWARE!
+
 XMLHttpRequest.prototype.sendMultipart = function(params) {
   var BOUNDARY = "---------------------------1966284435497298061834782736";
   var rn = "\r\n";
