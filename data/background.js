@@ -1,7 +1,7 @@
 
 if(localStorage.currentVersion == '1.0.3'){
   if(typeof chrome != 'undefined'){
-    chrome.tabs.create({url: "options.html", selected: true});
+    chrome.tabs.create({url: "data/options.html", selected: true});
   }
 }
 
@@ -76,7 +76,7 @@ function handleRequest(request, tab, sendResponse){
   if(request.action == 'settings'){
     console.log('opening settings page');
     if(typeof chrome != 'undefined'){
-      chrome.tabs.create({url: "options.html", selected: true});
+      chrome.tabs.create({url: "data/options.html", selected: true});
     }else if(typeof tabs != 'undefined'){
       tabs.open({
         url: data.url('options.html')
@@ -287,7 +287,7 @@ if(typeof chrome != 'undefined'){
   });
   
   chrome.pageAction.onClicked.addListener(function(tab) {
-    chrome.tabs.create({url: "options.html", selected: true});
+    chrome.tabs.create({url: "data/options.html", selected: true});
   });
 }
 

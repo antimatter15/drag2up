@@ -156,14 +156,22 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 				options.success
 			);
 		} else {
-			$.ajax({
-				url: message.action,
-				type: message.method,
-				data: OAuth.getParameterMap(message.parameters),
-				dataType: options.type,
-				success: options.success,
-				error: options.error
-			});
+		  var xhr = new XMLHttpRequest();
+		  var data =  OAuth.getParameterMap(message.parameters);
+
+		  if(message.method.toLowerCase() == 'post'){
+  		  xhr.open(message.method, message.action, true);
+        xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+        xhr.send(data);
+		  }else{
+  		  xhr.open(message.method, message.action+'?'+data, true);
+  		  xhr.send(null);
+		  }
+		  xhr.onload = function(){
+		    var res = xhr.responseText;
+		    if(message.type == 'json') res = JSON.parse(res);
+		    options.success(res);
+		  }
 		}
 	};
 	
