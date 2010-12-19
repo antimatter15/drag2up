@@ -186,12 +186,18 @@ function getURL(type, request, callback){
     var enc = request.url.substr(request.url.indexOf(',')+1);
     var data = b64 ? atob(enc) : unescape(enc);
     //data urls dont have any weird encoding issue as far as i can tell
+    var name = '';
+    if(request.name){
+      name = request.name;
+    }else{
+      name = enc.substr(enc.length/2 - 6, 6) + '.' + mime.split('/')[1];
+    }
     callback({
       data: data,
       type: mime,
       id: request.id,
       size: data.length,
-      name: enc.substr(enc.length/2 - 6, 6) + '_' + mime.replace('/','.')
+      name: name
     });
     
     //callback(new dFile(data, name, mime, id, size)

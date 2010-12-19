@@ -70,3 +70,6 @@ These sites had the documentation that I used to develop stuff.
 * https://chrome.google.com/extensions/detail/eclilalbnmdonojgjmkekinflhodgoii
 * https://github.com/harpyon/miniscurl
 * Chemical Servers are awesome! http://chemicalservers.com
+
+### Known Issues:
+Firefox 3.6 on Ubuntu Linux does not work properly. It seems to work fine on Mac OS X. I haven't bothered testing on Windows. Firefox 4b7 on Ubuntu Linux does work, however.
