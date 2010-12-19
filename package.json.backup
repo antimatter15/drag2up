@@ -1,0 +1,10 @@
+{
+  "license": "GPL 3.0", 
+  "name": "drag2up",
+  "contributors": [],
+  "author": "antimatter15",
+  "version": "2.0.0",
+  "keywords": [],
+  "icon": "data/icon/128.png",
+  "description": "Drag files to text boxes on any site to upload and share."
+}
