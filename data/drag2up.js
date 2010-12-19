@@ -283,6 +283,7 @@ function initialize(){
     mask.style.color = 'white';
     mask.style.borderRadius = '5px';
     mask.style.webkitBorderRadius = '5px';
+    mask.style.MozBorderRadius = '5px';
     mask.style.fontFamily = 'sans-serif, arial, helvetica'
     mask.innerHTML = 'Drop files here';
     mask.hasDropped = false;
@@ -452,14 +453,15 @@ function initialize(){
 
 
   document.documentElement.addEventListener('dragenter', function(e){
-    //console.log(e.dataTransfer.types, e)
+    //console.log(e.dataTransfer, e)
+    if(!e.dataTransfer) return;
     var types = Array.prototype.slice.call(e.dataTransfer.types, 0);
+    //console.log(types);
     if(types.indexOf('Files') != -1 && types.indexOf('text/uri-list') == -1){
       propagateMessage('reactivate');
     }else if(types.join(',') == 'text/html,text/uri-list,url'){ //images from other pages
       propagateMessage('reactivate');
     }
-    
     
   }, false);
 

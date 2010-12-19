@@ -9,6 +9,20 @@ localStorage.currentVersion = '2.0';
 
 var instant_host = 'drag2up.appspot.com/'//'localhost:8080/'
 
+
+function hostName(file){
+  var typehost = {
+    binary: localStorage.binhost || 'chemical',
+	  text: localStorage.texhost || 'gist',
+	  image: localStorage.imghost || 'imgur'
+	}
+	
+	var type = fileType(file);
+	
+	return typehost[type]
+}
+
+
 function uploadData(file, callback){
   console.log('uploading data');
   var hostfn = {
@@ -288,18 +302,6 @@ function fileType(file){
 	  }
 	}
 	return 'binary'
-}
-
-function hostName(file){
-  var typehost = {
-    binary: localStorage.binhost || 'hotfile',
-	  text: localStorage.texhost || 'gist',
-	  image: localStorage.imghost || 'imgur'
-	}
-	
-	var type = fileType(file);
-	
-	return typehost[type]
 }
 
 
