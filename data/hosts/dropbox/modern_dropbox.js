@@ -244,6 +244,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		                url: url,
 		                onOpen: function(tab){
                       var poll = function(){
+                      
 			                  if(tab.url.indexOf('uid=') != -1){
 				                  tab.close()
 				                  init();
@@ -253,7 +254,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		                  };
 		                  poll();
 		                }
-		              }
+		              })
 		            }
 						}).bind(this)
 					});

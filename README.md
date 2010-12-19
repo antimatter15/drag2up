@@ -77,3 +77,5 @@ Firefox 3.6 on Ubuntu Linux does not work properly. It seems to work fine on Mac
 ### Todo:
 
 get a button on the addons panel for Preferences to work, but jetpack doesnt seem to do that yet.
+
+Logging in to flickr is a little awkward.

@@ -245,7 +245,7 @@ function initialize(){
     var opacity_normal = '0.42', opacity_hover = '0.82';
     mask.style.opacity = opacity_normal;
     mask.style.backgroundColor = "rgb(91,84,183)"; //a shade of orange
-    mask.style.position = 'absolute';
+    mask.style.position = 'fixed';
     mask.style.zIndex = 9007199254740991;
     mask.style.webkitTransition = 'opacity 0.5s ease'
     mask.style.MozTransition = 'opacity 0.5s ease'

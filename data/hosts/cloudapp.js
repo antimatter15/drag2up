@@ -39,7 +39,7 @@ function uploadCloudApp(file, callback){
           };
           poll();
         }
-      }
+      })
     }
       
       

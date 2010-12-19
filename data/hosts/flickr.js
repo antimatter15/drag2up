@@ -75,15 +75,15 @@ function uploadFlickr(req, uploaded_fn){
         onOpen: function(tab){
           var poll = function(){
             if(/frob=(.+)/.test(tab.url)){
-              tab.close()
               init(tab.url);
+              tab.close()
             }else{
               setTimeout(poll, 100)
             }
           };
           poll();
         }
-      }
+      })
     }
   
   }
