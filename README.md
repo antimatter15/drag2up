@@ -73,3 +73,7 @@ These sites had the documentation that I used to develop stuff.
 
 ### Known Issues:
 Firefox 3.6 on Ubuntu Linux does not work properly. It seems to work fine on Mac OS X. I haven't bothered testing on Windows. Firefox 4b7 on Ubuntu Linux does work, however.
+
+### Todo:
+
+get a button on the addons panel for Preferences to work, but jetpack doesnt seem to do that yet.

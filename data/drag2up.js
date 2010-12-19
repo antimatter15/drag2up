@@ -29,7 +29,7 @@ function initialize(){
   //console.log('initialized ',iId,' at', location.href);
 
   function clearTargets(){
-  console.log('clear targets');
+  //console.log('clear targets');
   //return;
     isDragging = false;
     for(var i = dropTargets.length; i--;){
@@ -423,7 +423,7 @@ function initialize(){
         callbacks[cb] = function(data){
           numleft--;
           insertLink(el, data.url, file.type);
-          if(numleft == 0) mask.parentNode.removeChild(mask);
+          if(numleft == 0 && mask.parentNode) mask.parentNode.removeChild(mask);
           delete callbacks[cb];
         }
         file.id = cb;
@@ -522,7 +522,7 @@ function initialize(){
 
   document.documentElement.addEventListener('mousemove', function(e){
     //allow default to happen for normal drag/drops
-    //isDragging && propagateMessage('deactivate');
+    isDragging && propagateMessage('deactivate');
   }, false);
   
   document.documentElement.addEventListener('dragleave', function(e){
