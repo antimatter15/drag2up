@@ -44,7 +44,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		
 		for (i in keys) {
 			var key = keys[i];
-			value = localStorage.getItem(_storagePrefix + key);
+			value = localStorage[_storagePrefix + key];
 			if (value) {
 				_tokens[key] = value;
 			}
@@ -68,7 +68,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 			
 			if (valueMap[key] !== undefined) {
 			
-				localStorage.setItem(_storagePrefix + key, valueMap[key]);
+				localStorage[_storagePrefix + key] = valueMap[key];
 				_tokens[key] = valueMap[key];
 			}
 		}	
@@ -215,26 +215,46 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 					
 							_storeAuth(authTokens);
 							var init = this.initialize;
-              chrome.tabs.create({
-				        url: "http://api.getdropbox.com/" + _dropboxApiVersion + "/oauth/authorize?oauth_token=" 
+							var url = "http://api.getdropbox.com/" + _dropboxApiVersion + "/oauth/authorize?oauth_token=" 
 								+ authTokens["requestToken"] 
 								+ "&oauth_callback=" 
-								+ _authCallback
-				      }, function(tab){
-				        var poll = function(){
-			            chrome.tabs.get(tab.id, function(info){
-				            if(info.url.indexOf('uid=') != -1){
-					            chrome.tabs.remove(tab.id);
-					            //dropbox.setup();
-					            init();
+								+ _authCallback;
 
-				            }else{
-					            setTimeout(poll, 100)
-				            }
-			            })
-		            };
-		            poll();
-		            })
+		            
+		            if(typeof chrome != 'undefined'){
+                  chrome.tabs.create({
+				            url: url
+				          }, function(tab){
+				            var poll = function(){
+			                chrome.tabs.get(tab.id, function(info){
+				                if(info.url.indexOf('uid=') != -1){
+					                chrome.tabs.remove(tab.id);
+					                //dropbox.setup();
+					                init();
+
+				                }else{
+					                setTimeout(poll, 100)
+				                }
+			                })
+		                };
+		                poll();
+	                })
+		            }else if(typeof tabs != 'undefined'){
+		              tabs.open({
+		                url: url,
+		                onOpen: function(tab){
+                      var poll = function(){
+			                  if(tab.url.indexOf('uid=') != -1){
+				                  tab.close()
+				                  init();
+			                  }else{
+				                  setTimeout(poll, 100)
+			                  }
+		                  };
+		                  poll();
+		                }
+		              }
+		            }
 						}).bind(this)
 					});
 				} else {

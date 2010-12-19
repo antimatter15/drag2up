@@ -7,19 +7,42 @@ function uploadCloudApp(file, callback){
   xhr.onload = function(){
     if(xhr.status == 401){
       //i can haz login
-      chrome.tabs.create({url: "http://my.cl.ly/login"}, function(tab){
+
+      
+    if(typeof chrome != 'undefined'){
+      chrome.tabs.create({
+        url: "http://my.cl.ly/login"
+      }, function(tab){
         var poll = function(){
           chrome.tabs.get(tab.id, function(info){
-            if(info.url == 'http://my.cl.ly/'){
+            if('http://my.cl.ly/' == (info.url)){
               chrome.tabs.remove(tab.id);
               uploadCloudApp(file, callback);
             }else{
-              setTimeout(poll, 300)
+              setTimeout(poll, 100)
             }
           })
         };
         poll();
       })
+    }else if(typeof tabs != 'undefined'){
+      tabs.open({
+        url: "http://my.cl.ly/login",
+        onOpen: function(tab){
+          var poll = function(){
+            if('http://my.cl.ly/' == (tab.url)){
+              tab.close()
+              uploadCloudApp(file, callback);
+            }else{
+              setTimeout(poll, 100)
+            }
+          };
+          poll();
+        }
+      }
+    }
+      
+      
     }else{
       var json = JSON.parse(xhr.responseText);
       var xhr2 = new XMLHttpRequest();

@@ -25,37 +25,66 @@ function uploadFlickr(req, uploaded_fn){
   function getAuthToken(callback){
     var authurl = base+"/auth/?"+params(auth({perms: "write"}));
     
-    chrome.tabs.create({url: authurl}, function(tab){
-      var poll = function(){
-        chrome.tabs.get(tab.id, function(info){
-          if(/frob=(.+)/.test(info.url)){
-            var frob = info.url.match(/frob=(.+)/)[1]
-            chrome.tabs.remove(tab.id);
-            
-            var xt = new XMLHttpRequest();
-            xt.open("get", base+'/rest?'+params(auth({
-              method: 'flickr.auth.getToken',
-              frob: frob,
-              nojsoncallback: 1,
-              format: 'json'
-            })))
-            xt.onload = function(){
-              var json = JSON.parse(xt.responseText);
-              var token = json.auth.token._content;
-              localStorage.flickr_token = token;
-              console.log('magic token', token);
-              callback();
+
+
+    
+    function init(url){
+      var frob = url.match(/frob=(.+)/)[1]
+      chrome.tabs.remove(tab.id);
+      
+      var xt = new XMLHttpRequest();
+      xt.open("get", base+'/rest?'+params(auth({
+        method: 'flickr.auth.getToken',
+        frob: frob,
+        nojsoncallback: 1,
+        format: 'json'
+      })))
+      xt.onload = function(){
+        var json = JSON.parse(xt.responseText);
+        var token = json.auth.token._content;
+        localStorage.flickr_token = token;
+        console.log('magic token', token);
+        callback();
+      }
+      xt.send()
+      //localStorage.flickr_frob = frob;
+      console.log('magic frob', frob);
+    }
+    
+   
+    
+    if(typeof chrome != 'undefined'){
+      chrome.tabs.create({
+        url: authurl
+      }, function(tab){
+        var poll = function(){
+          chrome.tabs.get(tab.id, function(info){
+            if(/frob=(.+)/.test(info.url)){
+              chrome.tabs.remove(tab.id);
+              init(info.url);
+            }else{
+              setTimeout(poll, 100)
             }
-            xt.send()
-            //localStorage.flickr_frob = frob;
-            console.log('magic frob', frob);
-          }else{
-            setTimeout(poll, 300)
-          }
-        })
-      };
-      poll();
-    })
+          })
+        };
+        poll();
+      })
+    }else if(typeof tabs != 'undefined'){
+      tabs.open({
+        url: authurl,
+        onOpen: function(tab){
+          var poll = function(){
+            if(/frob=(.+)/.test(tab.url)){
+              tab.close()
+              init(tab.url);
+            }else{
+              setTimeout(poll, 100)
+            }
+          };
+          poll();
+        }
+      }
+    }
   
   }
 

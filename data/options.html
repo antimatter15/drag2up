@@ -115,6 +115,8 @@
 	}
 	</style>
 	<script>
+	if(typeof console == 'undefined') console = {log:function(){},warn:function(){},error:function(){},info:function(){}};
+	
 	function supports_binary(){
 	  var xhr = new XMLHttpRequest();
 	  if(xhr.sendAsBinary) return true; //firefox uses this instead
@@ -133,8 +135,54 @@
 	  }
 	}
 	
+	set = function(e){
+	  for(var i in e){
+	    localStorage[i] = e[i];
+	  }
+	}
 	
-	$(function() {
+	get = function(e){
+	  return localStorage[e]
+	}
+	
+	$(document).ready(function(){
+	  setTimeout(function(){
+	    var el = document.getElementById('drag2uplocalstorage');
+	    if(el){
+	    
+	     
+	      $('div[name=picasa]').remove(); //i hate picasa.
+	      
+	    
+	      console.log('found simplestore');
+	      var simplestore = {};
+        el.addEventListener('drag2upread', function(){
+          console.log('read data', el.value);
+          simplestore = JSON.parse(el.value);
+          get = function(prop){
+            return simplestore[prop]
+          }
+          init();
+        }, true);
+	      var customEvent = document.createEvent('Event');
+        customEvent.initEvent('drag2upsave', true, true);
+        
+        set = function(data){
+          el.value = JSON.stringify(data);
+          el.dispatchEvent(customEvent);
+        }
+        
+        el.value = "__get";
+        el.dispatchEvent(customEvent);
+	    }else{
+	      console.log('did not find simplestore');
+	      init(); //no need to bootstrap localstorage
+	    }
+	  },10);
+	})
+	
+	
+	function init() {
 	  if(!supports_binary()){
 	    $("body").addClass("unsupported");
 	    $(".unsupported .filehost.multipart").mousedown(function(){
@@ -174,7 +222,7 @@
 			accept: ".filehost.image",
 			activeClass: "active",
 			drop: function( event, ui ) {
-			  localStorage.imghost = ui.draggable.attr('name')
+			  set({imghost: ui.draggable.attr('name')})
 				$( this )
 					.find( "p" )
 						.html('')
@@ -185,7 +233,7 @@
 			accept: ".filehost.text",
 			activeClass: "active",
 			drop: function( event, ui ) {
-			  localStorage.texhost = ui.draggable.attr('name')
+			  set({texhost: ui.draggable.attr('name')});
 			  
 				$( this )
 					.find( "p" )
@@ -197,7 +245,7 @@
 			accept: ".filehost.binary",
 			activeClass: "active",
 			drop: function( event, ui ) {
-			  localStorage.binhost = ui.draggable.attr('name')
+			  set({binhost: ui.draggable.attr('name')})
 				$( this )
 					.find( "p" )
 						.html('')
@@ -211,26 +259,26 @@
 		})
 		
 		$('.filehost, .panel').disableSelection();
-		var bname = localStorage.binhost || 'chemical';
-		var tname = localStorage.texhost || 'gist';
-		var iname = localStorage.imghost || 'imgur';
+		var bname = get('binhost') || 'chemical';
+		var tname = get('texhost') || 'gist';
+		var iname = get('imghost') || 'imgur';
 		
 		$(".panel.binary").find("p").html('').append($(document.getElementsByName(bname)[0]).clone())
 		$(".panel.text").find("p").html('').append($(document.getElementsByName(tname)[0]).clone())
 		$(".panel.image").find("p").html('').append($(document.getElementsByName(iname)[0]).clone())
-		var instant = (localStorage.instant || 'on') == 'on'; //woot. its called instant because google made google instant.
+		var instant = (get('instant') || 'on') == 'on'; //woot. its called instant because google made google instant.
     
 		$('#instant').attr('checked', instant);
 		$('#instant').change(function(){
-		  localStorage.instant = $('#instant').attr('checked')?'on':'off'
+		  set({instant: $('#instant').attr('checked')?'on':'off'})
 		})
 		
 		$('.directions').disableSelection();
 		
     $('#insecure').change(function(){
-		  localStorage.no_https = $('#insecure').attr('checked')?'on':'off';
+		  set({no_https: $('#insecure').attr('checked')?'on':'off'});
 		})
-    $('#insecure').attr('checked', localStorage.no_https == 'on');
+    $('#insecure').attr('checked', get('no_https') == 'on');
     
 		window.ondragstart = function(e){
 		  e.preventDefault();
@@ -240,14 +288,15 @@
 		for(var shortener in shortSvcList){
 		  $("#shorten").append("<option>"+shortener+"</option>");
 		}
-		$("#shorten").val(shortSvcList[localStorage.url_shortener]?localStorage.url_shortener:"None");
+		var shortener = get('url_shortener');
+		$("#shorten").val(shortSvcList[shortener]?shortener:"None");
 		
 		$("#shorten").change(function(){
-		  localStorage.url_shortener = $("#shorten").val();
+		  set({url_shortener: $("#shorten").val()});
     })
 		
 		
-	});
+	}
 	</script>
 
 <h1>drag2up settings</h1>
