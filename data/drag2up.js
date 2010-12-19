@@ -107,20 +107,6 @@ function initialize(){
   }
   
   
-  var rootSearching = false;
-  function testDragRoot(){
-    rootSearching = true;
-    if(lastDrag < +new Date - 500){
-      trickleMessage('deactivate');
-    }
-    
-    if(isDragging){
-      setTimeout(testDragRoot, 100);
-    }else{
-      rootSearching = false
-    }
-  }
-  
 
   window.addEventListener('message', function(e){
     if(e.data.substr(0, postMessageHeader.length) != postMessageHeader) return;
@@ -160,11 +146,9 @@ function initialize(){
           addSettingsDropper()
           trickleMessage('reactivate');
         }
+        //console.log(new Date - lastDrag);
         lastDrag = (+new Date); //TODO; utilize the value that got passed
         
-        if(rootSearching == false){
-          testDragRoot();
-        }
       }else if(cmd == 'root_deactivate'){
         var lastDeactivation = +new Date;
         setTimeout(function(){
@@ -535,13 +519,14 @@ function initialize(){
 
   document.documentElement.addEventListener('mousemove', function(e){
     //allow default to happen for normal drag/drops
-    isDragging && propagateMessage('reactivate');
+    isDragging && propagateMessage('deactivate');
   }, false);
-
+  
   document.documentElement.addEventListener('dragleave', function(e){
     //console.log('leaving dragging');
     
-    //go ahed
+    //go ahead and leave me
+    //i think i prefer to stay inside
     isDragging && propagateMessage('deactivate');
   }, false);
 
