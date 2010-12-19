@@ -493,6 +493,7 @@ function initialize(){
 
   document.documentElement.addEventListener('dragenter', function(e){
     //console.log(e.dataTransfer, e)
+
     if(!e.dataTransfer) return;
     var types = Array.prototype.slice.call(e.dataTransfer.types, 0);
     //console.log(types);
@@ -501,7 +502,9 @@ function initialize(){
       
       if(types.join(',') == 'application/x-moz-file,text/x-moz-url,text/plain,Files'){
         propagateMessage('reactivate');
-      }
+      }else if(types.join(',') == 'application/x-moz-file,Files'){
+				propagateMessage('reactivate')
+			}
     }else{ //chrome  
       if(types.indexOf('Files') != -1 && types.indexOf('text/uri-list') == -1){
         propagateMessage('reactivate');
@@ -519,7 +522,7 @@ function initialize(){
 
   document.documentElement.addEventListener('mousemove', function(e){
     //allow default to happen for normal drag/drops
-    isDragging && propagateMessage('deactivate');
+    //isDragging && propagateMessage('deactivate');
   }, false);
   
   document.documentElement.addEventListener('dragleave', function(e){
