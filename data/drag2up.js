@@ -258,9 +258,9 @@ function initialize(){
     document.body.appendChild(mask);
     dropTargets.push(mask);
     
-    var opacity_normal = '0.84', opacity_hover = '0.42';
+    var opacity_normal = '0.42', opacity_hover = '0.82';
     mask.style.opacity = opacity_normal;
-    mask.style.backgroundColor = "rgb(224,167,67)"; //a shade of orange
+    mask.style.backgroundColor = "rgb(91,84,183)"; //a shade of orange
     mask.style.position = 'absolute';
     mask.style.zIndex = 9007199254740991;
     mask.style.webkitTransition = 'opacity 0.5s ease'
@@ -290,6 +290,18 @@ function initialize(){
       e.stopPropagation();
       return false;
     }, true);
+    
+    mask.addEventListener('drop', function(e){ 
+      e.preventDefault();
+      e.stopPropagation();
+      setTimeout(function(){
+        propagateMessage('forcedkill');
+      },0);
+      propagateMessage('background'+JSON.stringify({
+        action: 'settings'
+      }));
+    }, true);
+    
   }
 
 
@@ -305,7 +317,7 @@ function initialize(){
     console.log('render drop target',iId, el);
     
     
-    var opacity_normal = '0.84', opacity_hover = '0.42';
+    var opacity_normal = '0.62', opacity_hover = '0.91';
     var mask = document.createElement('div'); //this is what we're making!
     mask.style.opacity = '0'; //set to zero initially, for nice fade in
 
@@ -495,18 +507,23 @@ function initialize(){
 
   }
 
-
-
-
   document.documentElement.addEventListener('dragenter', function(e){
     //console.log(e.dataTransfer, e)
     if(!e.dataTransfer) return;
     var types = Array.prototype.slice.call(e.dataTransfer.types, 0);
     //console.log(types);
-    if(types.indexOf('Files') != -1 && types.indexOf('text/uri-list') == -1){
-      propagateMessage('reactivate');
-    }else if(types.join(',') == 'text/html,text/uri-list,url'){ //images from other pages
-      propagateMessage('reactivate');
+    if(types.join('').indexOf('x-moz') != -1){ //terribly hacky mozilla stuff
+      //because mozilla text input dragging is application/x-moz-file,text/plain,Files
+      
+      if(types.join(',') == 'application/x-moz-file,text/x-moz-url,text/plain,Files'){
+        propagateMessage('reactivate');
+      }
+    }else{ //chrome  
+      if(types.indexOf('Files') != -1 && types.indexOf('text/uri-list') == -1){
+        propagateMessage('reactivate');
+      }else if(types.join(',') == 'text/html,text/uri-list,url'){ //images from other pages
+        propagateMessage('reactivate');
+      }
     }
     
   }, false);

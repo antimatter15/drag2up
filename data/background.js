@@ -73,7 +73,22 @@ function https(){
 }
 
 function handleRequest(request, tab, sendResponse){
-  console.log(request)
+  if(request.action == 'settings'){
+    console.log('opening settings page');
+    if(typeof chrome != 'undefined'){
+      chrome.tabs.create({url: "options.html", selected: true});
+    }else if(typeof tabs != 'undefined'){
+      tabs.open({
+        url: data.url('options.html')
+      });
+
+    }else{
+      console.log('no means to create tab');
+    }
+    return;
+  }
+  
+
   console.log('handle request', +new Date, request.id);
   
   function returned_link(obj){
