@@ -466,9 +466,9 @@ function initialize(){
         
         mask.style.backgroundColor = '#007fff';
         if(numleft == 1){
-          mask.innerHTML = 'uploading file';
+          mask.innerHTML = '<b>uploading</b> file';
         }else{
-          mask.innerHTML = 'uploading '+numleft+' files';
+          mask.innerHTML = '<b>uploading</b> '+numleft+' files';
         }
       }else{
         mask.parentNode.removeChild(mask);
