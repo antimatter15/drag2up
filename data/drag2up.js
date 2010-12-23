@@ -29,8 +29,8 @@ function initialize(){
   //console.log('initialized ',iId,' at', location.href);
 
   function clearTargets(){
-  console.log('clear targets');
-  return;
+  //console.log('clear targets');
+  //return;
     isDragging = false;
     for(var i = dropTargets.length; i--;){
       if(dropTargets[i] && dropTargets[i].parentNode && dropTargets[i].hasDropped == false){
