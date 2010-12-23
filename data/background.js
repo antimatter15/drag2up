@@ -1,4 +1,3 @@
-
 if(localStorage.currentVersion == '1.0.3'){
   if(typeof chrome != 'undefined'){
     chrome.tabs.create({url: "data/options.html", selected: true});
@@ -179,7 +178,7 @@ function instantInit(file, callback){
   xhr.open('GET', https()+instant_host+'new?'+params({
     host: hostName(file),
     size: file.size,
-    name: file.name
+    name: file.name.replace(/\n/g,' ') //newlines suck. they cause errors.
   }), true);
   console.log('getted things');
   xhr.onload = function(){
@@ -326,34 +325,28 @@ function fileType(file){
 }
 
 
-
-
-function uploadDataURL(file, callback){
-  //here's the lazy data url encoding system :P
-  setTimeout(function(){
-    callback(file.data.replace('data:base64','data:text/plain;base64'));
-  },1337);
-}
-
-
-
-
 function linkData(id, url){
   var xhr = new XMLHttpRequest();
-  xhr.open('GET',https()+instant_host+'update/'+filetable[id][0]+'/'+filetable[id][1]+'?'+params({
-    url: url
-  }), true);
-  xhr.onload = function(e){
-    if(xhr.status != 200){
-      //doomsday scenario: error leads to error leading to error leading to effective DoS
-      linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
+  var file_id = filetable[id][0];
+  var edit_code = filetable[id][1];
+  if(file_id.length < 15 && edit_code.length < 15){
+    xhr.open('GET',https()+instant_host+'update/'+file_id+'/'+edit_code+'?'+params({
+      url: url
+    }), true);
+    xhr.onload = function(e){
+      if(xhr.status != 200){
+        //doomsday scenario: error leads to error leading to error leading to effective DoS
+        linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
+      }
     }
+    xhr.onerror = function(e){
+      console.log(e)
+      linkData(id, 'error: could not link.')
+    }
+    xhr.send();
+  }else{
+    console.log('probably this was an invalid thing');
   }
-  xhr.onerror = function(e){
-    console.log(e)
-    linkData(id, 'error: could not link.')
-  }
-  xhr.send();
 }
 
 
