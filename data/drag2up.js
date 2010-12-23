@@ -29,8 +29,8 @@ function initialize(){
   //console.log('initialized ',iId,' at', location.href);
 
   function clearTargets(){
-  //console.log('clear targets');
-  //return;
+  console.log('clear targets');
+  return;
     isDragging = false;
     for(var i = dropTargets.length; i--;){
       if(dropTargets[i] && dropTargets[i].parentNode && dropTargets[i].hasDropped == false){
@@ -78,7 +78,7 @@ function initialize(){
       
       if(over_mid && over_mid.tagName.toLowerCase() == 'label') return ~~A;
       
-      //console.log('booooooo', el, over_mid, over_el, pos, scrollX, scrollY);
+      console.log('booooooo', el, over_mid, over_el, pos, scrollX, scrollY);
       
     }
     return false;
@@ -108,6 +108,23 @@ function initialize(){
     //console.log('trikling', window.top, window.top.postMessage);
   }
   
+  var csx = 0, csy = 0, rsr = false;
+  function autoResetScroll(){
+    if(rsr == false){
+      csx = scrollX;
+      csy = scrollY;
+      resetScroll();
+    }
+  }
+  function resetScroll(){
+    if(isDragging){
+      rsr = true;
+      scrollTo(csx, csy);
+      setTimeout(resetScroll, 10);
+    }else{
+      rsr = false;
+    }
+  }
   
 
   window.addEventListener('message', function(e){
@@ -133,6 +150,7 @@ function initialize(){
         if(isDragging == false){
           isDragging = true;
           getTargets();
+          autoResetScroll();
         }
       }else if(cmd == 'trickle_deactivate'){
         clearTargets();
@@ -298,7 +316,9 @@ function initialize(){
     var pos = findPos(el), width = el.offsetWidth, height = el.offsetHeight;
     if(!width && !height) return; //no zero widther
     
-    console.log('render drop target',iId, el);
+
+    
+    console.log('render drop target',iId, el, width, height, pos);
     
     var opacity_normal = '0.62', opacity_hover = '0.91';
     var mask = document.createElement('div'); //this is what we're making!
@@ -312,6 +332,14 @@ function initialize(){
     mask.style.backgroundColor = "rgb(50,150,50)"; //a shade of green
     mask.dropTarget = el; //reference original element
     mask.style.position = 'absolute';
+    
+    var parent = el, cs = null;
+    while((cs = getComputedStyle(parent)) && cs.position != 'fixed'){
+      parent = parent.parentNode
+    };
+    if(cs && cs.position == 'fixed'){
+      mask.style.position = 'fixed';
+    }
     
     mask.style.zIndex = 9007199254740991;
     mask.style.webkitTransition = 'opacity 0.5s ease'
