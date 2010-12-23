@@ -512,20 +512,23 @@ function initialize(){
     //console.log(types);
     if(types.join('').indexOf('x-moz') != -1){ //terribly hacky mozilla stuff
       //because mozilla text input dragging is application/x-moz-file,text/plain,Files
-      
+      /*
       if(types.join(',') == 'application/x-moz-file,text/x-moz-url,text/plain,Files'){
         propagateMessage('reactivate');
       }else if(types.join(',') == 'application/x-moz-file,Files'){
         propagateMessage('reactivate')
       }else if(types.join(',') == "application/x-moz-file,text/x-moz-url,Files"){
-		propagateMessage('reactivate');
-	  }
+		    propagateMessage('reactivate');
+	    }*/
+	    if(types.indexOf('Files') != -1){
+	      propagateMessage('reactivate');
+	    }
     }else{ //chrome  
       if(types.indexOf('Files') != -1 && types.indexOf('text/uri-list') == -1){
         propagateMessage('reactivate');
-      }else if(types.join(',') == 'text/html,text/uri-list,url'){ //images from other pages
+      }/*else if(types.join(',') == 'text/html,text/uri-list,url'){ //images from other pages
         propagateMessage('reactivate');
-      }
+      }*/
     }
     
   }, false);
