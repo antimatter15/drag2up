@@ -1,5 +1,4 @@
 function initialize(){
-
   if(!document){ /*console.warn('no document'); */return}
   if(!window.top){ /*console.warn('no top', location.href); */return};
   if(document.__drag2up){/*console.warn('already exists in this window');*/ return}
@@ -20,6 +19,7 @@ function initialize(){
   var postMessageHeader = '!/__drag2up-$/!'; //crammed a bunch of random characters
   var callbacks = {};
 
+  
   //instance ID. useful for debugging.
 
 
@@ -48,7 +48,9 @@ function initialize(){
 
   // determines if an element can be droppable based on several conditions
   function isDroppable(el){
+  //console.log('checking droppability', el);
     if(!el) return false;
+  
     var tag = 'unknown', A;
     
     if(el.offsetWidth * el.offsetHeight < 100) return false;
@@ -157,13 +159,10 @@ function initialize(){
           
             trickleMessage('deactivate');
             //console.warn('fuh reeelz!',lastDeactivation - lastDrag)
-            
           }
         },300);
       }else if(cmd == 'root_forcedkill'){ //woot, same length!
         trickleMessage('deactivate');
-        
-      //}else if(cmd == 'root_initupload' || cmd == 'root_uploaddata'){
       }else if(cmd == 'root_background'){
         var json = JSON.parse(data.substr(15));
         try{
@@ -204,10 +203,10 @@ function initialize(){
     }catch(err){};
     //try{el.select();}catch(err){};
     setTimeout(function(){
-      try{el.focus();}catch(err){};
+      try{el.focus()}catch(err){};
     },100);
     setTimeout(function(){
-    try{el.focus();}catch(err){};
+    try{el.focus()}catch(err){};
       var elt = isDroppable(el); //get the type of drop mode
       if(elt == 1){ //input
         if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
@@ -242,7 +241,7 @@ function initialize(){
     document.body.appendChild(mask);
     dropTargets.push(mask);
     
-    var opacity_normal = '0.42', opacity_hover = '0.82';
+    var opacity_normal = '0.32', opacity_hover = '0.82';
     mask.style.opacity = opacity_normal;
     mask.style.backgroundColor = "rgb(91,84,183)"; //a shade of orange
     mask.style.position = 'fixed';
@@ -265,10 +264,12 @@ function initialize(){
     mask.style.paddingBottom = '10px';
     mask.style.fontSize = '16px';
 
-    mask.addEventListener('dragenter', function(e){ mask.style.opacity = opacity_hover; }, false);
-    mask.addEventListener('dragleave', function(e){ mask.style.opacity = opacity_normal;}, false);
-    //
+    mask.addEventListener('dragenter', function(e){
+      mask.style.opacity = opacity_hover;
+    }, false);
+    mask.addEventListener('dragleave', function(e){mask.style.opacity = opacity_normal;}, false);
     mask.addEventListener('dragover', function(e){ 
+      mask.style.opacity = opacity_hover;
       if(isDragging) propagateMessage('reactivate');
       e.preventDefault();
       e.stopPropagation();
@@ -285,7 +286,6 @@ function initialize(){
         action: 'settings'
       }));
     }, true);
-    
   }
 
 
@@ -300,7 +300,6 @@ function initialize(){
     
     console.log('render drop target',iId, el);
     
-    
     var opacity_normal = '0.62', opacity_hover = '0.91';
     var mask = document.createElement('div'); //this is what we're making!
     mask.style.opacity = '0'; //set to zero initially, for nice fade in
@@ -313,8 +312,6 @@ function initialize(){
     mask.style.backgroundColor = "rgb(50,150,50)"; //a shade of green
     mask.dropTarget = el; //reference original element
     mask.style.position = 'absolute';
-    
-    
     
     mask.style.zIndex = 9007199254740991;
     mask.style.webkitTransition = 'opacity 0.5s ease'
@@ -341,9 +338,6 @@ function initialize(){
     //and that means each half-breath is 2.5 seconds
 
     //this was more important the last version when there wasnt the magical instant feature
-
-
-    
     var cx = pos[0] + width/2 , cy = pos[1] + height/2 ;
     var pad = 5; //five pixel padding for normal thingsies
     if(el.tagName.toLowerCase() == 'body'){
@@ -371,14 +365,13 @@ function initialize(){
     
     mask.style.width = width+'px';
     mask.style.height = height+'px';
-    
     mask.style.padding = pad+'px';
-
     mask.style.fontSize = '16px';
 
     mask.addEventListener('dragenter', function(e){ mask.style.opacity = opacity_hover; }, false);
     mask.addEventListener('dragleave', function(e){ mask.style.opacity = opacity_normal;}, false);
     mask.addEventListener('dragover', function(e){ 
+      mask.style.opacity = opacity_hover;
       if(isDragging) propagateMessage('reactivate');
       e.preventDefault();
       e.stopPropagation();
@@ -408,10 +401,7 @@ function initialize(){
       
       e.preventDefault();
       e.stopPropagation();
-
-    
       console.log('drop event', +new Date);
-      
       var files = e.dataTransfer.files;
       
       console.log(files.length);
@@ -463,7 +453,6 @@ function initialize(){
       
       if(numleft != 0){
         mask.hasDropped = true;
-        
         mask.style.backgroundColor = '#007fff';
         if(numleft == 1){
           mask.innerHTML = '<b>uploading</b> file';
@@ -487,13 +476,9 @@ function initialize(){
         if(isDroppable(all[l])) renderTarget(all[l]);
       }
     }
-    
-
   }
 
   document.documentElement.addEventListener('dragenter', function(e){
-    //console.log(e.dataTransfer, e)
-
     if(!e.dataTransfer) return;
     var types = Array.prototype.slice.call(e.dataTransfer.types, 0);
     //console.log(types);
@@ -503,8 +488,10 @@ function initialize(){
       if(types.join(',') == 'application/x-moz-file,text/x-moz-url,text/plain,Files'){
         propagateMessage('reactivate');
       }else if(types.join(',') == 'application/x-moz-file,Files'){
-				propagateMessage('reactivate')
-			}
+        propagateMessage('reactivate')
+      }else if(types.join(',') == "application/x-moz-file,text/x-moz-url,Files"){
+		propagateMessage('reactivate');
+	  }
     }else{ //chrome  
       if(types.indexOf('Files') != -1 && types.indexOf('text/uri-list') == -1){
         propagateMessage('reactivate');
@@ -545,7 +532,6 @@ function initialize(){
   }, false);
   */
 
-  //*
   var lastFrameLength = 0;
   window.setInterval(function(){
     if(frames.length > lastFrameLength){
@@ -557,7 +543,6 @@ function initialize(){
             if(!frames[l].document.__drag2up){
               frames[l].eval("("+initialize.toString()+")()");
             }
-            
           }catch(err){};
         }
       }
@@ -569,15 +554,6 @@ function initialize(){
       lastFrameLength = frames.length;
     }
   },1000)
-  //*/
-
-
-
-
 }
 
 initialize();
-
-
-
-
