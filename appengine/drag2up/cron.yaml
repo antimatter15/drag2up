@@ -1,0 +1,4 @@
+cron:
+- description: daily channel cleaning lady. you'll be pulverized in two seconds. she dusts. 
+  url: /tasks/channels
+  schedule: every 2 hours

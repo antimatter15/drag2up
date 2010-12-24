@@ -70,6 +70,11 @@ These sites had the documentation that I used to develop stuff.
 * https://chrome.google.com/extensions/detail/eclilalbnmdonojgjmkekinflhodgoii
 * https://github.com/harpyon/miniscurl
 * Chemical Servers are awesome! http://chemicalservers.com
+* https://github.com/jfelectron/OAuth-for-WebOS/blob/master/OAuth.js
+* http://destroytoday.com/blog/2010/02/encoding-for-oauth-using-as3/
+* http://pic.pbsrc.com/dev_help/WebHelpPublic/PhotobucketPublicHelp.htm
+* http://www.imdb.com/title/tt1104001/
+* https://developer.mozilla.org/en/DOM:window.getComputedStyle
 
 ### Known Issues:
 Firefox 3.6 on Ubuntu Linux does not work properly. It seems to work fine on Mac OS X. I haven't bothered testing on Windows. Firefox 4b7 on Ubuntu Linux does work, however.
@@ -79,3 +84,7 @@ Firefox 3.6 on Ubuntu Linux does not work properly. It seems to work fine on Mac
 get a button on the addons panel for Preferences to work, but jetpack doesnt seem to do that yet.
 
 Logging in to flickr is a little awkward.
+
+Picasa's album chooser sucks and doesn't work on firefox (I didn't try).
+
+I hate OAuth.

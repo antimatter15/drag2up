@@ -78,7 +78,9 @@ function initialize(){
       
       if(over_mid && over_mid.tagName.toLowerCase() == 'label') return ~~A;
       
-      console.log('booooooo', el, over_mid, over_el, pos, scrollX, scrollY);
+      if((over_el && over_el.dropTarget) || (over_mid && over_mid.dropTarget)) return ~~A;
+      
+      //console.log('booooooo', el, over_mid, over_el, pos, scrollX, scrollY);
       
     }
     return false;
@@ -285,7 +287,9 @@ function initialize(){
     mask.addEventListener('dragenter', function(e){
       mask.style.opacity = opacity_hover;
     }, false);
-    mask.addEventListener('dragleave', function(e){mask.style.opacity = opacity_normal;}, false);
+    mask.addEventListener('dragleave', function(e){
+      if(e.target.parentNode != mask) mask.style.opacity = opacity_normal;
+    }, false);
     mask.addEventListener('dragover', function(e){ 
       mask.style.opacity = opacity_hover;
       if(isDragging) propagateMessage('reactivate');
@@ -318,7 +322,7 @@ function initialize(){
     
 
     
-    console.log('render drop target',iId, el, width, height, pos);
+    console.log('render drop target',iId, el);
     
     var opacity_normal = '0.62', opacity_hover = '0.91';
     var mask = document.createElement('div'); //this is what we're making!
@@ -397,7 +401,9 @@ function initialize(){
     mask.style.fontSize = '16px';
 
     mask.addEventListener('dragenter', function(e){ mask.style.opacity = opacity_hover; }, false);
-    mask.addEventListener('dragleave', function(e){ mask.style.opacity = opacity_normal;}, false);
+    mask.addEventListener('dragleave', function(e){
+      if(e.target.parentNode != mask) mask.style.opacity = opacity_normal;
+    }, false);
     mask.addEventListener('dragover', function(e){ 
       mask.style.opacity = opacity_hover;
       if(isDragging) propagateMessage('reactivate');

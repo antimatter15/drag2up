@@ -79,6 +79,22 @@
         document.getElementById('since').innerHTML = relative(Math.floor((+new Date - uploaded)/1000));
     },500)
     
+    setTimeout(function(){
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/poll/{{key}}?ts='+(new Date()), true);
+      xhr.onload = function(){
+        if(xhr.responseText == 'yay'){
+          //sometimes the upload finishes while this uploading page is being loaded.
+          document.getElementById('link').style.display = 'block'
+					document.getElementById('dlink').href = '?retry';
+					document.getElementById('progress').innerHTML = 'Done uploading!';
+					if(document.getElementById('annoy').checked) alert('{{name|addslashes}} is done uploading');
+					if(document.getElementById('autodown').checked) location = '?retry';
+        }
+      }
+      xhr.send(null);
+    },1337);
+    
     </script>
   </body>
 </html>

@@ -2,16 +2,13 @@
 
 from google.appengine.ext import webapp
 from google.appengine.ext import db
-from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
-from google.appengine.api import channel
 from google.appengine.api import memcache
-import random
-import os
 
 class Channels(db.Model):
   name = db.StringProperty()
   token = db.StringProperty()
+  date = db.DateTimeProperty(auto_now_add=True)
 
 
 #http://stackoverflow.com/questions/2350454/simplest-way-to-store-a-value-in-google-app-engine-python
@@ -31,6 +28,7 @@ class Link(db.Model):
   @classmethod
   def create(cls, size = None, name = None, host = None):
     letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    import random
     key = ''.join(random.choice(letters) for i in xrange(4))
     #secret passcode to allow editing
     code = ''.join(random.choice(letters) for i in xrange(4))
@@ -55,17 +53,19 @@ class CreateHandler(webapp.RequestHandler):
     
 class MainHandler(webapp.RequestHandler):
   def get(self):
-    self.redirect("https://chrome.google.com/extensions/detail/bjgjolhpdlgebodaapdafhdnikagbfll")
+    self.redirect("https://chrome.google.com/webstore/detail/bjgjolhpdlgebodaapdafhdnikagbfll")
     #self.response.out.write('This is the drag2up specialized URL shortening service.')
 
 class UpdateHandler(webapp.RequestHandler):
   def get(self, name, code):
+    from google.appengine.api import channel
     url = self.request.get('url')
     if Link.set(name, code, url) is True:
       self.response.out.write('done')
       #stupid channel api makes everything needlessly complicated
       query = Channels.all().filter('name =', name)
       results = query.fetch(1000)
+      from google.appengine.api import channel
       for viewer in results:
         channel.send_message(viewer.token, url)
         viewer.delete()
@@ -74,7 +74,14 @@ class UpdateHandler(webapp.RequestHandler):
 
 class PollHandler(webapp.RequestHandler):
   def get(self, name):
-    self.response.out.write("nay" if memcache.get(name) is None else "yay")
+    self.response.out.write("nay" if Link.get(name) is None else "yay")
+    
+    
+class CleanupHandler(webapp.RequestHandler):
+  def get(self):
+    import datetime  
+    q = db.GqlQuery("SELECT * FROM Channels WHERE date < :1", datetime.datetime.now() - datetime.timedelta(hours = 2))
+    db.delete(q.fetch(1000))
     
 class LinkHandler(webapp.RequestHandler):
   def get(self, name):
@@ -82,6 +89,7 @@ class LinkHandler(webapp.RequestHandler):
     if link is not None:
       self.redirect(link)
     else:
+      from google.appengine.ext.webapp import template
       entity = Link.get(name)
       if entity is None:
         self.error(404)
@@ -110,7 +118,9 @@ class LinkHandler(webapp.RequestHandler):
       }
       
 
+      import os
       if link is None:
+        import random
         clientid = name+'uid'+str(random.random())
         Channels(name = name, token = clientid).put()
         template_values['token']  = channel.create_channel(clientid)
@@ -136,6 +146,7 @@ def main():
                       ('/new', CreateHandler),
                       ('/update/(.*)/(.*)', UpdateHandler),
                       ('/poll/(.*)', PollHandler),
+                      ('/tasks/channels', CleanupHandler),
                       ('/(.*)', LinkHandler)],
                      debug=True)
   util.run_wsgi_app(application)
