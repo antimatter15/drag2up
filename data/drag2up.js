@@ -455,8 +455,17 @@ function initialize(){
         propagateMessage('background'+JSON.stringify(file))
       }
       
+      
       if(files.length == 0 && (url = e.dataTransfer.getData('url'))){
+        var htmldata = e.dataTransfer.getData('text/html');
+        if(htmldata && htmldata.toLowerCase().indexOf('<img') != -1){
+          var xdiv = document.createElement('div');
+          xdiv.innerHTML = htmldata;
+          url = xdiv.getElementsByTagName('img')[0].src;
+          console.log('using new URL extracted from HTML ', url);
+        }
         console.log('uploading URL', url);
+        console.log(e.dataTransfer.getData('text/html'));
         uploadFile({url: url, name: url.replace(/^.+\/([^\?\#]+).*$/,'$1'), type: "image/png" /*more or less all iamges dropped this way for now are going to be images*/ });
       }else if(files.length > 0){
         console.log('uploading actual files', files.length);
@@ -515,7 +524,7 @@ function initialize(){
   document.documentElement.addEventListener('dragenter', function(e){
     if(!e.dataTransfer) return;
     var types = Array.prototype.slice.call(e.dataTransfer.types, 0);
-    //console.log(types);
+    console.log(types);
     if(types.join('').indexOf('x-moz') != -1){ //terribly hacky mozilla stuff
       //because mozilla text input dragging is application/x-moz-file,text/plain,Files
       /*
@@ -531,6 +540,8 @@ function initialize(){
 	    }
     }else{ //chrome  
       if(types.indexOf('Files') != -1 && types.indexOf('text/uri-list') == -1){
+        propagateMessage('reactivate');
+      }else if(types.indexOf('url') != -1 && types.indexOf('Files') == -1 && types.indexOf('text') == -1){ //images from other pages
         propagateMessage('reactivate');
       }/*else if(types.join(',') == 'text/html,text/uri-list,url'){ //images from other pages
         propagateMessage('reactivate');

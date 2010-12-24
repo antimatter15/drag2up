@@ -129,9 +129,13 @@ function handleRequest(request, tab, sendResponse){
       }, function(parts){
       car.done();
       console.log('finished initializing instant', +new Date);
+      var shorturl = https()+instant_host+''+parts[0];
+      if(localStorage.descriptive && request.name){
+        shorturl += '?'+request.name;
+      }
       returned_link({
         callback: request.id,
-        url: https()+instant_host+''+parts[0]
+        url: shorturl
       })
     })
   }
@@ -327,7 +331,7 @@ function fileType(file){
 
 function linkData(id, url){
   var xhr = new XMLHttpRequest();
-  var file_id = filetable[id][0];
+  var file_id = filetable[id][0];0
   var edit_code = filetable[id][1];
   if(file_id.length < 15 && edit_code.length < 15){
     xhr.open('GET',https()+instant_host+'update/'+file_id+'/'+edit_code+'?'+params({

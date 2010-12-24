@@ -271,6 +271,8 @@
 		$('#instant').attr('checked', instant);
 		$('#instant').change(function(){
 		  set({instant: $('#instant').attr('checked')?'on':'off'})
+		  instant = (get('instant') || 'on') == 'on';
+      if(instant) $('.descriptive').show(); else $('.descriptive').hide();
 		})
 		
 		$('.directions').disableSelection();
@@ -283,7 +285,13 @@
 		window.ondragstart = function(e){
 		  e.preventDefault();
 		}
-		
+    if(instant) $('.descriptive').show(); else $('.descriptive').hide();
+    
+		$('#descriptive').change(function(){
+		  set({descriptive: $('#descriptive').attr('checked')?'on':'off'});
+    })
+    $('#descriptive').attr('checked', get('descriptive') == 'on');
+
 		
 		for(var shortener in shortSvcList){
 		  $("#shorten").append("<option>"+shortener+"</option>");
@@ -344,7 +352,12 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <p>
   <h3 style="display:inline">Basic</h3>
   
-  <input type="checkbox" id="instant"  > <label for="instant">Background uploading.</label>
+  <input type="checkbox" id="instant"> <label for="instant">Background uploading.</label>
+  
+  <span class="descriptive">
+    <input type="checkbox" id="descriptive"> <label for="descriptive">Descriptive link names.</label>
+  </span>
+  
   <input type="checkbox" id="insecure"  style="margin-left: 10px;"> <label for="insecure">Prefer insecure HTTP.</label>
   
   <label for="shorten" style="margin-left: 10px;">URL shortener</label>
@@ -380,6 +393,10 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 
 <div class="filehost image multipart login" name="picasa">
 	<img src="hosts/logo/picasa.png">
+</div>
+
+<div class="filehost image login" name="photobucket">
+	<img src="hosts/logo/photobucket.png">
 </div>
 
 
