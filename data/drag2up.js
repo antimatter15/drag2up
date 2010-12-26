@@ -1,4 +1,7 @@
 function initialize(){
+  if(typeof console == 'undefined') console = {log:function(){},warn:function(){}};
+  
+
   if(!document){ /*console.warn('no document'); */return}
   if(!window.top){ /*console.warn('no top', location.href); */return};
   if(document.__drag2up){/*console.warn('already exists in this window');*/ return}
@@ -338,13 +341,15 @@ function initialize(){
     mask.style.position = 'absolute';
     
     var parent = el, cs = null;
-    while((cs = getComputedStyle(parent)) && cs.position != 'fixed'){
-      parent = parent.parentNode
-    };
-    if(cs && cs.position == 'fixed'){
-      mask.style.position = 'fixed';
-    }
-    
+    try{
+      while(parent && parent != document && (cs = window.getComputedStyle(parent, null)) && cs.position != 'fixed'){
+        parent = parent.parentNode
+      };
+      
+      if(cs && cs.position == 'fixed'){
+        mask.style.position = 'fixed';
+      }
+    }catch(err){}
     mask.style.zIndex = 9007199254740991;
     mask.style.webkitTransition = 'opacity 0.5s ease'
     mask.style.MozTransition = 'opacity 0.5s ease'
@@ -524,7 +529,7 @@ function initialize(){
   document.documentElement.addEventListener('dragenter', function(e){
     if(!e.dataTransfer) return;
     var types = Array.prototype.slice.call(e.dataTransfer.types, 0);
-    console.log(types);
+    //console.log(types);
     if(types.join('').indexOf('x-moz') != -1){ //terribly hacky mozilla stuff
       //because mozilla text input dragging is application/x-moz-file,text/plain,Files
       /*
