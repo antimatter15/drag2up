@@ -119,13 +119,13 @@ function handleRequest(request, tab, sendResponse){
   console.log('progress of instant',instant);
   
   if(instant){
-    console.log('initializing instnat');
+    console.log('initializing instnat', request.url);
     instantInit({
         id: request.id,
-        name:request.name || 'unknown.filetype', 
+        name: request.name || 'unknown.filetype', 
         type: request.type || 'application/octet-stream', 
-        size: request.size || -1, 
-        data: '\xff'
+        size: request.size || -1,
+        url: request.url
       }, function(parts){
       car.done();
       console.log('finished initializing instant', +new Date);
@@ -195,8 +195,11 @@ function instantInit(file, callback){
 }
 
 
-function getURL(type, request, callback){
+function getURL(type, request, callback, sync){
+  if(request.data && sync) return request.data;
+  
   if(request.data) return callback(request); //no need reconverting!
+  
   if(/^data:/.test(request.url)){
     console.log('opened via data url');
     var parts = request.url.match(/^data:(.+),/)[1].split(';');
@@ -210,6 +213,7 @@ function getURL(type, request, callback){
     }else{
       name = enc.substr(enc.length/2 - 6, 6) + '.' + mime.split('/')[1];
     }
+    if(sync) return data;
     callback({
       data: data,
       type: mime,
@@ -220,10 +224,15 @@ function getURL(type, request, callback){
     
     //callback(new dFile(data, name, mime, id, size)
   }else{
+    
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', request.url, true);
+    xhr.open('GET', request.url, !sync);
     if(type == 'binary' || type == 'raw'){
       xhr.overrideMimeType('text/plain; charset=x-user-defined'); //should i loop through and do that & 0xff?
+    }
+    if(sync){
+      xhr.send();
+      return xhr.responseText;
     }
     xhr.onload = function(){
       console.log('opened via xhr ', request.url);
@@ -246,15 +255,15 @@ function getURL(type, request, callback){
           callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
         }else{
         
-        var bb = new BlobBuilder();//this webworker is totally overkill
-        bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
-        var worker = new Worker(createObjectURL(bb.getBlob()));
-        worker.onmessage = function(e) {
-          var data = e.data;
-          callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
-        };
-        
-        worker.postMessage(xhr.responseText);
+          var bb = new BlobBuilder();//this webworker is totally overkill
+          bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
+          var worker = new Worker(createObjectURL(bb.getBlob()));
+          worker.onmessage = function(e) {
+            var data = e.data;
+            callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
+          };
+          
+          worker.postMessage(xhr.responseText);
         }
         
         //*/
@@ -295,36 +304,47 @@ if(typeof chrome != 'undefined'){
 }
 
 
+var text_ext = 'log,less,sass,coffee,yaml,json,md,conf,config,css,cfm,yaws,html,htm,xhtml,js,pl'.split(',') //do not add semicol
+.concat('php,php4,php3,phtml,py,rb,rhtml,xml,rss,svg,cgi,yaml,md,markdown,shtml,asp,java,c'.split(',')) //do not add semicol
+.concat('README,sh,make,automake,configure,LICENSE,h,m,info,nfo,classdescription,in'.split(','));
+
 
 function fileType(file){
-  var text_ext = 'log,less,sass,coffee,yaml,json,md,css,cfm,yaws,html,htm,xhtml,js,pl,php,php4,php3,phtml,py,rb,rhtml,xml,rss,svg,cgi'.split(',');
-  var ext = file.name.toLowerCase().replace(/^.*\.(\w+?)(\#|\?)?.*$/,'$1');
+  console.log('checking file type for file',file);
+  var ext = file.name.toLowerCase().replace(/^.*\.(\w+)(\#|\?)?.*?$/,'$1');
   var image_ext = 'jpg,jpeg,tiff,raw,png,gif,bmp,ppm,pgm,pbm,pnm,webp'.split(','); //woot webp
+  
   if(image_ext.indexOf(ext) != -1) file.type = 'image/'+ (ext == 'jpg'?'jpeg':ext);
+  
+  if(file.type.indexOf('text/') == -1) if(text_ext.indexOf(ext) != -1) file.type = 'text/plain';
+	  
   if(file.type){
+    console.log('the file type was', file.type, 'file extension was ', ext);
     if(file.type.indexOf('image/') == 0){
 	    //image type
 	    return 'image'
 	  }else if(file.type.indexOf('text/') == 0){
 	    return 'text'
-	  }else if(text_ext.indexOf(ext) != -1){
-	    return 'text'
 	  }else if(file.type.indexOf('script') != -1 || file.type.indexOf('xml') != -1){
 	    return 'text'; //scripts or xml usually means code which usually means text
-	  }else if(file.size < 1024 * 1024) { //its rare for text files to be so huge
-	    /*
-	    var src = file.data;//atob(file.data.replace(/^data.+base64,/i,''));
-	    var txt = src.substr(0,512) + src.slice(-512);
-	    for(var i = 0, isAscii = true; i < 128; i++){
-	      if((txt.charCodeAt(i) & 0xff) > 128){
-	       isAscii = false;
-	       continue
-        }
-      }
-      if(isAscii && file.size < 1024 * 300) return 'text';
-      */
 	  }
 	}
+	
+	
+	if(file.size < 1024 * 300) { //its not as common for there to be 1 meg text files
+    console.log('checking for file type');
+    var src = getURL('raw', file, function(){}, true); //binary sync xhr.. its baddd.
+    console.log(src);
+    for(var l = src.length, i = 0; i < l; i++){
+      var code = src.charCodeAt(i) & 0xff;
+      if(code <= 8 || (code >= 14 && code <= 31) || code == 127 || code >= 240){
+        console.log('failed test: binary', code, src.charAt(i));
+        return 'binary'; //non printable ascii
+      }
+    }
+    file.type = 'text/plain';
+    return 'text';
+  }
 	return 'binary'
 }
 

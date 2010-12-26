@@ -90,6 +90,7 @@ class LinkHandler(webapp.RequestHandler):
       self.redirect(link)
     else:
       from google.appengine.ext.webapp import template
+      from google.appengine.api import channel
       entity = Link.get(name)
       if entity is None:
         self.error(404)
