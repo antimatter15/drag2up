@@ -1,6 +1,6 @@
 {
   "name": "drag2up",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Drag files to text boxes on any site to upload and share.",
 	"background_page": "data/background.html",
   "permissions": [
