@@ -53,8 +53,11 @@ class CreateHandler(webapp.RequestHandler):
     
 class MainHandler(webapp.RequestHandler):
   def get(self):
-    self.redirect("https://chrome.google.com/webstore/detail/bjgjolhpdlgebodaapdafhdnikagbfll")
-    #self.response.out.write('This is the drag2up specialized URL shortening service.')
+    ua = self.request.headers['User-Agent']
+    if ua is None or "Chrome" in ua:
+      self.redirect("https://chrome.google.com/webstore/detail/bjgjolhpdlgebodaapdafhdnikagbfll")
+    else:
+      self.redirect("https://addons.mozilla.org/en-US/firefox/addon/265087/")
 
 class UpdateHandler(webapp.RequestHandler):
   def get(self, name, code):
