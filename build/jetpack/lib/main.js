@@ -14,18 +14,7 @@ XMLHttpRequest.prototype.__defineSetter__('onload', function(cb){
     if(this.readyState == 4) cb();
   }
 })
-/*
-var customEvent = document.createEvent('Event');
-var el = document.getElementById('drag2uplocalstorage');
-el.addEventListener('drag2upread', function(){
-  console.log('read data', el.value);
-}, true);
-customEvent.initEvent('drag2upsave', true, true);
-function saveData(data){
-  el.value = data;
-  el.dispatchEvent(customEvent);
-}
-*/
+
 pageMod.PageMod({
   include: data.url("options.html"),
   contentScriptWhen: 'ready',
@@ -273,12 +262,6 @@ function binb2b64(binarray)
   }
   return str;
 }
-
-
-
-;
-
-
 /*
  * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
  * Digest Algorithm, as defined in RFC 1321.
@@ -658,12 +641,6 @@ function bit_rol(num, cnt)
 {
   return (num << cnt) | (num >>> (32 - cnt));
 }
-
-
-
-;
-
-
 //stolen from mozilla http://demos.hacks.mozilla.org/openweb/imageUploader/js/extends/xhr.js
 //http://code.google.com/p/chromium/issues/detail?id=35705#c6
 //http://efreedom.com/Question/1-3743047/Uploading-Binary-String-WebKit-Chrome-Using-XHR-Equivalent-Firefoxs-SendAsBinary
@@ -774,12 +751,6 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
     }
   });
 };
-
-
-
-;
-
-
 //based on ChromeMuse GPLv3
 
 
@@ -1045,12 +1016,6 @@ var shortSvcList = {
                         f((r.voizle !== undefined && r.voizle.success) ? {status: "ok", url: r.voizle.voizleurl} : {status: "error", error: "Error shortening URL."});
         }}
 };
-
-
-
-;
-
-
 //uses multipart helper function.
 //magic totally obfuscated key that you shall never see
 //39ACEJNQa5b92fbce7fd90b1cb6f1104d728eccb
@@ -1076,12 +1041,6 @@ function uploadImageshack(file, callback){
     fileupload: file
   })
 }
-
-
-
-
-
-;
 
 
 //based on description from http://gist.github.com/4277
@@ -1119,12 +1078,6 @@ function uploadGist(req, callback){
   })
 
 }
-
-
-
-;
-
-
 /*
  * uploadPastebin({data:btoa('hello world')},function(url){console.log(url)})
  * http://pastebin.com/x43mgnhf
@@ -1142,12 +1095,6 @@ function uploadPastebin(req, callback){
 	}
 	
 }
-
-
-
-;
-
-
 //https://github.com/kinabalu/mysticpaste/blob/master/idea-plugin/src/com/mysticcoders/mysticpaste/plugin/PastebinAction.java
 //no https
 function uploadMysticpaste(req, callback){
@@ -1161,12 +1108,6 @@ function uploadMysticpaste(req, callback){
   	xhr.send("type="+file.type+"&content="+encodeURIComponent( file.data  ));
 	})
 }
-
-
-
-;
-
-
 function uploadImgur(req, callback){
 	function postJSON(url, data, callback){
 	  var xhr = new XMLHttpRequest();
@@ -1201,12 +1142,6 @@ function uploadImgur(req, callback){
     })
   })
 }
-
-
-
-;
-
-
 //uses multipart helper function.
 function uploadHotfile(file, callback){
   //http://api.hotfile.com/?action=getuploadserver
@@ -1239,12 +1174,6 @@ function uploadHotfile(file, callback){
 	}
 	
 }
-
-
-
-;
-
-
 //uses multipart helper function.
 //does not support https
 function uploadCloudApp(file, callback){
@@ -1311,12 +1240,6 @@ function uploadCloudApp(file, callback){
   }
   xhr.send()
 }
-
-
-
-;
-
-
 //https://chrome.google.com/extensions/detail/mdddabjhelpilpnpgondfmehhcplpiin (A stretch, but it introduced me to the imm.io hosting service and I made my implementation by sniffing traffic data)
 
 
@@ -1331,12 +1254,6 @@ function uploadImmio(req, callback){
     callback(xhr.responseText.replace(/^ERR:/,'error: '));
   }
 }
-
-
-
-
-;
-
 
 //19d4df95a040e50112bd8e49a6096b59
 //edc13066151f70ed (super secret secret)
@@ -1479,12 +1396,6 @@ function uploadFlickr(req, uploaded_fn){
   
   uploadPhoto();
 }
-
-
-
-;
-
-
 /*
   Thanks so much to the chemical servers hosting for this!
   Designed the API myself, wrote the hosting code too.
@@ -1527,12 +1438,6 @@ function uploadChemical(req, callback){
     xhr.send('file='+encodeURIComponent(btoa(file.data)))
   });
 }
-
-
-
-;
-
-
 //no https
 //it looks like a small host, but it's got a good ux
 
@@ -1550,12 +1455,6 @@ function uploadDAFK(file, callback){
     "uploaded-file": file
   })
 }
-
-
-
-
-
-;
 
 
 /* OAuthSimple
@@ -2016,12 +1915,6 @@ if (OAuthSimple === undefined)
     return this;
     };
 }
-
-
-
-;
-
-
 /**
  * Copyright (c) 2010 The Chromium Authors. All rights reserved.  Use of this
  * source code is governed by a BSD-style license that can be found in the
@@ -2638,12 +2531,6 @@ ChromeExOAuth.prototype.onAccessToken = function(callback, xhr) {
     }
   }
 };
-
-
-
-;
-
-
 /*
   do not venture below, i hate this.
   wont bother seeing if https works
@@ -2742,12 +2629,6 @@ function uploadPicasa(req, callback){
     });
   });
 }
-
-
-
-;
-
-
 /*
  * Copyright 2008 Netflix, Inc.
  *
@@ -3299,12 +3180,6 @@ try {
     OAuth.correctTimestampFromSrc();
 } catch(e) {
 }
-
-
-
-;
-
-
 var ModernDropbox = function(consumerKey, consumerSecret) {
 	// Constructor / Private
 	var _consumerKey = consumerKey;
@@ -3671,12 +3546,6 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		}
 	}).initialize();
 };
-
-
-
-;
-
-
 //uses multipart helper function.
 
 
@@ -3730,12 +3599,6 @@ var dropbox = new ModernDropbox(key.substr(1,key.charCodeAt(0)),key.substr(key.c
   
   
 }
-
-
-
-;
-
-
 if(localStorage.currentVersion == '1.0.3'){
   if(typeof chrome != 'undefined'){
     chrome.tabs.create({url: "data/options.html", selected: true});
@@ -4110,7 +3973,6 @@ function linkData(id, url){
     console.log('probably this was an invalid thing');
   }
 }
-
 
 
 

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset=utf-8 />
+<title>drag2up settings</title>
+<script src="hosts/js/jquery.min.js"></script>
+<script src="hosts/js/jquery-ui.min.js"></script>
+<script src="hosts/shorten.js"></script>
+<body>
+	
+	<style>
+	body {
+		font-family: sans-serif, arial, helvetica;
+	}
+	
+	#panelcontainer.dragging .panel {
+	  opacity: 0.2;
+	}
+	
+	.panel {
+		width: 210px;
+		position: fixed;		
+		top: 0;
+		z-index: 1;
+		padding: 10px;
+		right: 0;
+	}
+	.panel.binary {
+		top: 0%;
+		height: 33%;
+		background-color: hsl(48, 100%, 95%);
+	}
+	
+	.panel.text {
+		top: 33%;
+		height: 33%;
+		background-color: hsl(200, 100%, 95%);
+	}
+	
+	.panel.image {
+		top: 66%;
+		height: 33%;
+		background-color: hsl(9, 100%, 95%);
+	}
+	
+	.panel.active {
+    opacity: 1 !important;
+  }
+	.has .binary, .active.binary{
+		background-color: hsl(48, 100%, 80%);
+	}
+	
+	.has .text, .active.text {
+		background-color: hsl(200, 100%, 80%);
+	}
+	
+	.has .image, .active.image {
+		background-color: hsl(9, 100%, 80%);
+	}
+	
+	.login .has .login{
+		color: red;
+		display: inline;
+	}
+		
+	
+	.has span {
+	  display: none; 
+	  border-radius: 4px; 
+	  -moz-border-radius: 4px;
+	  padding: 3px
+  }
+	.binary .binary { display: inline; }
+	.text .text { display: inline; }
+	.image .image { display: inline;}
+	
+	.directions, .filehost {
+		float: left;
+		width: 150px;
+		padding: 15px;
+		height: 85px;
+	}
+	
+	.filehost {
+
+		z-index: 5;
+		background-color: hsl(120, 73%, 90%);
+		margin: 10px;
+		border: 1px solid hsl(120, 73%, 70%);
+		border-radius: 10px;
+	  -moz-border-radius: 10px;
+	}
+	
+	h3 {
+	  padding-right: 10px;
+	}
+	
+	.directions {
+		background-color: hsl(240, 73%, 90%);
+		border: 1px solid hsl(240, 73%, 70%);
+		margin: 10px;
+		border-radius: 10px;
+	  -moz-border-radius: 10px;
+	}
+	
+	.filehost img {
+		width: 100%;
+		border-radius: 5px;
+		
+	}
+	
+	.unsupported .multipart {
+	  background-color: hsl(0, 0%, 90%);
+		border: 1px solid hsl(0, 0%, 70%);
+	}
+	</style>
+	<script>
+	if(typeof console == 'undefined') console = {log:function(){},warn:function(){},error:function(){},info:function(){}};
+	
+	function supports_binary(){
+	  var xhr = new XMLHttpRequest();
+	  if(xhr.sendAsBinary) return true; //firefox uses this instead
+	  try{
+	    var bb = new BlobBuilder();
+	    var ui = new Uint8Array(42);
+	    bb.append(ui.buffer);
+	    var blob = bb.getBlob();
+	    if(blob.size == 42){
+	      return true
+	    }else{
+	      return false
+	    }
+	  }catch(err){
+	    return false
+	  }
+	}
+	
+	set = function(e){
+	  for(var i in e){
+	    localStorage[i] = e[i];
+	  }
+	}
+	
+	get = function(e){
+	  return localStorage[e]
+	}
+	
+	$(document).ready(function(){
+	  setTimeout(function(){
+	    var el = document.getElementById('drag2uplocalstorage');
+	    if(el){
+	    
+	     
+	      $('div[name=picasa]').remove(); //i hate picasa.
+	      
+	    
+	      console.log('found simplestore');
+	      var simplestore = {};
+        el.addEventListener('drag2upread', function(){
+          console.log('read data', el.value);
+          simplestore = JSON.parse(el.value);
+          get = function(prop){
+            return simplestore[prop]
+          }
+          init();
+        }, true);
+	      var customEvent = document.createEvent('Event');
+        customEvent.initEvent('drag2upsave', true, true);
+        
+        set = function(data){
+          el.value = JSON.stringify(data);
+          el.dispatchEvent(customEvent);
+        }
+        
+        el.value = "__get";
+        el.dispatchEvent(customEvent);
+	    }else{
+	      console.log('did not find simplestore');
+	      init(); //no need to bootstrap localstorage
+	    }
+	  },10);
+	})
+	
+	
+	function init() {
+	  if(!supports_binary()){
+	    $("body").addClass("unsupported");
+	    $(".unsupported .filehost.multipart").mousedown(function(){
+	      $('#not_suported').queue($('#not_suported').queue().slice(0,1))
+	      $('#not_suported').slideDown()
+	    })
+	    $("body").mouseup(function(){
+	      //$('#not_suported').clearQueue();
+	      $('#not_suported').queue($('#not_suported').queue().slice(0,1))
+	      //doesnt cause weird jumpyness like clearqueue does
+	      $('#not_suported').slideUp()
+	    })
+	  }
+	
+		$( ".filehost" ).not(".unsupported .multipart").draggable({
+			revert: "invalid",
+			containment: "body",
+			helper: "clone",
+			scroll: false
+		});
+		
+		
+		$(".panel").droppable({
+		  accept: '.filehost',
+		  activate: function(){
+		    //btw future self and anyone else who happens to stumble on this code
+		    //the reason there's the weird semitransparent thing under things when you drag the text types
+		    //is because the dragging class. uh. 33% + padding makes something a bit more than 33% so thats
+		    //why it overlaps and when you change the opacity, poop happens.
+			  $('#panelcontainer').addClass('dragging')
+		  },
+		  deactivate: function(){
+  			$('#panelcontainer').removeClass('dragging')
+		  }
+		});
+		$( ".image.panel" ).droppable({
+			accept: ".filehost.image",
+			activeClass: "active",
+			drop: function( event, ui ) {
+			  set({imghost: ui.draggable.attr('name')})
+				$( this )
+					.find( "p" )
+						.html('')
+						.append(ui.draggable.clone())
+			}
+		});
+		$( ".text.panel" ).droppable({
+			accept: ".filehost.text",
+			activeClass: "active",
+			drop: function( event, ui ) {
+			  set({texhost: ui.draggable.attr('name')});
+			  
+				$( this )
+					.find( "p" )
+						.html('')
+						.append(ui.draggable.clone())
+			}
+		});
+		$( ".binary.panel" ).droppable({
+			accept: ".filehost.binary",
+			activeClass: "active",
+			drop: function( event, ui ) {
+			  set({binhost: ui.draggable.attr('name')})
+				$( this )
+					.find( "p" )
+						.html('')
+						.append(ui.draggable.clone())
+			}
+		});
+		
+		var has = $('div.has');
+		$('.filehost').each(function(){
+			$(this).append(has.clone())
+		})
+		
+		$('.filehost, .panel').disableSelection();
+		var bname = get('binhost') || 'chemical';
+		var tname = get('texhost') || 'gist';
+		var iname = get('imghost') || 'imgur';
+		
+		$(".panel.binary").find("p").html('').append($(document.getElementsByName(bname)[0]).clone())
+		$(".panel.text").find("p").html('').append($(document.getElementsByName(tname)[0]).clone())
+		$(".panel.image").find("p").html('').append($(document.getElementsByName(iname)[0]).clone())
+		var instant = (get('instant') || 'on') == 'on'; //woot. its called instant because google made google instant.
+    
+		$('#instant').attr('checked', instant);
+		$('#instant').change(function(){
+		  set({instant: $('#instant').attr('checked')?'on':'off'})
+		  instant = (get('instant') || 'on') == 'on';
+      if(instant) $('.descriptive').show(); else $('.descriptive').hide();
+		})
+		
+		$('.directions').disableSelection();
+		
+    $('#insecure').change(function(){
+		  set({no_https: $('#insecure').attr('checked')?'on':'off'});
+		})
+    $('#insecure').attr('checked', get('no_https') == 'on');
+    
+		window.ondragstart = function(e){
+		  e.preventDefault();
+		}
+    if(instant) $('.descriptive').show(); else $('.descriptive').hide();
+    
+		$('#descriptive').change(function(){
+		  set({descriptive: $('#descriptive').attr('checked')?'on':'off'});
+    })
+    $('#descriptive').attr('checked', get('descriptive') == 'on');
+
+		
+		for(var shortener in shortSvcList){
+		  $("#shorten").append("<option>"+shortener+"</option>");
+		}
+		var shortener = get('url_shortener');
+		$("#shorten").val(shortSvcList[shortener]?shortener:"None");
+		
+		$("#shorten").change(function(){
+		  set({url_shortener: $("#shorten").val()});
+    })
+		
+		
+	}
+	</script>
+
+<h1>drag2up settings</h1>
+
+
+
+<div style="display:none">
+	<div class="has">
+		<span class="text">Text</span>
+		<span class="binary">Binary</span>
+		<span class="image">Image</span>
+		<span class="login">Login</span>
+	</div>	
+</div>
+<div id="panelcontainer">
+
+
+
+
+<div class="binary panel">
+	Current <b>Binary</b> File  Host
+	<p>binary</p>
+</div>
+
+<div class="text panel">
+	Current <b>Text</b>  File  Host
+	<p>text</p>
+</div>
+
+
+<div class="image panel">
+	Current <b>Image</b> File Host
+	<p>image</p>
+</div>
+
+<div style="top:0;padding:10px;position:fixed;width:210px;right:0;background-color:#eeeeee;display:none;z-index:42" id="not_suported">
+<p>Sorry! This host <b>isn't supported</b> by your browser. You will be able to use this file host <b>when Chrome 9 is stable</b>, or if you switch to a developer channel build.</p>
+<p>
+To upload certain types of files, chrome needs to upload binary data (that is, ones and zeroes), but before Chrome 9, there was no way to upload them properly (there were certain sequences of ones and zeroes that could not be uploaded).
+</p>
+</div>
+</div>
+<div style="margin-right:240px;">
+
+<p>
+  <h3 style="display:inline">Basic</h3>
+  
+  <input type="checkbox" id="instant"> <label for="instant">Background uploading.</label>
+  
+  <span class="descriptive">
+    <input type="checkbox" id="descriptive"> <label for="descriptive">Descriptive link names.</label>
+  </span>
+  
+  <input type="checkbox" id="insecure"  style="margin-left: 10px;"> <label for="insecure">Prefer insecure HTTP.</label>
+  
+  <label for="shorten" style="margin-left: 10px;">URL shortener</label>
+  
+  <select id="shorten" >
+    <option>None</option>
+  </select> 
+</p>
+
+<div style="width: 100%;float:left;margin-bottom: 30px">
+<div class="directions">
+<img src="64r.png" style="float:right">
+<b>Drag hosts</b> to the slots on the right.
+</div>
+
+<!-- image hosts -->
+<div class="filehost image" name="imgur">
+	<img src="hosts/logo/imgur.png">
+</div>
+
+<div class="filehost image" name="immio">
+	<img src="hosts/logo/immio.png">
+</div>
+
+<div class="filehost image multipart" name="imageshack">
+	<img src="hosts/logo/imageshack.png">
+</div>
+
+<div class="filehost image multipart login" name="flickr">
+	<img src="hosts/logo/flickr.png">
+</div>
+
+
+<div class="filehost image multipart login" name="picasa">
+	<img src="hosts/logo/picasa.png">
+</div>
+<!--
+<div class="filehost image login" name="photobucket">
+	<img src="hosts/logo/photobucket.png">
+</div>
+-->
+
+
+<!-- pastebins -->
+<div class="filehost text" name="gist">
+	<img src="hosts/logo/gist.png">
+</div>
+
+<div class="filehost text" name="pastebin">
+	<img src="hosts/logo/pastebin.png">
+</div>
+
+
+
+<div class="filehost text" name="mysticpaste">
+	<img src="hosts/logo/mysticpaste.png">
+</div>
+
+<!-- API DOES NOT WORK -->
+<!--
+<div class="filehost text" name="tinypaste">
+	<img src="hosts/logo/tinypaste.png">
+</div>
+-->
+
+<!-- binary -->
+
+<div class="filehost binary image text" name="chemical">
+	<img src="hosts/logo/chemical.png">
+</div>
+
+
+<div class="filehost binary image text multipart" name="dafk">
+	<img src="hosts/logo/dafk.png">
+</div>
+
+
+<div class="filehost binary image text multipart" name="hotfile">
+	<img src="hosts/logo/hotfile.png">
+</div>
+
+
+<div class="filehost binary image text login multipart" name="dropbox">
+	<img src="hosts/logo/dropbox.png">
+</div>
+
+
+<div class="filehost binary image text login multipart" name="cloudapp">
+	<img src="hosts/logo/cloudapp.png">
+</div>
+
+
+
+
+
+
+</div>
+<p>
+  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. A totally irrelevant fact is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now, aware of that magical fact, you should <b>follow me on twitter</b> and share this extension with all your peers.
+</p>
+
+<p>
+If you have you have any <b>comments or suggestions</b>, feel free to send a tweet in my direction <a href="http://twitter.com/antimatter15">@antimatter15</a> or email me at <a href="mailto:antimatter15@gmail.com">antimatter15@gmail.com</a>. You should also totally give this app a high rating on <a href="https://chrome.google.com/webstore/detail/bjgjolhpdlgebodaapdafhdnikagbfll">the chrome web store</a>.
+</p>
+
+</div>
+</body>
+</html>

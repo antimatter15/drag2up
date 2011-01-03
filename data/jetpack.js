@@ -14,18 +14,7 @@ XMLHttpRequest.prototype.__defineSetter__('onload', function(cb){
     if(this.readyState == 4) cb();
   }
 })
-/*
-var customEvent = document.createEvent('Event');
-var el = document.getElementById('drag2uplocalstorage');
-el.addEventListener('drag2upread', function(){
-  console.log('read data', el.value);
-}, true);
-customEvent.initEvent('drag2upsave', true, true);
-function saveData(data){
-  el.value = data;
-  el.dispatchEvent(customEvent);
-}
-*/
+
 pageMod.PageMod({
   include: data.url("options.html"),
   contentScriptWhen: 'ready',
