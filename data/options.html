@@ -17,6 +17,16 @@
 	  opacity: 0.2;
 	}
 	
+	body {
+	  background-image: url(icon/settings.png);
+	  background-repeat: no-repeat;
+	  background-position: 10px 10px;
+  }
+	
+	h1 {
+	  padding-left: 70px;
+	}
+	
 	.panel {
 		width: 210px;
 		position: fixed;		
@@ -59,36 +69,45 @@
 	}
 	
 	.login .has .login{
-		color: red;
+		background-color: hsl(0,0%,80%);
+		
 		display: inline;
 	}
-		
 	
+  
+	.has {
+	  margin-top: 5px;
+	}
 	.has span {
 	  display: none; 
 	  border-radius: 4px; 
 	  -moz-border-radius: 4px;
-	  padding: 3px
+	  padding: 3px;
+	
   }
 	.binary .binary { display: inline; }
 	.text .text { display: inline; }
 	.image .image { display: inline;}
 	
+	
+  .binary .has .text, .binary .has .image {
+    display:none
+  }
+	
 	.directions, .filehost {
 		float: left;
 		width: 150px;
 		padding: 15px;
-		height: 85px;
+		height: 80px;
+		margin: 7px;
+		border-radius: 10px;
+	  -moz-border-radius: 10px;
 	}
 	
 	.filehost {
-
 		z-index: 5;
 		background-color: hsl(120, 73%, 90%);
-		margin: 10px;
 		border: 1px solid hsl(120, 73%, 70%);
-		border-radius: 10px;
-	  -moz-border-radius: 10px;
 	}
 	
 	h3 {
@@ -98,9 +117,6 @@
 	.directions {
 		background-color: hsl(240, 73%, 90%);
 		border: 1px solid hsl(240, 73%, 70%);
-		margin: 10px;
-		border-radius: 10px;
-	  -moz-border-radius: 10px;
 	}
 	
 	.filehost img {
@@ -314,9 +330,10 @@
 <div style="display:none">
 	<div class="has">
 		<span class="text">Text</span>
-		<span class="binary">Binary</span>
+		<span class="binary">All</span>
 		<span class="image">Image</span>
-		<span class="login">Login</span>
+		
+		<span class="login" title="A login prompt will show the first time you upload a file using this host.">Registration</span>
 	</div>	
 </div>
 <div id="panelcontainer">
@@ -369,7 +386,7 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 
 <div style="width: 100%;float:left;margin-bottom: 30px">
 <div class="directions">
-<img src="64r.png" style="float:right">
+<img src="icon/64r.png" style="float:right">
 <b>Drag hosts</b> to the slots on the right.
 </div>
 
@@ -385,6 +402,11 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <div class="filehost image multipart" name="imageshack">
 	<img src="hosts/logo/imageshack.png">
 </div>
+
+<div class="filehost image multipart" name="snelhest">
+	<img src="hosts/logo/snelhest.png">
+</div>
+
 
 <div class="filehost image multipart login" name="flickr">
 	<img src="hosts/logo/flickr.png">
@@ -449,6 +471,9 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/cloudapp.png">
 </div>
 
+<div class="filehost binary image text login multipart" name="box">
+	<img src="hosts/logo/box.gif">
+</div>
 
 
 

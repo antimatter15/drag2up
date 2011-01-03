@@ -3,6 +3,7 @@
 //http://flickr.com/services/auth/?api_key=19d4df95a040e50112bd8e49a6096b59&perms=write&api_sig=[api_sig]
 //https://secure.flickr.com/services
 //http://api.flickr.com/services
+
 function uploadFlickr(req, uploaded_fn){
   var base = "http://flickr.com/services" //https://secure.flickr.com/services
   //wooot security!
@@ -11,8 +12,9 @@ function uploadFlickr(req, uploaded_fn){
   }
   
   function auth(params){
-    params.api_key = "19d4df95a040e50112bd8e49a6096b59";
-    var secret = 'edc13066151f70ed';
+    params.api_key = Keys.flickr.key;
+    var secret = Keys.flickr.secret
+
     params.api_sig = hex_md5(secret+Object.keys(params).sort().map(function(x){return x+params[x]}).join(''))
     return params;
   }

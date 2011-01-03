@@ -37,7 +37,8 @@ function uploadData(file, callback){
     picasa: uploadPicasa,
     chemical: uploadChemical,
     mysticpaste: uploadMysticpaste,
-    dafk: uploadDAFK
+    dafk: uploadDAFK,
+    snelhest: uploadSnelhest
   };
   var hostname = hostName(file);
   console.log('selecte dhostname',hostname);
