@@ -132,12 +132,28 @@
 	.unsupported .multipart {
 	  background-color: hsl(0, 0%, 90%);
 		border: 1px solid hsl(0, 0%, 70%);
+		
+	}
+	
+	#not_supported {
+  	top:0;
+  	padding:10px;
+  	position:fixed;
+  	width:190px;
+  	right:4px;
+  	background-color:#eeeeee;
+  	border: 1px solid gray;
+  	border-top:none;
+  	border-radius: 0 0 10px 10px;
+  	display:none;
+  	z-index:42
 	}
 	</style>
 	<script>
 	if(typeof console == 'undefined') console = {log:function(){},warn:function(){},error:function(){},info:function(){}};
 	
 	function supports_binary(){
+	  //return false;
 	  var xhr = new XMLHttpRequest();
 	  if(xhr.sendAsBinary) return true; //firefox uses this instead
 	  try{
@@ -206,14 +222,14 @@
 	  if(!supports_binary()){
 	    $("body").addClass("unsupported");
 	    $(".unsupported .filehost.multipart").mousedown(function(){
-	      $('#not_suported').queue($('#not_suported').queue().slice(0,1))
-	      $('#not_suported').slideDown()
+	      $('#not_supported').queue($('#not_supported').queue().slice(0,1))
+	      $('#not_supported').slideDown()
 	    })
 	    $("body").mouseup(function(){
-	      //$('#not_suported').clearQueue();
-	      $('#not_suported').queue($('#not_suported').queue().slice(0,1))
+	      //$('#not_supported').clearQueue();
+	      $('#not_supported').queue($('#not_supported').queue().slice(0,1))
 	      //doesnt cause weird jumpyness like clearqueue does
-	      $('#not_suported').slideUp()
+	      $('#not_supported').slideUp()
 	    })
 	  }
 	
@@ -366,7 +382,7 @@
 	<p>image</p>
 </div>
 
-<div style="top:0;padding:10px;position:fixed;width:200px;right:0;background-color:#eeeeee;display:none;z-index:42" id="not_suported">
+<div id="not_supported">
 <p>Sorry! This host <b>isn't supported</b> by your browser. You will be able to use this file host <b>when Chrome 9 is stable</b>, or if you switch to a developer channel build.</p>
 <p>
 To upload certain types of files, chrome needs to upload binary data (that is, ones and zeroes), but before Chrome 9, there was no way to upload them properly (there were certain sequences of ones and zeroes that could not be uploaded).
