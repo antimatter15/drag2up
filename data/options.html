@@ -24,11 +24,11 @@
   }
 	
 	h1 {
-	  padding-left: 70px;
+	  padding-left: 80px;
 	}
 	
 	.panel {
-		width: 210px;
+		width: 200px;
 		position: fixed;		
 		top: 0;
 		z-index: 1;
@@ -77,6 +77,7 @@
   
 	.has {
 	  margin-top: 5px;
+	  float:right;
 	}
 	.has span {
 	  display: none; 
@@ -97,11 +98,15 @@
 	.directions, .filehost {
 		float: left;
 		width: 150px;
-		padding: 15px;
-		height: 80px;
+		padding: 10px;
+		height: 85px;
 		margin: 7px;
 		border-radius: 10px;
 	  -moz-border-radius: 10px;
+	}
+	
+	.container {
+	  height: 60px;
 	}
 	
 	.filehost {
@@ -122,7 +127,6 @@
 	.filehost img {
 		width: 100%;
 		border-radius: 5px;
-		
 	}
 	
 	.unsupported .multipart {
@@ -271,8 +275,13 @@
 		
 		var has = $('div.has');
 		$('.filehost').each(function(){
+			$('<div class="container">')
+			  .append($(this).find('img'))
+			  .appendTo(this);
+			  
 			$(this).append(has.clone())
-		})
+			
+		});
 		
 		$('.filehost, .panel').disableSelection();
 		var bname = get('binhost') || 'chemical';
@@ -357,7 +366,7 @@
 	<p>image</p>
 </div>
 
-<div style="top:0;padding:10px;position:fixed;width:210px;right:0;background-color:#eeeeee;display:none;z-index:42" id="not_suported">
+<div style="top:0;padding:10px;position:fixed;width:200px;right:0;background-color:#eeeeee;display:none;z-index:42" id="not_suported">
 <p>Sorry! This host <b>isn't supported</b> by your browser. You will be able to use this file host <b>when Chrome 9 is stable</b>, or if you switch to a developer channel build.</p>
 <p>
 To upload certain types of files, chrome needs to upload binary data (that is, ones and zeroes), but before Chrome 9, there was no way to upload them properly (there were certain sequences of ones and zeroes that could not be uploaded).
@@ -369,17 +378,15 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <p>
   <h3 style="display:inline">Basic</h3>
   
-  <input type="checkbox" id="instant"> <label for="instant">Background uploading.</label>
+  <input type="checkbox" id="instant"><label for="instant">Background uploading.</label>
   
   <span class="descriptive">
-    <input type="checkbox" id="descriptive"> <label for="descriptive">Descriptive link names.</label>
+    <input type="checkbox" id="descriptive" style="margin-left: 10px;"><label for="descriptive">Descriptive URLs.</label>
   </span>
   
-  <input type="checkbox" id="insecure"  style="margin-left: 10px;"> <label for="insecure">Prefer insecure HTTP.</label>
+  <input type="checkbox" id="insecure"  style="margin-left: 10px;"><label for="insecure">Prefer insecure HTTP.</label>
   
-  <label for="shorten" style="margin-left: 10px;">URL shortener</label>
-  
-  <select id="shorten" >
+  <label for="shorten" style="margin-left: 10px;">URL&nbsp;shortener</label><select id="shorten" style="margin-left: 10px;">
     <option>None</option>
   </select> 
 </p>
@@ -481,12 +488,13 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 
 </div>
 <p>
-  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. A totally irrelevant fact is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now, aware of that magical fact, you should <b>follow me on twitter</b> and share this extension with all your peers.
+  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. A totally irrelevant fact is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now that you are aware of this, you should <b>follow me on twitter</b> and share this extension with all your peers.
 </p>
 
 <p>
 If you have you have any <b>comments or suggestions</b>, feel free to send a tweet in my direction <a href="http://twitter.com/antimatter15">@antimatter15</a> or email me at <a href="mailto:antimatter15@gmail.com">antimatter15@gmail.com</a>. You should also totally give this app a high rating on <a href="https://chrome.google.com/webstore/detail/bjgjolhpdlgebodaapdafhdnikagbfll">the chrome web store</a>.
 </p>
+
 
 </div>
 </body>
