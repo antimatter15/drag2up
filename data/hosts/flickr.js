@@ -4,7 +4,7 @@
 //https://secure.flickr.com/services
 //http://api.flickr.com/services
 
-function uploadFlickr(req, uploaded_fn){
+Hosts.flickr = function uploadFlickr(req, uploaded_fn){
   var base = "http://flickr.com/services" //https://secure.flickr.com/services
   //wooot security!
   if(https() == "https://"){

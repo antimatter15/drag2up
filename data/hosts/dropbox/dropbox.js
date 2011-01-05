@@ -1,11 +1,9 @@
 //uses multipart helper function.
 
 
-function uploadDropbox(req, callback){
+Hosts.dropbox = function uploadDropbox(req, callback){
+  var dropbox = new ModernDropbox(Keys.dropbox.key, Keys.dropbox.secret)
 
-var dropbox = new ModernDropbox(Keys.dropbox.key, Keys.dropbox.secret)
-
-  
   var poll = function(){
     if(dropbox.isAccessGranted()){
       getRaw(req, function(file){

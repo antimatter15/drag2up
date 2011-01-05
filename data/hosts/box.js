@@ -1,6 +1,6 @@
 //box.net
 
-function uploadBox(){
+Hosts.box = function uploadBox(){
   function auth_token(url){
     var auth = url.match(/auth_token=([^\&]+)/)[1];
     localStorage.box_auth = auth;

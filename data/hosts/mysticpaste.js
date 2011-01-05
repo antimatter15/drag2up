@@ -1,6 +1,6 @@
 //https://github.com/kinabalu/mysticpaste/blob/master/idea-plugin/src/com/mysticcoders/mysticpaste/plugin/PastebinAction.java
 //no https
-function uploadMysticpaste(req, callback){
+Hosts.mysticpaste = function uploadMysticpaste(req, callback){
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "http://www.mysticpaste.com/servlet/plugin");  
 	xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');

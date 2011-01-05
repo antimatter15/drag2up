@@ -6,6 +6,8 @@ if(localStorage.currentVersion == '1.0.3'){
 
 localStorage.currentVersion = '2.0';
 
+var Hosts = {};
+
 var instant_host = 'drag2up.appspot.com/'//'localhost:8080/'
 
 
@@ -24,7 +26,7 @@ function hostName(file){
 
 function uploadData(file, callback){
   console.log('uploading data');
-  var hostfn = {
+  /*var Hosts = {
     hotfile: uploadHotfile,
     gist: uploadGist,
     imgur: uploadImgur,
@@ -39,10 +41,10 @@ function uploadData(file, callback){
     mysticpaste: uploadMysticpaste,
     dafk: uploadDAFK,
     snelhest: uploadSnelhest
-  };
+  };*/
   var hostname = hostName(file);
   console.log('selecte dhostname',hostname);
-  var fn = hostfn[hostname];
+  var fn = Hosts[hostname];
   if(fn){
     fn(file, callback);
   }else{

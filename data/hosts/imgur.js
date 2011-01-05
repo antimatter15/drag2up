@@ -1,4 +1,4 @@
-function uploadImgur(req, callback){
+Hosts.imgur = function uploadImgur(req, callback){
 	function postJSON(url, data, callback){
 	  var xhr = new XMLHttpRequest();
 	  xhr.open("POST", url);  

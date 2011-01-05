@@ -13,7 +13,7 @@ var PicasaOAUTH = ChromeExOAuth.initBackgroundPage({
 });
 
 
-function uploadPicasa(req, callback){
+Hosts.snelhost = function uploadPicasa(req, callback){
   // Constants for various album types.
   var PICASA = 'picasa';
   var ALBUM_TYPE_STRING = {

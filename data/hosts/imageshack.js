@@ -4,7 +4,7 @@
 //does not support https
 
 
-function uploadImageshack(file, callback){
+Hosts.imageshack = function uploadImageshack(file, callback){
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "http://www.imageshack.us/upload_api.php");  
   xhr.onload = function(){

@@ -2,7 +2,7 @@
 //it looks like a small host, but it's got a good ux
 //per user request, but no clue if there's an official API
 
-function uploadSnelhest(file, callback){
+Hosts.snelhost = function uploadSnelhest(file, callback){
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "http://upload.snelhest.org/?p=upload");  
   xhr.onload = function(){

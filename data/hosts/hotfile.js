@@ -1,5 +1,5 @@
 //uses multipart helper function.
-function uploadHotfile(file, callback){
+Hosts.hotfile = function uploadHotfile(file, callback){
   //http://api.hotfile.com/?action=getuploadserver
 
 	var xhr = new XMLHttpRequest();
