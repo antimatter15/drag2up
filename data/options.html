@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset=utf-8 />
-<title>drag2up settings</title>
-<script src="hosts/js/jquery.min.js"></script>
-<script src="hosts/js/jquery-ui.min.js"></script>
-<script src="hosts/shorten.js"></script>
-<body>
-	
+  <meta charset=utf-8 />
+  <title>drag2up settings</title>
+  <script src="hosts/js/jquery.min.js"></script>
+  <script src="hosts/js/jquery-ui.min.js"></script>
+  <script src="hosts/shorten.js"></script>
+  
+
 	<style>
 	body {
 		font-family: sans-serif, arial, helvetica;
@@ -98,9 +98,9 @@
 	.directions, .filehost {
 		float: left;
 		width: 150px;
-		padding: 10px;
+		padding: 9px;
 		height: 85px;
-		margin: 7px;
+		margin: 6px;
 		border-radius: 10px;
 	  -moz-border-radius: 10px;
 	}
@@ -132,8 +132,8 @@
 	.unsupported .multipart {
 	  background-color: hsl(0, 0%, 90%);
 		border: 1px solid hsl(0, 0%, 70%);
-		
 	}
+	
 	
 	#not_supported {
   	top:0;
@@ -149,6 +149,8 @@
   	z-index:42
 	}
 	</style>
+</head>
+<body>
 	<script>
 	if(typeof console == 'undefined') console = {log:function(){},warn:function(){},error:function(){},info:function(){}};
 	
@@ -235,7 +237,7 @@
 	
 		$( ".filehost" ).not(".unsupported .multipart").draggable({
 			revert: "invalid",
-			containment: "body",
+			containment: "#everything",
 			helper: "clone",
 			scroll: false
 		});
@@ -347,7 +349,7 @@
 		
 	}
 	</script>
-
+<div id="everything">
 <h1>drag2up settings</h1>
 
 
@@ -394,13 +396,13 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <p>
   <h3 style="display:inline">Basic</h3>
   
-  <input type="checkbox" id="instant"><label for="instant">Background uploading.</label>
+  <input type="checkbox" id="instant"><label for="instant">Background uploading</label>
   
   <span class="descriptive">
-    <input type="checkbox" id="descriptive" style="margin-left: 10px;"><label for="descriptive">Descriptive URLs.</label>
+    <input type="checkbox" id="descriptive" style="margin-left: 10px;"><label for="descriptive">Descriptive URLs</label>
   </span>
   
-  <input type="checkbox" id="insecure"  style="margin-left: 10px;"><label for="insecure">Prefer insecure HTTP.</label>
+  <input type="checkbox" id="insecure"  style="margin-left: 10px;"><label for="insecure">Prefer insecure HTTP</label>
   
   <label for="shorten" style="margin-left: 10px;">URL&nbsp;shortener</label><select id="shorten" style="margin-left: 10px;">
     <option>None</option>
@@ -439,11 +441,11 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <div class="filehost image multipart login" name="picasa">
 	<img src="hosts/logo/picasa.png">
 </div>
-<!--
+
 <div class="filehost image login" name="photobucket">
 	<img src="hosts/logo/photobucket.png">
 </div>
--->
+
 
 
 <!-- pastebins -->
@@ -512,6 +514,7 @@ If you have you have any <b>comments or suggestions</b>, feel free to send a twe
 </p>
 
 
+</div>
 </div>
 </body>
 </html>
