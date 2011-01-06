@@ -1,13 +1,4 @@
-if(localStorage.currentVersion == '1.0.3'){
-  if(typeof chrome != 'undefined'){
-    chrome.tabs.create({url: "data/options.html", selected: true});
-  }
-}
-
-localStorage.currentVersion = '2.0';
-
 var Hosts = {};
-
 var instant_host = 'drag2up.appspot.com/'//'localhost:8080/'
 
 
@@ -26,29 +17,17 @@ function hostName(file){
 
 function uploadData(file, callback){
   console.log('uploading data');
-  /*var Hosts = {
-    hotfile: uploadHotfile,
-    gist: uploadGist,
-    imgur: uploadImgur,
-    imageshack: uploadImageshack,
-    dropbox: uploadDropbox,
-    pastebin: uploadPastebin,
-    cloudapp: uploadCloudApp,
-    flickr: uploadFlickr,
-    immio: uploadImmio,
-    picasa: uploadPicasa,
-    chemical: uploadChemical,
-    mysticpaste: uploadMysticpaste,
-    dafk: uploadDAFK,
-    snelhest: uploadSnelhest
-  };*/
   var hostname = hostName(file);
   console.log('selecte dhostname',hostname);
   var fn = Hosts[hostname];
   if(fn){
-    fn(file, callback);
+    try{
+      fn(file, callback);
+    }catch(err){
+      callback('error: An error occured while running the upload script for '+hostname);
+    }
   }else{
-    callback('error: no host function for type '+hostName(file)+' for file type '+fileType(file));
+    callback('error: No script found for uploading '+fileType(file)+' files to '+hostname);
   }
   
   //uploadDataURL(file, callback);
@@ -159,7 +138,7 @@ function handleRequest(request, tab, sendResponse){
     if(/^error/.test(url) && typeof chrome != 'undefined'){
       var notification = webkitNotifications.createNotification(
         'icon/64sad.png',  // icon url - can be relative
-        "Oops! Something went terribly awry...",  // notification title
+        "Something went terribly awry...",  // notification title
         url  // notification body text
       );
       notification.show();

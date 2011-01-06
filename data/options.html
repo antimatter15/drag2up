@@ -346,7 +346,7 @@
     $('#descriptive').attr('checked', get('descriptive') == 'on');
 
 		$('#notify').change(function(){
-		  set({descriptive: $('#notify').attr('checked')?'on':'off'});
+		  set({notify: $('#notify').attr('checked')?'on':'off'});
     })
     $('#notify').attr('checked', get('notify') == 'on');
 
