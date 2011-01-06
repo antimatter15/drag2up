@@ -61,86 +61,14 @@ function shorten(svc, url, func){
 
 
 var shortSvcList = {
-        "goo.gl": {
+"goo.gl": {
                 method: "POST",
-                s_url: "http://goo.gl/api/url",
-                param: function(b) {
-
-                        // generate auth_token
-
-                        function c() {
-                                for (var l = 0, m = 0; m < arguments.length; m++)
-                                        l = l + arguments[m] & 4294967295;
-                                return l
-                        }
-
-                        function d(l) {
-                                l = l = String(l > 0 ? l : l + 4294967296);
-                                var m;
-                                m = l;
-                                for (var o = 0, n = false, p = m.length - 1; p >= 0; --p)       {
-                                        var q = Number(m.charAt(p));
-                                        if (n) {
-                                                q *= 2;
-                                                o += Math.floor(q / 10) + q % 10
-                                        }
-                                        else    {
-                                                o += q;
-                                        }
-                                        n = !n
-                                }
-                                m = m = o % 10;
-                                o = 0;
-                                if (m != 0) {
-                                        o = 10 - m;
-                                        if (l.length % 2 == 1) {
-                                                if (o % 2 == 1) o += 9;
-                                                o /= 2
-                                        }
-                                }
-                                m = String(o);
-                                m += l;
-                                return l = m
-                        }
-
-                        function e(l) {
-                                for (var m = 5381, o = 0; o < l.length; o++)
-                                        m = c(m << 5, m, l.charCodeAt(o));
-                                return m
-                        }
-
-                        function f(l) {
-                                for (var m = 0, o = 0; o < l.length; o++)
-                                        m = c(l.charCodeAt(o), m << 6, m << 16, -m);
-                                return m
-                        }
-
-                        var h = {
-                                byteArray_: b,
-                                charCodeAt: function (l) {
-                                        return this.byteArray_[l]
-                                }
-                        };
-
-                        h.length = h.byteArray_.length;
-                        var i = e(h.byteArray_);
-                        i = i >> 2 & 1073741823;
-                        i = i >> 4 & 67108800 | i & 63;
-                        i = i >> 4 & 4193280 | i & 1023;
-                        i = i >> 4 & 245760 | i & 16383;
-                        var j = "7";
-                        h = f(h.byteArray_);
-                        var k = (i >> 2 & 15) << 4 | h & 15;
-                        k |= (i >> 6 & 15) << 12 | (h >> 8 & 15) << 8;
-                        k |= (i >> 10 & 15) << 20 | (h >> 16 & 15) << 16;
-                        k |= (i >> 14 & 15) << 28 | (h >> 24 & 15) << 24;
-                        j += d(k);
-
-                        return "user=toolbar@google.com&auth_token="+j+"&url="
-                },
+                s_url: "http://goo.gl/api/shorten",
+                param: "url=",
                 dataType: "json",
                 s_proc: function(r,f) {
-                        f((r.short_url !== undefined) ? {status: "ok", url: r.short_url} : {status: "error", error: r.error_message});
+                        // need to check for error code?
+                        f({status: "ok", url: r.short_url});
         }},
         "bit.ly": {
                 method: "GET",
@@ -257,7 +185,7 @@ var shortSvcList = {
                         r1 = r.match(/Your ur1 is: <a href="(http:\/\/ur1\.ca\/.+)">/i);
                         f(r1 ? {status: "ok", url: r1[1]} : {status: "error", error: r.match(/<p .lass="error">([^<]+)<\/p>/i)});
         }},
-        "Voizle": {
+        "voizle": {
                 method: "GET",
                 s_url: "http://api.voizle.com",
                 param: "format=json&crawl=no&type=short&u=",
