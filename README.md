@@ -75,6 +75,8 @@ These sites had the documentation that I used to develop stuff.
 * http://pic.pbsrc.com/dev_help/WebHelpPublic/PhotobucketPublicHelp.htm
 * http://www.imdb.com/title/tt1104001/
 * https://developer.mozilla.org/en/DOM:window.getComputedStyle
+* http://developers.box.net/w/page/12923958/FrontPage
+* http://min.us/pages/api
 
 ### Known Issues:
 Firefox 3.6 on Ubuntu Linux does not work properly. It seems to work fine on Mac OS X. I haven't bothered testing on Windows. Firefox 4b7 on Ubuntu Linux does work, however.
