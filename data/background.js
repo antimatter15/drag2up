@@ -98,15 +98,18 @@ function handleRequest(request, tab, sendResponse){
     var shortener = localStorage.url_shortener;
     if(shortSvcList[shortener]){ //if there's a url shortener selected
       var orig = obj.url;
+	  console.log('quering url shortenr', shortSvcList[shortener], 'for', orig)
       shorten(shortener, orig, function(res){
         if(res.status == 'ok'){
           obj.url = res.url;
         }else{
           obj.url = 'error: the url shortener '+shortener+' is broken. The original URL was '+orig;
         }
+		console.log('sending delayed response', obj);
         sendResponse(obj); //yay returned call! albeit slightly delayed
       })
     }else{
+		console.log('immediately sent resposne',obj)
       sendResponse(obj); //yay returned call!
     }
   }
@@ -152,19 +155,11 @@ function handleRequest(request, tab, sendResponse){
   }
   console.log('going to upload');
   uploadData(request, function(url){
-    //errors are always notified
-    if(/^error/.test(url) && typeof chrome != 'undefined'){
-      var notification = webkitNotifications.createNotification(
-        'icon/64sad.png',  // icon url - can be relative
-        "Oops! It's not working :(",  // notification title
-        url  // notification body text
-      );
-      notification.show();
-    }
-  
+  	console.log('done uploading stuff')
     if(instant){
       car.done({url: url});
-    }else if(filetable[request.id]){ //non-instant
+    }else{ //non-instant
+      console.log('non instant callback')
       returned_link({callback: request.id, url: url})
     }
     if(typeof chrome != 'undefined'){
