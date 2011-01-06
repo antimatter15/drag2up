@@ -98,18 +98,18 @@ function handleRequest(request, tab, sendResponse){
     var shortener = localStorage.url_shortener;
     if(shortSvcList[shortener]){ //if there's a url shortener selected
       var orig = obj.url;
-	  console.log('quering url shortenr', shortSvcList[shortener], 'for', orig)
+      console.log('quering url shortenr', shortSvcList[shortener], 'for', orig)
       shorten(shortener, orig, function(res){
         if(res.status == 'ok'){
           obj.url = res.url;
         }else{
           obj.url = 'error: the url shortener '+shortener+' is broken. The original URL was '+orig;
         }
-		console.log('sending delayed response', obj);
+		    console.log('sending delayed response', obj);
         sendResponse(obj); //yay returned call! albeit slightly delayed
       })
     }else{
-		console.log('immediately sent resposne',obj)
+		  console.log('immediately sent resposne',obj)
       sendResponse(obj); //yay returned call!
     }
   }
@@ -156,6 +156,14 @@ function handleRequest(request, tab, sendResponse){
   console.log('going to upload');
   uploadData(request, function(url){
   	console.log('done uploading stuff')
+    if(/^error/.test(url) && typeof chrome != 'undefined'){
+      var notification = webkitNotifications.createNotification(
+        'icon/64sad.png',  // icon url - can be relative
+        "Oops! Something went terribly awry...",  // notification title
+        url  // notification body text
+      );
+      notification.show();
+    }
     if(instant){
       car.done({url: url});
     }else{ //non-instant
@@ -167,7 +175,7 @@ function handleRequest(request, tab, sendResponse){
       chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
       if(tabqueue[tab] == 0){
         chrome.pageAction.hide(tab);
-        if(localStorage.notify == 'on' && /^error/.test(url) && typeof chrome != 'undefined'){
+        if(localStorage.notify == 'on' && typeof chrome != 'undefined'){
           var notification = webkitNotifications.createNotification(
             'icon/64.png',  // icon url - can be relative
             "Uploading Complete",  // notification title
