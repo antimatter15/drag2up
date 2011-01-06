@@ -133,7 +133,7 @@ function handleRequest(request, tab, sendResponse){
       car.done();
       console.log('finished initializing instant', +new Date);
       var shorturl = https()+instant_host+''+parts[0];
-      if(localStorage.descriptive && request.name){
+      if(localStorage.descriptive == 'on' && request.name){
         shorturl += '?'+request.name;
       }
       returned_link({
