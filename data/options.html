@@ -345,6 +345,11 @@
     })
     $('#descriptive').attr('checked', get('descriptive') == 'on');
 
+		$('#notify').change(function(){
+		  set({descriptive: $('#notify').attr('checked')?'on':'off'});
+    })
+    $('#notify').attr('checked', get('notify') == 'on');
+
 		
 		for(var shortener in shortSvcList){
 		  $("#shorten").append("<option>"+shortener+"</option>");
@@ -413,6 +418,9 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
   </span>
   
   <input type="checkbox" id="insecure"  style="margin-left: 10px;"><label for="insecure">Prefer insecure HTTP</label>
+  
+  <input type="checkbox" id="notify"  style="margin-left: 10px;"><label for="notify">Notifications</label>
+  
   
   <label for="shorten" style="margin-left: 10px;">URL&nbsp;shortener</label><select id="shorten" style="margin-left: 10px;">
     <option>None</option>

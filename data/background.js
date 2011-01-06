@@ -152,6 +152,16 @@ function handleRequest(request, tab, sendResponse){
   }
   console.log('going to upload');
   uploadData(request, function(url){
+    //errors are always notified
+    if(/^error/.test(url) && typeof chrome != 'undefined'){
+      var notification = webkitNotifications.createNotification(
+        'icon/64sad.png',  // icon url - can be relative
+        "Oops! It's not working :(",  // notification title
+        url  // notification body text
+      );
+      notification.show();
+    }
+  
     if(instant){
       car.done({url: url});
     }else if(filetable[request.id]){ //non-instant
@@ -160,7 +170,17 @@ function handleRequest(request, tab, sendResponse){
     if(typeof chrome != 'undefined'){
       tabqueue[tab]--;
       chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
-      if(tabqueue[tab] == 0) chrome.pageAction.hide(tab);
+      if(tabqueue[tab] == 0){
+        chrome.pageAction.hide(tab);
+        if(localStorage.notify == 'on' && /^error/.test(url) && typeof chrome != 'undefined'){
+          var notification = webkitNotifications.createNotification(
+            'icon/64.png',  // icon url - can be relative
+            "Uploading Complete",  // notification title
+            "All files have been uploaded."  // notification body text
+          );
+          notification.show();
+        }
+      }
     }
   });
   

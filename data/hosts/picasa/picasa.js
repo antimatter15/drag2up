@@ -13,7 +13,7 @@ var PicasaOAUTH = ChromeExOAuth.initBackgroundPage({
 });
 
 
-Hosts.snelhost = function uploadPicasa(req, callback){
+Hosts.picasa = function uploadPicasa(req, callback){
   // Constants for various album types.
   var PICASA = 'picasa';
   var ALBUM_TYPE_STRING = {
@@ -51,13 +51,14 @@ Hosts.snelhost = function uploadPicasa(req, callback){
                   ', response body = "' + xhr.responseText + '"');
             return;
           }
-          var jsonData = $.parseJSON(resp);
+          var jsonData = JSON.parse(resp);
           var albums = []
           var msg = "Please select an album to upload to (enter the number): \n"
-          $.each(jsonData.feed.entry, function(index, entryData) {
+          for(var index = 0; index < jsonData.feed.entry.length; index++){
+            var entryData = jsonData.feed.entry[index];
             albums[1+index] = {id: entryData['gphoto$id']['$t'], title: entryData.title['$t']};
             msg += (1+index) + ' - ' + entryData.title['$t'] + '\n';
-          });
+          }
           var num = parseInt(prompt(msg));
           if(albums[num] && num){
             var albumId = albums[num].id;
