@@ -3,7 +3,7 @@
   Designed the API myself, wrote the hosting code too.
 */
 //no https
-function uploadChemical(req, callback){
+Hosts.chemical = function uploadChemical(req, callback){
   //http://files.chemicalservers.com/api.php
   var api_url = "http://files.chemicalservers.com/api.php";
   var download_url = "http://files.chemicalservers.com/download.php";

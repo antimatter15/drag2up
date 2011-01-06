@@ -14,18 +14,7 @@ XMLHttpRequest.prototype.__defineSetter__('onload', function(cb){
     if(this.readyState == 4) cb();
   }
 })
-/*
-var customEvent = document.createEvent('Event');
-var el = document.getElementById('drag2uplocalstorage');
-el.addEventListener('drag2upread', function(){
-  console.log('read data', el.value);
-}, true);
-customEvent.initEvent('drag2upsave', true, true);
-function saveData(data){
-  el.value = data;
-  el.dispatchEvent(customEvent);
-}
-*/
+
 pageMod.PageMod({
   include: data.url("options.html"),
   contentScriptWhen: 'ready',
@@ -273,12 +262,6 @@ function binb2b64(binarray)
   }
   return str;
 }
-
-
-
-;
-
-
 /*
  * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
  * Digest Algorithm, as defined in RFC 1321.
@@ -658,12 +641,6 @@ function bit_rol(num, cnt)
 {
   return (num << cnt) | (num >>> (32 - cnt));
 }
-
-
-
-;
-
-
 //stolen from mozilla http://demos.hacks.mozilla.org/openweb/imageUploader/js/extends/xhr.js
 //http://code.google.com/p/chromium/issues/detail?id=35705#c6
 //http://efreedom.com/Question/1-3743047/Uploading-Binary-String-WebKit-Chrome-Using-XHR-Equivalent-Firefoxs-SendAsBinary
@@ -774,12 +751,6 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
     }
   });
 };
-
-
-
-;
-
-
 //based on ChromeMuse GPLv3
 
 
@@ -1045,12 +1016,6 @@ var shortSvcList = {
                         f((r.voizle !== undefined && r.voizle.success) ? {status: "ok", url: r.voizle.voizleurl} : {status: "error", error: "Error shortening URL."});
         }}
 };
-
-
-
-;
-
-
 //uses multipart helper function.
 //magic totally obfuscated key that you shall never see
 //39ACEJNQa5b92fbce7fd90b1cb6f1104d728eccb
@@ -1076,12 +1041,6 @@ function uploadImageshack(file, callback){
     fileupload: file
   })
 }
-
-
-
-
-
-;
 
 
 //based on description from http://gist.github.com/4277
@@ -1119,12 +1078,6 @@ function uploadGist(req, callback){
   })
 
 }
-
-
-
-;
-
-
 /*
  * uploadPastebin({data:btoa('hello world')},function(url){console.log(url)})
  * http://pastebin.com/x43mgnhf
@@ -1142,12 +1095,6 @@ function uploadPastebin(req, callback){
 	}
 	
 }
-
-
-
-;
-
-
 //https://github.com/kinabalu/mysticpaste/blob/master/idea-plugin/src/com/mysticcoders/mysticpaste/plugin/PastebinAction.java
 //no https
 function uploadMysticpaste(req, callback){
@@ -1161,12 +1108,6 @@ function uploadMysticpaste(req, callback){
   	xhr.send("type="+file.type+"&content="+encodeURIComponent( file.data  ));
 	})
 }
-
-
-
-;
-
-
 function uploadImgur(req, callback){
 	function postJSON(url, data, callback){
 	  var xhr = new XMLHttpRequest();
@@ -1188,7 +1129,7 @@ function uploadImgur(req, callback){
 	}
 	getBinary(req, function(file){
 	  postJSON(https()+"api.imgur.com/2/upload.json", {
-      key: '390230bc94c4cc1354bcdb2dae0b9afd', /*should i invent a meaningless means of obfuscating this? no.*/
+      key: 'bbb444d5415156c67a5908fb1ce68fd5', /*should i invent a meaningless means of obfuscating this? no.*/
       type: 'base64',
       name: file.name,
       image: btoa(file.data)
@@ -1201,12 +1142,6 @@ function uploadImgur(req, callback){
     })
   })
 }
-
-
-
-;
-
-
 //uses multipart helper function.
 function uploadHotfile(file, callback){
   //http://api.hotfile.com/?action=getuploadserver
@@ -1239,12 +1174,6 @@ function uploadHotfile(file, callback){
 	}
 	
 }
-
-
-
-;
-
-
 //uses multipart helper function.
 //does not support https
 function uploadCloudApp(file, callback){
@@ -1311,12 +1240,6 @@ function uploadCloudApp(file, callback){
   }
   xhr.send()
 }
-
-
-
-;
-
-
 //https://chrome.google.com/extensions/detail/mdddabjhelpilpnpgondfmehhcplpiin (A stretch, but it introduced me to the imm.io hosting service and I made my implementation by sniffing traffic data)
 
 
@@ -1331,12 +1254,6 @@ function uploadImmio(req, callback){
     callback(xhr.responseText.replace(/^ERR:/,'error: '));
   }
 }
-
-
-
-
-;
-
 
 //19d4df95a040e50112bd8e49a6096b59
 //edc13066151f70ed (super secret secret)
@@ -1479,12 +1396,6 @@ function uploadFlickr(req, uploaded_fn){
   
   uploadPhoto();
 }
-
-
-
-;
-
-
 /*
   Thanks so much to the chemical servers hosting for this!
   Designed the API myself, wrote the hosting code too.
@@ -1527,12 +1438,6 @@ function uploadChemical(req, callback){
     xhr.send('file='+encodeURIComponent(btoa(file.data)))
   });
 }
-
-
-
-;
-
-
 //no https
 //it looks like a small host, but it's got a good ux
 
@@ -1550,12 +1455,6 @@ function uploadDAFK(file, callback){
     "uploaded-file": file
   })
 }
-
-
-
-
-
-;
 
 
 /* OAuthSimple
@@ -2016,12 +1915,6 @@ if (OAuthSimple === undefined)
     return this;
     };
 }
-
-
-
-;
-
-
 /**
  * Copyright (c) 2010 The Chromium Authors. All rights reserved.  Use of this
  * source code is governed by a BSD-style license that can be found in the
@@ -2638,12 +2531,6 @@ ChromeExOAuth.prototype.onAccessToken = function(callback, xhr) {
     }
   }
 };
-
-
-
-;
-
-
 /*
   do not venture below, i hate this.
   wont bother seeing if https works
@@ -2742,12 +2629,6 @@ function uploadPicasa(req, callback){
     });
   });
 }
-
-
-
-;
-
-
 /*
  * Copyright 2008 Netflix, Inc.
  *
@@ -3299,12 +3180,6 @@ try {
     OAuth.correctTimestampFromSrc();
 } catch(e) {
 }
-
-
-
-;
-
-
 var ModernDropbox = function(consumerKey, consumerSecret) {
 	// Constructor / Private
 	var _consumerKey = consumerKey;
@@ -3671,22 +3546,31 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		}
 	}).initialize();
 };
-
-
-
-;
-
-
 //uses multipart helper function.
 
 
 function uploadDropbox(req, callback){
-  //hey! this is a file that has a oauth secret! close your eyes!
-  //it probably does not compromise the security for other people to know it
-  //but using oauth secrets inside a client app is just wrong. it's sort
-  //of an abuse of oauth anyway.
+  var rant = "hey! this is a file that has a oauth secret! close your eyes!'"+
+  "OAuth is a pretty bad idea anyway, ESPECIALLY for apps that '"+
+  "run on hardware. It's a really stupid idea to use OAuth on any'"+
+  "desktop or mobile application. Running the strings command on'"+
+  "the executable you pull from /var/mobile/Applications on a developer'"+
+  "or jailbroken iPhone is all you need to take those oh so precious'"+
+  '"secrets". But this whole ridiculous "security through obscurity" '+
+  "approach still seems very prevalent.'";
+
   //<spoiler alert>
-  var dropbox = new ModernDropbox("eicw1uywyigukn4", "xkapobwa2r0i8y1");
+
+var key = [1.5522799247268875, 1.561705668129837, 1.5532542667374942, 1.5601584302193552, 1.5405025668761214, 1.5623931632472496, 1.5526165117219184, 1.5609927193156006, 1.5624631863547607, 1.5610878939607877, 1.560380036863927, 1.5604874136486533, 1.5609927193156006, 1.5599271896176263, 1.5625320521352455, 1.5519306407732258, 1.5606956602095747, 1.5599271896176263, 1.562599789044984, 1.5611812384951942, 1.5601584302193552, 1.561705668129837, 1.5624631863547607, 1.561705668129837, 1.562599789044984, 1.5522799247268875, 1.5624631863547607, 1.5607966601082315, 1.5601584302193552, 1.5613626443888957, 1.5551725981744198];
+
+key = key.slice(+!1).reverse().map(function(e,i){
+var w = window,W=['Math','round','tan',42,6,'String','fromCharCode'];
+var d = w[W[0]][W[1]](w[W[0]][W[2]](e));
+var c = ((d-W[3]+((W[3]/(+!(W-w)-(-(+!(W-w)))))-W[3]/W[4]))^W[3])+(+!(w-w));
+return w[W[5]][W[6]](c);
+}).join('');
+var dropbox = new ModernDropbox(key.substr(1,key.charCodeAt(0)),key.substr(key.charCodeAt(0)+1))
+
   //</spoiler alert>
   
   var poll = function(){
@@ -3715,13 +3599,6 @@ function uploadDropbox(req, callback){
   
   
 }
-
-
-
-;
-
-
-
 if(localStorage.currentVersion == '1.0.3'){
   if(typeof chrome != 'undefined'){
     chrome.tabs.create({url: "data/options.html", selected: true});
@@ -3843,19 +3720,23 @@ function handleRequest(request, tab, sendResponse){
   console.log('progress of instant',instant);
   
   if(instant){
-    console.log('initializing instnat');
+    console.log('initializing instnat', request.url);
     instantInit({
         id: request.id,
-        name:request.name || 'unknown.filetype', 
+        name: request.name || 'unknown.filetype', 
         type: request.type || 'application/octet-stream', 
-        size: request.size || -1, 
-        data: '\xff'
+        size: request.size || -1,
+        url: request.url
       }, function(parts){
       car.done();
       console.log('finished initializing instant', +new Date);
+      var shorturl = https()+instant_host+''+parts[0];
+      if(localStorage.descriptive && request.name){
+        shorturl += '?'+request.name;
+      }
       returned_link({
         callback: request.id,
-        url: https()+instant_host+''+parts[0]
+        url: shorturl
       })
     })
   }
@@ -3902,7 +3783,7 @@ function instantInit(file, callback){
   xhr.open('GET', https()+instant_host+'new?'+params({
     host: hostName(file),
     size: file.size,
-    name: file.name
+    name: file.name.replace(/\n/g,' ') //newlines suck. they cause errors.
   }), true);
   console.log('getted things');
   xhr.onload = function(){
@@ -3915,8 +3796,11 @@ function instantInit(file, callback){
 }
 
 
-function getURL(type, request, callback){
+function getURL(type, request, callback, sync){
+  if(request.data && sync) return request.data;
+  
   if(request.data) return callback(request); //no need reconverting!
+  
   if(/^data:/.test(request.url)){
     console.log('opened via data url');
     var parts = request.url.match(/^data:(.+),/)[1].split(';');
@@ -3930,6 +3814,7 @@ function getURL(type, request, callback){
     }else{
       name = enc.substr(enc.length/2 - 6, 6) + '.' + mime.split('/')[1];
     }
+    if(sync) return data;
     callback({
       data: data,
       type: mime,
@@ -3940,10 +3825,15 @@ function getURL(type, request, callback){
     
     //callback(new dFile(data, name, mime, id, size)
   }else{
+    
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', request.url, true);
+    xhr.open('GET', request.url, !sync);
     if(type == 'binary' || type == 'raw'){
       xhr.overrideMimeType('text/plain; charset=x-user-defined'); //should i loop through and do that & 0xff?
+    }
+    if(sync){
+      xhr.send();
+      return xhr.responseText;
     }
     xhr.onload = function(){
       console.log('opened via xhr ', request.url);
@@ -3966,15 +3856,15 @@ function getURL(type, request, callback){
           callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
         }else{
         
-        var bb = new BlobBuilder();//this webworker is totally overkill
-        bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
-        var worker = new Worker(createObjectURL(bb.getBlob()));
-        worker.onmessage = function(e) {
-          var data = e.data;
-          callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
-        };
-        
-        worker.postMessage(xhr.responseText);
+          var bb = new BlobBuilder();//this webworker is totally overkill
+          bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
+          var worker = new Worker(createObjectURL(bb.getBlob()));
+          worker.onmessage = function(e) {
+            var data = e.data;
+            callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
+          };
+          
+          worker.postMessage(xhr.responseText);
         }
         
         //*/
@@ -4015,70 +3905,74 @@ if(typeof chrome != 'undefined'){
 }
 
 
+var text_ext = 'log,less,sass,coffee,yaml,json,md,conf,config,css,cfm,yaws,html,htm,xhtml,js,pl'.split(',') //do not add semicol
+.concat('php,php4,php3,phtml,py,rb,rhtml,xml,rss,svg,cgi,yaml,md,markdown,shtml,asp,java,c'.split(',')) //do not add semicol
+.concat('README,sh,make,automake,configure,LICENSE,h,m,info,nfo,classdescription,in'.split(','));
+
 
 function fileType(file){
-  var text_ext = 'log,less,sass,coffee,yaml,json,md,css,cfm,yaws,html,htm,xhtml,js,pl,php,php4,php3,phtml,py,rb,rhtml,xml,rss,svg,cgi'.split(',');
-  var ext = file.name.toLowerCase().replace(/^.*\.(\w+?)(\#|\?)?.*$/,'$1');
+  console.log('checking file type for file',file);
+  var ext = file.name.toLowerCase().replace(/^.*\.(\w+)(\#|\?)?.*?$/,'$1');
   var image_ext = 'jpg,jpeg,tiff,raw,png,gif,bmp,ppm,pgm,pbm,pnm,webp'.split(','); //woot webp
+  
   if(image_ext.indexOf(ext) != -1) file.type = 'image/'+ (ext == 'jpg'?'jpeg':ext);
+  
+  if(file.type.indexOf('text/') == -1) if(text_ext.indexOf(ext) != -1) file.type = 'text/plain';
+	  
   if(file.type){
+    console.log('the file type was', file.type, 'file extension was ', ext);
     if(file.type.indexOf('image/') == 0){
 	    //image type
 	    return 'image'
 	  }else if(file.type.indexOf('text/') == 0){
 	    return 'text'
-	  }else if(text_ext.indexOf(ext) != -1){
-	    return 'text'
 	  }else if(file.type.indexOf('script') != -1 || file.type.indexOf('xml') != -1){
 	    return 'text'; //scripts or xml usually means code which usually means text
-	  }else if(file.size < 1024 * 1024) { //its rare for text files to be so huge
-	    /*
-	    var src = file.data;//atob(file.data.replace(/^data.+base64,/i,''));
-	    var txt = src.substr(0,512) + src.slice(-512);
-	    for(var i = 0, isAscii = true; i < 128; i++){
-	      if((txt.charCodeAt(i) & 0xff) > 128){
-	       isAscii = false;
-	       continue
-        }
-      }
-      if(isAscii && file.size < 1024 * 300) return 'text';
-      */
 	  }
 	}
+	
+	
+	if(file.size < 1024 * 300) { //its not as common for there to be 1 meg text files
+    console.log('checking for file type');
+    var src = getURL('raw', file, function(){}, true); //binary sync xhr.. its baddd.
+    console.log(src);
+    for(var l = src.length, i = 0; i < l; i++){
+      var code = src.charCodeAt(i) & 0xff;
+      if(code <= 8 || (code >= 14 && code <= 31) || code == 127 || code >= 240){
+        console.log('failed test: binary', code, src.charAt(i));
+        return 'binary'; //non printable ascii
+      }
+    }
+    file.type = 'text/plain';
+    return 'text';
+  }
 	return 'binary'
 }
 
 
-
-
-function uploadDataURL(file, callback){
-  //here's the lazy data url encoding system :P
-  setTimeout(function(){
-    callback(file.data.replace('data:base64','data:text/plain;base64'));
-  },1337);
-}
-
-
-
-
 function linkData(id, url){
   var xhr = new XMLHttpRequest();
-  xhr.open('GET',https()+instant_host+'update/'+filetable[id][0]+'/'+filetable[id][1]+'?'+params({
-    url: url
-  }), true);
-  xhr.onload = function(e){
-    if(xhr.status != 200){
-      //doomsday scenario: error leads to error leading to error leading to effective DoS
-      linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
+  var file_id = filetable[id][0];0
+  var edit_code = filetable[id][1];
+  if(file_id.length < 15 && edit_code.length < 15){
+    xhr.open('GET',https()+instant_host+'update/'+file_id+'/'+edit_code+'?'+params({
+      url: url
+    }), true);
+    xhr.onload = function(e){
+      if(xhr.status != 200){
+        //doomsday scenario: error leads to error leading to error leading to effective DoS
+        linkData(id, 'error: could not link to upload url because of '+xhr.status+' '+xhr.statusText)
+      }
     }
+    xhr.onerror = function(e){
+      console.log(e)
+      linkData(id, 'error: could not link.')
+    }
+    xhr.send();
+  }else{
+    console.log('probably this was an invalid thing');
   }
-  xhr.onerror = function(e){
-    console.log(e)
-    linkData(id, 'error: could not link.')
-  }
-  xhr.send();
 }
-
 
 
 

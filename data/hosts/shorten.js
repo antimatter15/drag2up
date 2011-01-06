@@ -14,10 +14,13 @@ function shorten(svc, url, func){
   }
 
   var xhr = new XMLHttpRequest();
-  xhr.open(shortSvc.method, shortSvc.s_url, true);
+  
   
   if(shortSvc.method.toLowerCase() == 'post'){
+    xhr.open(shortSvc.method, shortSvc.s_url, true);
   	xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+  }else{
+    xhr.open(shortSvc.method, shortSvc.s_url + '?' + param, true);
   }
 
   xhr.onerror = function(){

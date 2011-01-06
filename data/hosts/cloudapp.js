@@ -1,6 +1,6 @@
 //uses multipart helper function.
 //does not support https
-function uploadCloudApp(file, callback){
+Hosts.cloudapp = function uploadCloudApp(file, callback){
   var xhr = new XMLHttpRequest();
   xhr.open('GET', 'http://my.cl.ly/items/new');
   xhr.setRequestHeader('Accept', 'application/json');

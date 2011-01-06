@@ -1,15 +1,9 @@
 //uses multipart helper function.
 
 
-function uploadDropbox(req, callback){
-  //hey! this is a file that has a oauth secret! close your eyes!
-  //it probably does not compromise the security for other people to know it
-  //but using oauth secrets inside a client app is just wrong. it's sort
-  //of an abuse of oauth anyway.
-  //<spoiler alert>
-  var dropbox = new ModernDropbox("eicw1uywyigukn4", "xkapobwa2r0i8y1");
-  //</spoiler alert>
-  
+Hosts.dropbox = function uploadDropbox(req, callback){
+  var dropbox = new ModernDropbox(Keys.dropbox.key, Keys.dropbox.secret)
+
   var poll = function(){
     if(dropbox.isAccessGranted()){
       getRaw(req, function(file){
