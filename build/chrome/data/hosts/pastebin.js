@@ -3,7 +3,7 @@
  * http://pastebin.com/x43mgnhf
  * */
  //no https
-function uploadPastebin(req, callback){
+Hosts.pastebin = function uploadPastebin(req, callback){
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "http://pastebin.com/api_public.php");  
 	xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');

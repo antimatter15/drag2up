@@ -1,11 +1,4 @@
-if(localStorage.currentVersion == '1.0.3'){
-  if(typeof chrome != 'undefined'){
-    chrome.tabs.create({url: "data/options.html", selected: true});
-  }
-}
-
-localStorage.currentVersion = '2.0';
-
+var Hosts = {};
 var instant_host = 'drag2up.appspot.com/'//'localhost:8080/'
 
 
@@ -24,28 +17,17 @@ function hostName(file){
 
 function uploadData(file, callback){
   console.log('uploading data');
-  var hostfn = {
-    hotfile: uploadHotfile,
-    gist: uploadGist,
-    imgur: uploadImgur,
-    imageshack: uploadImageshack,
-    dropbox: uploadDropbox,
-    pastebin: uploadPastebin,
-    cloudapp: uploadCloudApp,
-    flickr: uploadFlickr,
-    immio: uploadImmio,
-    picasa: uploadPicasa,
-    chemical: uploadChemical,
-    mysticpaste: uploadMysticpaste,
-    dafk: uploadDAFK
-  };
   var hostname = hostName(file);
   console.log('selecte dhostname',hostname);
-  var fn = hostfn[hostname];
+  var fn = Hosts[hostname];
   if(fn){
-    fn(file, callback);
+    try{
+      fn(file, callback);
+    }catch(err){
+      callback('error: An error occured while running the upload script for '+hostname);
+    }
   }else{
-    callback('error: no host function for type '+hostName(file)+' for file type '+fileType(file));
+    callback('error: No script found for uploading '+fileType(file)+' files to '+hostname);
   }
   
   //uploadDataURL(file, callback);
@@ -95,15 +77,18 @@ function handleRequest(request, tab, sendResponse){
     var shortener = localStorage.url_shortener;
     if(shortSvcList[shortener]){ //if there's a url shortener selected
       var orig = obj.url;
+      console.log('quering url shortenr', shortSvcList[shortener], 'for', orig)
       shorten(shortener, orig, function(res){
         if(res.status == 'ok'){
           obj.url = res.url;
         }else{
           obj.url = 'error: the url shortener '+shortener+' is broken. The original URL was '+orig;
         }
+		    console.log('sending delayed response', obj);
         sendResponse(obj); //yay returned call! albeit slightly delayed
       })
     }else{
+		  console.log('immediately sent resposne',obj)
       sendResponse(obj); //yay returned call!
     }
   }
@@ -130,7 +115,7 @@ function handleRequest(request, tab, sendResponse){
       car.done();
       console.log('finished initializing instant', +new Date);
       var shorturl = https()+instant_host+''+parts[0];
-      if(localStorage.descriptive && request.name){
+      if(localStorage.descriptive == 'on' && request.name){
         shorturl += '?'+request.name;
       }
       returned_link({
@@ -149,15 +134,35 @@ function handleRequest(request, tab, sendResponse){
   }
   console.log('going to upload');
   uploadData(request, function(url){
+  	console.log('done uploading stuff')
+    if(/^error/.test(url) && typeof chrome != 'undefined'){
+      var notification = webkitNotifications.createNotification(
+        'icon/64sad.png',  // icon url - can be relative
+        "Something went terribly awry...",  // notification title
+        url  // notification body text
+      );
+      notification.show();
+    }
     if(instant){
       car.done({url: url});
-    }else if(filetable[request.id]){ //non-instant
+    }else{ //non-instant
+      console.log('non instant callback')
       returned_link({callback: request.id, url: url})
     }
     if(typeof chrome != 'undefined'){
       tabqueue[tab]--;
       chrome.pageAction.setTitle({tabId: tab, title: 'Uploading '+tabqueue[tab]+' files...'});
-      if(tabqueue[tab] == 0) chrome.pageAction.hide(tab);
+      if(tabqueue[tab] == 0){
+        chrome.pageAction.hide(tab);
+        if(localStorage.notify == 'on' && typeof chrome != 'undefined'){
+          var notification = webkitNotifications.createNotification(
+            'icon/64.png',  // icon url - can be relative
+            "Uploading Complete",  // notification title
+            "All files have been uploaded."  // notification body text
+          );
+          notification.show();
+        }
+      }
     }
   });
   

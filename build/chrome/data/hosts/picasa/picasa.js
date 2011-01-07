@@ -13,21 +13,12 @@ var PicasaOAUTH = ChromeExOAuth.initBackgroundPage({
 });
 
 
-function uploadPicasa(req, callback){
+Hosts.picasa = function uploadPicasa(req, callback){
   // Constants for various album types.
   var PICASA = 'picasa';
   var ALBUM_TYPE_STRING = {
     'picasa': 'Picasa Web Albums'
   };
-  
-  
-  function complete(resp, xhr){
-    var prs = JSON.parse(resp);
-    console.log(resp, xhr);
-    var href = prs.entry.link.filter(function(e){return e.type.indexOf('image/') == 0})[0].href
-    callback(href);
-    
-  }
   
   getRaw(req, function(file){
     var builder = new BlobBuilder();
@@ -38,31 +29,48 @@ function uploadPicasa(req, callback){
     }
     builder.append(arr.buffer);
     
-    PicasaOAUTH.authorize(function() {
-      console.log("yay authorized");
-      
-      
-      
-       PicasaOAUTH.sendSignedRequest(
+  
+  
+  function complete(resp, xhr){
+    var prs = JSON.parse(resp);
+    console.log(resp, xhr);
+    var href = prs.entry.link.filter(function(e){return e.type.indexOf('image/') == 0})[0].href
+    callback(href);
+    
+  }
+  
+  
+  function createAlbum(){
+      console.log('creating drag2up album')
+      PicasaOAUTH.sendSignedRequest(
         'http://picasaweb.google.com/data/feed/api/user/default',
-        function(resp, xhr) {
-          if (!(xhr.status >= 200 && xhr.status <= 299)) {
-            alert('Error: Response status = ' + xhr.status +
-                  ', response body = "' + xhr.responseText + '"');
-            return;
-          }
-          var jsonData = $.parseJSON(resp);
-          var albums = []
-          var msg = "Please select an album to upload to (enter the number): \n"
-          $.each(jsonData.feed.entry, function(index, entryData) {
-            albums[1+index] = {id: entryData['gphoto$id']['$t'], title: entryData.title['$t']};
-            msg += (1+index) + ' - ' + entryData.title['$t'] + '\n';
-          });
-          var num = parseInt(prompt(msg));
-          if(albums[num] && num){
-            var albumId = albums[num].id;
-            
-            
+        function(resp){
+          var j = JSON.parse(resp);
+          uploadImage(j.entry.gphoto$id.$t);
+        },
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': "application/atom+xml"
+          },
+          parameters: {
+            alt: 'json'
+          },
+          body: "<entry xmlns='http://www.w3.org/2005/Atom' \
+xmlns:media='http://search.yahoo.com/mrss/'\
+    xmlns:gphoto='http://schemas.google.com/photos/2007'>\
+  <title type='text'>drag2up</title>\
+  <summary type='text'>Files uploaded with drag2up.</summary>\
+  <gphoto:access>public</gphoto:access>\
+  <category scheme='http://schemas.google.com/g/2005#kind'\
+    term='http://schemas.google.com/photos/2007#album'></category>\
+</entry>"
+        });
+  }
+  
+  
+  function uploadImage(albumId){
+      console.log('uploading image');
       PicasaOAUTH.sendSignedRequest(
         'http://picasaweb.google.com/data/feed/api/' +
         'user/default/albumid/'+albumId,
@@ -79,20 +87,41 @@ function uploadPicasa(req, callback){
           body: builder.getBlob(file.type)
         });
         
-        
-        
-          }else if(num){
-            alert('invalid album selection');
+  
+  }
+  
+  
+  
+
+    PicasaOAUTH.authorize(function() {
+      console.log("yay authorized");
+      
+       PicasaOAUTH.sendSignedRequest(
+        'http://picasaweb.google.com/data/feed/api/user/default',
+        function(resp, xhr) {
+          if (!(xhr.status >= 200 && xhr.status <= 299)) {
+            alert('Error: Response status = ' + xhr.status +
+                  ', response body = "' + xhr.responseText + '"');
+            return;
           }
+          var jsonData = JSON.parse(resp);
+          var albumId;
+          for(var index = 0; index < jsonData.feed.entry.length; index++){
+            var entryData = jsonData.feed.entry[index];
+            if(/drag2up/.test(entryData.title['$t'])){
+              albumId = entryData['gphoto$id']['$t']
+              console.log('found a drag2up album');
+            }
+          }
+          if(albumId){
           
+            uploadImage(albumId);
+          }else{
+
+            createAlbum();
+          }
         },
         {method: 'GET', parameters: {'alt': 'json'}})
-    
-    
-    
-      /*
-
-        */
     });
   });
 }

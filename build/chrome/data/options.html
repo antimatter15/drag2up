@@ -1,29 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset=utf-8 />
-<title>drag2up settings</title>
-<script src="hosts/js/jquery.min.js"></script>
-<script src="hosts/js/jquery-ui.min.js"></script>
-<script src="hosts/shorten.js"></script>
-<body>
-	
+  <meta charset=utf-8 />
+  <title>drag2up settings</title>
+  <script src="hosts/js/jquery-1.4.4.min.js"></script>
+  <script src="hosts/js/jquery-ui.min.js"></script>
+  <script src="hosts/shorten.js"></script>
+  
+
 	<style>
 	body {
 		font-family: sans-serif, arial, helvetica;
+	}
+	
+	#everything {
+	  height: 100%;
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  margin-left: 10px;
 	}
 	
 	#panelcontainer.dragging .panel {
 	  opacity: 0.2;
 	}
 	
+	body {
+	  background-image: url(icon/settings.png);
+	  background-repeat: no-repeat;
+	  background-position: 10px 10px;
+  }
+	
+	h1 {
+	  padding-left: 80px;
+	}
+	
 	.panel {
-		width: 210px;
+		width: 200px;
 		position: fixed;		
 		top: 0;
 		z-index: 1;
 		padding: 10px;
 		right: 0;
+    -webkit-transition-property: background-color, opacity;
+    -webkit-transition-duration: 0.5s, 0.5s;
 	}
 	.panel.binary {
 		top: 0%;
@@ -59,36 +79,50 @@
 	}
 	
 	.login .has .login{
-		color: red;
+		background-color: hsl(0,0%,80%);
+		
 		display: inline;
 	}
-		
 	
+  
+	.has {
+	  margin-top: 5px;
+	  float:right;
+	}
 	.has span {
 	  display: none; 
 	  border-radius: 4px; 
 	  -moz-border-radius: 4px;
-	  padding: 3px
+	  padding: 3px;
+	
   }
 	.binary .binary { display: inline; }
 	.text .text { display: inline; }
 	.image .image { display: inline;}
 	
+	
+  .binary .has .text, .binary .has .image {
+    display:none
+  }
+	
 	.directions, .filehost {
 		float: left;
 		width: 150px;
-		padding: 15px;
+		padding: 9px;
 		height: 85px;
+		margin: 6px;
+		border-radius: 10px;
+	  -moz-border-radius: 10px;
+	}
+	
+	.container {
+	  height: 60px;
 	}
 	
 	.filehost {
-
 		z-index: 5;
 		background-color: hsl(120, 73%, 90%);
-		margin: 10px;
 		border: 1px solid hsl(120, 73%, 70%);
-		border-radius: 10px;
-	  -moz-border-radius: 10px;
 	}
 	
 	h3 {
@@ -98,26 +132,40 @@
 	.directions {
 		background-color: hsl(240, 73%, 90%);
 		border: 1px solid hsl(240, 73%, 70%);
-		margin: 10px;
-		border-radius: 10px;
-	  -moz-border-radius: 10px;
 	}
 	
 	.filehost img {
 		width: 100%;
 		border-radius: 5px;
-		
 	}
 	
 	.unsupported .multipart {
 	  background-color: hsl(0, 0%, 90%);
 		border: 1px solid hsl(0, 0%, 70%);
 	}
+	
+	
+	#not_supported {
+  	top:0;
+  	padding:10px;
+  	position:fixed;
+  	width:190px;
+  	right:4px;
+  	background-color:#eeeeee;
+  	border: 1px solid gray;
+  	border-top:none;
+  	border-radius: 0 0 10px 10px;
+  	display:none;
+  	z-index:42
+	}
 	</style>
+</head>
+<body>
 	<script>
 	if(typeof console == 'undefined') console = {log:function(){},warn:function(){},error:function(){},info:function(){}};
 	
 	function supports_binary(){
+	  //return false;
 	  var xhr = new XMLHttpRequest();
 	  if(xhr.sendAsBinary) return true; //firefox uses this instead
 	  try{
@@ -186,20 +234,20 @@
 	  if(!supports_binary()){
 	    $("body").addClass("unsupported");
 	    $(".unsupported .filehost.multipart").mousedown(function(){
-	      $('#not_suported').queue($('#not_suported').queue().slice(0,1))
-	      $('#not_suported').slideDown()
+	      $('#not_supported').queue($('#not_supported').queue().slice(0,1))
+	      $('#not_supported').slideDown()
 	    })
 	    $("body").mouseup(function(){
-	      //$('#not_suported').clearQueue();
-	      $('#not_suported').queue($('#not_suported').queue().slice(0,1))
+	      //$('#not_supported').clearQueue();
+	      $('#not_supported').queue($('#not_supported').queue().slice(0,1))
 	      //doesnt cause weird jumpyness like clearqueue does
-	      $('#not_suported').slideUp()
+	      $('#not_supported').slideUp()
 	    })
 	  }
 	
 		$( ".filehost" ).not(".unsupported .multipart").draggable({
 			revert: "invalid",
-			containment: "body",
+			containment: "#everything",
 			helper: "clone",
 			scroll: false
 		});
@@ -255,8 +303,13 @@
 		
 		var has = $('div.has');
 		$('.filehost').each(function(){
+			$('<div class="container">')
+			  .append($(this).find('img'))
+			  .appendTo(this);
+			  
 			$(this).append(has.clone())
-		})
+			
+		});
 		
 		$('.filehost, .panel').disableSelection();
 		var bname = get('binhost') || 'chemical';
@@ -292,6 +345,14 @@
     })
     $('#descriptive').attr('checked', get('descriptive') == 'on');
 
+		$('#notify').change(function(){
+		  set({notify: $('#notify').attr('checked')?'on':'off'});
+    })
+    
+    
+    $('#notify').attr('checked', get('notify') == 'on');
+
+    if(typeof chrome == 'undefined') $('#notify').hide();
 		
 		for(var shortener in shortSvcList){
 		  $("#shorten").append("<option>"+shortener+"</option>");
@@ -306,7 +367,7 @@
 		
 	}
 	</script>
-
+<div id="everything">
 <h1>drag2up settings</h1>
 
 
@@ -314,9 +375,10 @@
 <div style="display:none">
 	<div class="has">
 		<span class="text">Text</span>
-		<span class="binary">Binary</span>
+		<span class="binary">All</span>
 		<span class="image">Image</span>
-		<span class="login">Login</span>
+		
+		<span class="login" title="A login prompt will show the first time you upload a file using this host.">Registration</span>
 	</div>	
 </div>
 <div id="panelcontainer">
@@ -340,7 +402,7 @@
 	<p>image</p>
 </div>
 
-<div style="top:0;padding:10px;position:fixed;width:210px;right:0;background-color:#eeeeee;display:none;z-index:42" id="not_suported">
+<div id="not_supported">
 <p>Sorry! This host <b>isn't supported</b> by your browser. You will be able to use this file host <b>when Chrome 9 is stable</b>, or if you switch to a developer channel build.</p>
 <p>
 To upload certain types of files, chrome needs to upload binary data (that is, ones and zeroes), but before Chrome 9, there was no way to upload them properly (there were certain sequences of ones and zeroes that could not be uploaded).
@@ -352,24 +414,24 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <p>
   <h3 style="display:inline">Basic</h3>
   
-  <input type="checkbox" id="instant"> <label for="instant">Background uploading.</label>
+  <input type="checkbox" id="instant"><label for="instant">Background uploading</label>
   
   <span class="descriptive">
-    <input type="checkbox" id="descriptive"> <label for="descriptive">Descriptive link names.</label>
+    <input type="checkbox" id="descriptive" style="margin-left: 10px;"><label for="descriptive">Descriptive URLs</label>
   </span>
   
-  <input type="checkbox" id="insecure"  style="margin-left: 10px;"> <label for="insecure">Prefer insecure HTTP.</label>
+  <input type="checkbox" id="insecure"  style="margin-left: 10px;"><label for="insecure">Prefer insecure HTTP</label>
   
-  <label for="shorten" style="margin-left: 10px;">URL shortener</label>
+  <input type="checkbox" id="notify"  style="margin-left: 10px;"><label for="notify">Notifications</label>
   
-  <select id="shorten" >
+  <label for="shorten" style="margin-left: 10px;">URL&nbsp;shortener</label><select id="shorten" style="margin-left: 10px;">
     <option>None</option>
   </select> 
 </p>
 
 <div style="width: 100%;float:left;margin-bottom: 30px">
 <div class="directions">
-<img src="64r.png" style="float:right">
+<img src="icon/64r.png" style="float:right">
 <b>Drag hosts</b> to the slots on the right.
 </div>
 
@@ -386,6 +448,11 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/imageshack.png">
 </div>
 
+<div class="filehost image multipart" name="snelhest">
+	<img src="hosts/logo/snelhest.png">
+</div>
+
+
 <div class="filehost image multipart login" name="flickr">
 	<img src="hosts/logo/flickr.png">
 </div>
@@ -394,11 +461,11 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <div class="filehost image multipart login" name="picasa">
 	<img src="hosts/logo/picasa.png">
 </div>
-<!--
+
 <div class="filehost image login" name="photobucket">
 	<img src="hosts/logo/photobucket.png">
 </div>
--->
+
 
 
 <!-- pastebins -->
@@ -434,6 +501,10 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/dafk.png">
 </div>
 
+<div class="filehost binary image text multipart" name="minus">
+	<img src="hosts/logo/minus.png">
+</div>
+
 
 <div class="filehost binary image text multipart" name="hotfile">
 	<img src="hosts/logo/hotfile.png">
@@ -449,6 +520,9 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/cloudapp.png">
 </div>
 
+<div class="filehost binary image text login multipart" name="box">
+	<img src="hosts/logo/box.gif">
+</div>
 
 
 
@@ -456,13 +530,15 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 
 </div>
 <p>
-  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. A totally irrelevant fact is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now, aware of that magical fact, you should <b>follow me on twitter</b> and share this extension with all your peers.
+  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. A totally irrelevant fact is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now that you are aware of this, you should <b>follow me on twitter</b> and share this extension with all your peers.
 </p>
 
 <p>
 If you have you have any <b>comments or suggestions</b>, feel free to send a tweet in my direction <a href="http://twitter.com/antimatter15">@antimatter15</a> or email me at <a href="mailto:antimatter15@gmail.com">antimatter15@gmail.com</a>. You should also totally give this app a high rating on <a href="https://chrome.google.com/webstore/detail/bjgjolhpdlgebodaapdafhdnikagbfll">the chrome web store</a>.
 </p>
 
+
+</div>
 </div>
 </body>
 </html>

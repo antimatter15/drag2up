@@ -1,6 +1,6 @@
 //based on description from http://gist.github.com/4277
   
-function uploadGist(req, callback){
+Hosts.gist = function uploadGist(req, callback){
   function postJSON(url, data, callback){
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url);  

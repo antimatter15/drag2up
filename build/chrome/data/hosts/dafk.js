@@ -1,7 +1,7 @@
 //no https
 //it looks like a small host, but it's got a good ux
 
-function uploadDAFK(file, callback){
+Hosts.dafk = function uploadDAFK(file, callback){
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "http://up.dafk.net/up.php");  
   xhr.onload = function(){

@@ -1,4 +1,4 @@
-function uploadImgur(req, callback){
+Hosts.imgur = function uploadImgur(req, callback){
 	function postJSON(url, data, callback){
 	  var xhr = new XMLHttpRequest();
 	  xhr.open("POST", url);  
@@ -19,7 +19,7 @@ function uploadImgur(req, callback){
 	}
 	getBinary(req, function(file){
 	  postJSON(https()+"api.imgur.com/2/upload.json", {
-      key: 'bbb444d5415156c67a5908fb1ce68fd5', /*should i invent a meaningless means of obfuscating this? no.*/
+      key: Keys.imgur, 
       type: 'base64',
       name: file.name,
       image: btoa(file.data)
