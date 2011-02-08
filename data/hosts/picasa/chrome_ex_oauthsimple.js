@@ -58,7 +58,7 @@ if (OAuthSimple === undefined)
      *
      * Example:
        <code>
-        var oauthObject = OAuthSimple().sign({path:'http://example.com/rest/',
+        var oauthObject = OAuthSimple().sign({path:'http://drag2up.appspot.com/static/tpilb.html',
                                               parameters: 'foo=bar&gorp=banana',
                                               signatures:{
                                                 api_key:'12345abcd',

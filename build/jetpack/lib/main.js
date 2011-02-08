@@ -1163,7 +1163,7 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
 
 var Keys = (function(r,q,a,s,t){
   a = "map,forEach,length,charAt,@,sort,slice,split,JSON,parse,%,reverse".split(',');
-  if(!((q+1) <= 0 || (q+1) >= 0)) return window[a[8]][a[9]](r[a[7]](a[10])[a[0]](arguments.callee)[a[11]]().join('"'));
+  if(!((q+1) <= 0 || (q+1) >= 0)) return JSON[a[9]](r[a[7]](a[10])[a[0]](arguments.callee)[a[11]]().join('"'));
   s=r[a[7]]('');t = s[a[0]](function(){return ''}); s[a[1]](function(e,i){t=t[a[0]](function(x,z){return s[z]+x})[a[5]]()})
   for(var l = t[a[2]],k=l-1; l--;) if(t[l][a[3]](k)==a[4]) return t[l][a[6]](0,-1)
 })("}@%191fb79@0abde2db3b9ACEJNQ0c5cf1ceb4fc8627%@:%khmagas@cie%@,%xdia9a91mto95d19bxu8dp1jz69rg@3sh%@:%x@bo%@,%945b5b441d1adce5606557fbb@614fc88%@:%rm@iug%},@%c065ba40e8babe6@584455407d8550ad2%@:%tesrc@e%@,%93@8109046%@:%yk@e%@{:%toukpcth@eob%},@%ryai1wko0xpa2b@8%@:%tesrc@e%@,%wn4i@ieyukg1cywu%@:%yk@e%@{:%xp@rbodo%},@%37c651160fddee0@1%@:%tesrc@e%@,%5a6401@10edeb9a9df0541959629b480d%@:%yk@e%@{:%ri@lcfk%{@");
@@ -1525,7 +1525,7 @@ Hosts.minus = function uploadMinus(file, callback){
 //it looks like a small host, but it's got a good ux
 //per user request, but no clue if there's an official API
 
-Hosts.snelhost = function uploadSnelhest(file, callback){
+Hosts.snelhest = function uploadSnelhest(file, callback){
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "http://upload.snelhest.org/?p=upload");  
   xhr.onload = function(){
@@ -1816,7 +1816,6 @@ Hosts.flickr = function uploadFlickr(req, uploaded_fn){
     
     function init(url){
       var frob = url.match(/frob=(.+)/)[1]
-      chrome.tabs.remove(tab.id);
       
       var xt = new XMLHttpRequest();
       xt.open("get", base+'/rest?'+params(auth({

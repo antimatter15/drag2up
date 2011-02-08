@@ -594,6 +594,9 @@ function initialize(){
           try{
             //check to make sure drag2up isnt already loaded
             if(!frames[l].document.__drag2up){
+              //yeah, sure this uses eval. And yes, eval is evil. sure whatever.
+              //don't be eval
+              //But I still dont think there's any better solution to this
               frames[l].eval("("+initialize.toString()+")()");
             }
           }catch(err){};

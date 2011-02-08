@@ -199,7 +199,7 @@
 	    if(el){
 	    
 	     
-	      $('div[name=picasa]').remove(); //i hate picasa.
+	      $('div[name=picasa]').remove(); //there some weird things that make picasa hard to port
 	      
 	    
 	      console.log('found simplestore');
@@ -218,6 +218,9 @@
         set = function(data){
           el.value = JSON.stringify(data);
           el.dispatchEvent(customEvent);
+          for(var i in data){
+	          simplestore[i] = data[i];
+	        }
         }
         
         el.value = "__get";
@@ -352,7 +355,7 @@
     
     $('#notify').attr('checked', get('notify') == 'on');
 
-    if(typeof chrome == 'undefined') $('#notify').hide();
+    if(typeof chrome == 'undefined') $('.notify').hide();
 		
 		for(var shortener in shortSvcList){
 		  $("#shorten").append("<option>"+shortener+"</option>");
@@ -422,8 +425,9 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
   
   <input type="checkbox" id="insecure"  style="margin-left: 10px;"><label for="insecure">Prefer insecure HTTP</label>
   
+  <span class="notify">
   <input type="checkbox" id="notify"  style="margin-left: 10px;"><label for="notify">Notifications</label>
-  
+  </span>
   <label for="shorten" style="margin-left: 10px;">URL&nbsp;shortener</label><select id="shorten" style="margin-left: 10px;">
     <option>None</option>
   </select> 
@@ -462,10 +466,11 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/picasa.png">
 </div>
 
+<!--
 <div class="filehost image login" name="photobucket">
 	<img src="hosts/logo/photobucket.png">
 </div>
-
+-->
 
 
 <!-- pastebins -->

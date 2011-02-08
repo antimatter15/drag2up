@@ -32,7 +32,6 @@ Hosts.flickr = function uploadFlickr(req, uploaded_fn){
     
     function init(url){
       var frob = url.match(/frob=(.+)/)[1]
-      chrome.tabs.remove(tab.id);
       
       var xt = new XMLHttpRequest();
       xt.open("get", base+'/rest?'+params(auth({
