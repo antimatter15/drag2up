@@ -93,7 +93,7 @@ function handleRequest(request, tab, sendResponse){
     }
   }
   
-  var instant = (localStorage.instant || 'on') == 'on'; //woot. its called instant because google made google instant.
+  var instant = localStorage.instant  == 'on'; //woot. its called instant because google made google instant.
 
   if(instant){
     var car = new racer(2, function(data){

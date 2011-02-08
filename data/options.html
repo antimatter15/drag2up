@@ -125,6 +125,12 @@
 		border: 1px solid hsl(120, 73%, 70%);
 	}
 	
+	.filehost.twitter {
+	  background-image: url(hosts/logo/twitter.png);
+	  background-repeat: no-repeat;
+	  background-position: top right;
+	}
+	
 	h3 {
 	  padding-right: 10px;
 	}
@@ -322,12 +328,12 @@
 		$(".panel.binary").find("p").html('').append($(document.getElementsByName(bname)[0]).clone())
 		$(".panel.text").find("p").html('').append($(document.getElementsByName(tname)[0]).clone())
 		$(".panel.image").find("p").html('').append($(document.getElementsByName(iname)[0]).clone())
-		var instant = (get('instant') || 'on') == 'on'; //woot. its called instant because google made google instant.
+		var instant = get('instant') == 'on'; //woot. its called instant because google made google instant.
     
 		$('#instant').attr('checked', instant);
 		$('#instant').change(function(){
 		  set({instant: $('#instant').attr('checked')?'on':'off'})
-		  instant = (get('instant') || 'on') == 'on';
+		  instant = get('instant') == 'on';
       if(instant) $('.descriptive').show(); else $('.descriptive').hide();
 		})
 		
@@ -466,23 +472,23 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/picasa.png">
 </div>
 
-<div class="filehost image multipart login" name="twitpic">
+<div class="filehost image multipart login twitter" name="twitpic">
 	<img src="hosts/logo/twitpic.png">
 </div>
 
 
-<div class="filehost image multipart login" name="twitgoo">
+<div class="filehost image multipart login twitter" name="twitgoo">
 	<img src="hosts/logo/twitgoo.png">
 </div>
 
 <!--
-<div class="filehost image multipart login" name="posterous">
+<div class="filehost image multipart login twitter" name="posterous">
 	<img src="hosts/logo/posterous.jpg">
 </div>
 -->
 
 <!--
-<div class="filehost image multipart login" name="yfrog">
+<div class="filehost image multipart login twitter" name="yfrog">
 	<img src="hosts/logo/yfrog.png">
 </div>
 -->

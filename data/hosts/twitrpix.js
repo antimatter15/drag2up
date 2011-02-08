@@ -1,4 +1,4 @@
-Hosts.posterous = function uploadposterous(file, callback){
+Hosts.twitrpix = function uploadtwitrpix(file, callback){
   function core_upload(){
     var message = {
       action: 'https://api.twitter.com/1/account/verify_credentials.json',
@@ -20,7 +20,7 @@ Hosts.posterous = function uploadposterous(file, callback){
     var auth = OAuth.getAuthorizationHeader("http://api.twitter.com/", message.parameters);
     
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://posterous.com/api2/upload.json");  
+    xhr.open("POST", "http://api.twitrpix.com/2/upload.json");  
     xhr.setRequestHeader('X-Verify-Credentials-Authorization', auth);
     xhr.setRequestHeader('X-Auth-Service-Provider', 'https://api.twitter.com/1/account/verify_credentials.json');
     
@@ -31,16 +31,16 @@ Hosts.posterous = function uploadposterous(file, callback){
       }else if(xhr.status == 200){
         var json = JSON.parse(xhr.responseText);
         console.log(json);
-        callback(json.url);
+        callback(json.response.url);
       }else{
-        callback('error: posterous uploading failed')
+        callback('error: twitrpix uploading failed')
       }
     }
     xhr.onerror = function(){
-      callback('error: posterous uploading failed')
+      callback('error: twitrpix uploading failed')
     }
     xhr.sendMultipart({
-      key: Keys.posterous,
+      key: Keys.twitrpix,
       media: file
     })
   }
