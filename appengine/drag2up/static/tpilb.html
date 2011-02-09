@@ -18,7 +18,16 @@
     <p>
       This page was intentionally left blank.
     </p>
-
+    
+    <script>
+      //this fixes the Flickr auth flow.
+      if(window.opener){
+        opener.location = location.href;
+        setTimeout(function(){
+          window.close();
+        },100);
+      }
+    </script>
     
     <hr>
     <div style="font-size: small">
