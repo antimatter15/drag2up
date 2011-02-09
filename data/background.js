@@ -339,7 +339,7 @@ function fileType(file){
 	if(file.size < 1024 * 300) { //its not as common for there to be 1 meg text files
     console.log('checking for file type');
     var src = getURL('raw', file, function(){}, true); //binary sync xhr.. its baddd.
-    console.log(src);
+    //console.log(src);
     for(var l = src.length, i = 0; i < l; i++){
       var code = src.charCodeAt(i) & 0xff;
       if(code <= 8 || (code >= 14 && code <= 31) || code == 127 || code >= 240){

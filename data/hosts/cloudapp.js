@@ -56,7 +56,11 @@ Hosts.cloudapp = function uploadCloudApp(file, callback){
         xhr3.open('GET', 'http://my.cl.ly/items');
         xhr3.setRequestHeader('Accept', 'application/json');
         xhr3.onload = function(){
-          callback(JSON.parse(xhr3.responseText)[0].content_url)
+          var j3 = JSON.parse(xhr3.responseText)[0];
+          callback({
+            direct: j3.remote_url,
+            url: j3.url
+          })
         }
         xhr3.send()
       }

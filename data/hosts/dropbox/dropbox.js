@@ -18,7 +18,7 @@ Hosts.dropbox = function uploadDropbox(req, callback){
               //http://dl.dropbox.com/u/1024307/drag2up/testing.txt
               //console.log(arguments)
               var url = https()+"dl.dropbox.com/u/"+user.uid+"/"+folder+fname;
-              callback(url)
+              callback({direct: url})
             })
           });
       })
