@@ -32,13 +32,18 @@ Hosts.minus = function uploadMinus(file, callback){
       x.open('GET', 'http://min.us/api/GetItems/m'+minusGallery.reader_id, true);
       x.onload = function(){
         var j = JSON.parse(x.responseText).ITEMS_GALLERY
+        var filepos = "";
         for(var i = 0; i < j.length; i++){
           if(j[i].indexOf(info.id) != -1){
+            filepos = j[i];
             i++; //increment by one as counter starts at one
             break;
           }
         }
-        callback('http://min.us/m'+minusGallery.reader_id+'#'+i);
+        callback({
+          url: 'http://min.us/m'+minusGallery.reader_id+'#'+i,
+          direct: filepos
+        });
       }
       x.send()
     }

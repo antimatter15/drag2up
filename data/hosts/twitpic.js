@@ -31,7 +31,7 @@ Hosts.twitpic = function uploadTwitpic(file, callback){
       }else if(xhr.status == 200){
         var json = JSON.parse(xhr.responseText);
         console.log(json);
-        callback(json.url);
+        callback({url: json.url}); //note that Twitpic does not support direct links!
       }else{
         callback('error: Twitpic uploading failed')
       }

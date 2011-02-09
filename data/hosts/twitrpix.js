@@ -31,16 +31,20 @@ Hosts.twitrpix = function uploadtwitrpix(file, callback){
       }else if(xhr.status == 200){
         var json = JSON.parse(xhr.responseText);
         console.log(json);
-        callback(json.response.url);
+        callback({
+          url: json.response.media.url,
+          direct: json.response.media.full,
+          thumb: json.response.media.thumb
+        });
       }else{
         callback('error: twitrpix uploading failed')
       }
     }
     xhr.onerror = function(){
-      callback('error: twitrpix uploading failed')
+      callback('error: twitrpix uploading failed (XHR)')
     }
     xhr.sendMultipart({
-      key: Keys.twitrpix,
+      api_key: Keys.twitrpix,
       media: file
     })
   }

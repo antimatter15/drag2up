@@ -325,7 +325,7 @@ function initialize(){
     
 
     
-    console.log('render drop target',iId, el);
+    //console.log('render drop target',iId, el);
     
     var opacity_normal = '0.62', opacity_hover = '0.91';
     var mask = document.createElement('div'); //this is what we're making!
@@ -419,24 +419,19 @@ function initialize(){
     }, true);
     
     mask.addEventListener('drop', function(e){
-      setTimeout(function(){
+      function breathe(){
         if(mask.parentNode){
           mask.style.webkitTransition = 'opacity 2.5s ease'
           mask.style.MozTransition = 'opacity 2.5s ease'
           var opacity_breathe = "0.2"
           mask.style.opacity = (mask.style.opacity == opacity_breathe)?opacity_normal:opacity_breathe;
-          setTimeout(arguments.callee, 2500);
+          setTimeout(breathe, 2500);
         }
-      }, 2500);
+      }
+      breathe();
       
       console.log('file was dropped');
       
-      setTimeout(function(){
-        propagateMessage('forcedkill');
-        var leaveEvent = document.createEvent('Event');
-        leaveEvent.initEvent('drop', true, true);
-        el.dispatchEvent(leaveEvent);
-      },0);
       
       e.preventDefault();
       e.stopPropagation();
@@ -452,7 +447,14 @@ function initialize(){
         callbacks[cb] = function(data){
           numleft--;
           insertLink(el, data.url, file.type);
-          if(numleft == 0 && mask.parentNode) mask.parentNode.removeChild(mask);
+          if(numleft == 0 && mask.parentNode){
+            mask.style.webkitTransition = 'opacity .3s ease'
+            mask.style.MozTransition = 'opacity .3s ease'
+            mask.style.opacity = '0';
+            setTimeout(function(){
+              mask.parentNode.removeChild(mask);
+            },300);
+          }
           delete callbacks[cb];
         }
         file.id = cb;
@@ -460,7 +462,7 @@ function initialize(){
         propagateMessage('background'+JSON.stringify(file))
       }
       
-      
+      var likelyleft = 0;
       if(files.length == 0 && (url = e.dataTransfer.getData('url'))){
         var htmldata = e.dataTransfer.getData('text/html');
         if(htmldata && htmldata.toLowerCase().indexOf('<img') != -1){
@@ -472,6 +474,7 @@ function initialize(){
         console.log('uploading URL', url);
         console.log(e.dataTransfer.getData('text/html'));
         uploadFile({url: url, name: url.replace(/^.+\/([^\?\#]+).*$/,'$1'), type: "image/png" /*more or less all iamges dropped this way for now are going to be images*/ });
+        likelyleft++;
       }else if(files.length > 0){
         console.log('uploading actual files', files.length);
         for(var i = 0; i < files.length; i++){
@@ -489,20 +492,22 @@ function initialize(){
           }
           if(url){
             uploadFile({url: url, name: file.name, size: file.size, type: file.type});
+            likelyleft++;
           }else{
             var fr = new FileReader();
             fr.onload = function(){
               uploadFile({url: fr.result, name: file.name, size: file.size, type: file.type});
             }
             fr.readAsDataURL(file);
+            likelyleft++;
           }
         }
       }
-      
-      if(numleft != 0){
+      if(likelyleft > 0){
+        console.log('yay its more than zero');
         mask.hasDropped = true;
         mask.style.backgroundColor = '#007fff';
-        if(numleft == 1){
+        if(likelyleft == 1){
           mask.innerHTML = '<b>uploading</b> file';
         }else{
           mask.innerHTML = '<b>uploading</b> '+numleft+' files';
@@ -510,6 +515,14 @@ function initialize(){
       }else{
         mask.parentNode.removeChild(mask);
       }
+      
+      
+      setTimeout(function(){
+        propagateMessage('forcedkill');
+        var leaveEvent = document.createEvent('Event');
+        leaveEvent.initEvent('drop', true, true);
+        el.dispatchEvent(leaveEvent);
+      },0);
     }, true);
     
   }

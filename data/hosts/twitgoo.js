@@ -29,8 +29,14 @@ Hosts.twitgoo = function uploadTwitgoo(file, callback){
       if(xhr.status == 401){
         twitter_login(core_upload);
       }else if(xhr.status == 200){
-        var link = xhr.responseXML.getElementsByTagName('mediaurl');
-  	    callback(link[0].childNodes[0].nodeValue);
+        var link = xhr.responseXML.getElementsByTagName('mediaurl')[0].childNodes[0].nodeValue;
+        var thumb = xhr.responseXML.getElementsByTagName('thumburl')[0].childNodes[0].nodeValue;
+        var direct = xhr.responseXML.getElementsByTagName('imageurl')[0].childNodes[0].nodeValue;
+  	    callback({
+  	      url: link,
+  	      direct: direct,
+  	      thumb: thumb
+  	    });
   	    //also: imageurl element
       }else{
         callback('error: twitgoo uploading failed')
