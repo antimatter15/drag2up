@@ -44,49 +44,18 @@ Here's some projects that have been incorperated into this:
 * http://demos.hacks.mozilla.org/openweb/imageUploader/js/extends/xhr.js
 * http://code.google.com/p/chromemuse/wiki/SupportedServices
 
-These sites had the documentation that I used to develop stuff.
-
-* https://chrome.google.com/extensions/detail/mdddabjhelpilpnpgondfmehhcplpiin (A stretch, but it introduced me to the imm.io hosting service and I made my implementation by sniffing traffic data)
-* http://code.google.com/p/chromium/issues/detail?id=35705#c6
-* http://efreedom.com/Question/1-3743047/Uploading-Binary-String-WebKit-Chrome-Using-XHR-Equivalent-Firefoxs-SendAsBinary
-* http://pastebin.com/api.php
-* https://www.dropbox.com/developers
-* https://github.com/evnm/dropbox-node
-* https://github.com/cramforce/streamie (yeah, you might wonder why a twitter client's here. simply, I based the imgur hosting script off of the one in streamie, that I found while developing my fork. Great app anyway.)
-* http://gist.github.com/4277 (Gist API)
-* http://imageshack.us/content.php?page=developer
-* http://api.hotfile.com/?c=getuploadserver
-* http://support.getcloudapp.com/faqs/developers/api
-* http://www.flickr.com/services/api/
-* http://tinypaste.com/70c90ce
-* http://tinypaste.com/api/doc/
-* https://github.com/kinabalu/mysticpaste/blob/master/idea-plugin/src/com/mysticcoders/mysticpaste/plugin/PastebinAction.java
-* https://github.com/kinabalu/mysticpaste/blob/master/eclipse-plugin/plugin.properties
-* http://mysticpaste.com/plugin
-* http://en.wikipedia.org/wiki/Pastebin
-* http://en.wikipedia.org/wiki/Comparison_of_pastebins
-* https://chrome.google.com/extensions/detail/digfdjelalmeldlplgcapchelgnlkomc
-* https://chrome.google.com/extensions/detail/gcfajadhhjjcpkbhdphfefbdnffochho
-* https://chrome.google.com/extensions/detail/eclilalbnmdonojgjmkekinflhodgoii
-* https://github.com/harpyon/miniscurl
-* Chemical Servers are awesome! http://chemicalservers.com
-* https://github.com/jfelectron/OAuth-for-WebOS/blob/master/OAuth.js
-* http://destroytoday.com/blog/2010/02/encoding-for-oauth-using-as3/
-* http://pic.pbsrc.com/dev_help/WebHelpPublic/PhotobucketPublicHelp.htm
-* http://www.imdb.com/title/tt1104001/
-* https://developer.mozilla.org/en/DOM:window.getComputedStyle
-* http://developers.box.net/w/page/12923958/FrontPage
-* http://min.us/pages/api
 
 ### Known Issues:
 Firefox 3.6 on Ubuntu Linux does not work properly. It seems to work fine on Mac OS X. I haven't bothered testing on Windows. Firefox 4b7 on Ubuntu Linux does work, however.
+
+Windows XP does not seem to work from preliminary testing.
 
 ### Todo:
 
 get a button on the addons panel for Preferences to work, but jetpack doesnt seem to do that yet.
 
-Logging in to flickr is a little awkward.
 
-Picasa's album chooser sucks and doesn't work on firefox (I didn't try).
+### Host classifications:
 
-I hate OAuth.
+I just found it pretty interesting, but here is how the hosts are organized: first it's grouped into file support: images, text and then binary. Within each group, It's grouped by registration walls. First the ones that are free, then the ones that require registration and finally the ones that login using Twitter's auth. The default selection is always one that does not require registration and is always first.
+

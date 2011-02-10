@@ -50,7 +50,7 @@ Hosts.droplr = function uploaddroplr(file, callback){
         callback({
           url: data[2],
           direct: direct
-        });        
+        });
       }
       gd.send();
     }

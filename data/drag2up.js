@@ -217,36 +217,57 @@ function initialize(){
     console.log('insertLink',iId, el, url, type);
     try{
       el.focus();
-      /*
+    }catch(err){}
+    try{
+      //*
       var evt = el.ownerDocument.createEvent('MouseEvents');
       evt.initMouseEvent('click', true, true, el.ownerDocument.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
       el.dispatchEvent(evt);
-      */
+      //*/
       el.focus();
     }catch(err){};
-    //try{el.select();}catch(err){};
+    try{
+      el.select();
+    }catch(err){};
+    setTimeout(function(){
+      try{
+        el.focus()
+      }catch(err){};
+    },10);
     setTimeout(function(){
       try{el.focus()}catch(err){};
-    },100);
-    setTimeout(function(){
-    try{el.focus()}catch(err){};
       var elt = isDroppable(el); //get the type of drop mode
       if(elt == 1){ //input
         if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
         console.log('input yay');
         //simple little test to use bbcode insertion if it's something that looks like bbcode
-        if(/\[img\]/i.test(document.body.innerHTML) && type.indexOf('image/') == 0){
-          el.value += '[img]'+url+'[/img]' + ' ';
+        if(/\[(quote|img|url|code)\]/i.test(document.body.innerHTML)){
+          if(type.indexOf('image/') == 0 && url.direct){
+            el.value += '[img]'+url.direct+'[/img]' + ' ';
+          }else{
+            el.value += '[url='+url.url+']'+(url.name||url.url)+'[/url]' + ' ';
+          }
+        }else if(el.value.indexOf('<a') != -1){
+          el.value += '<a href="' + url.url + '">'+(url.name||url.url)+'</a>';
         }else{
-          el.value += url + ' ';
+          el.value += url.url + ' ';
         }
-
-        
       }else if(elt == 2){ //contentEditable
-        var a = document.createElement('a');
-        a.href = url;
-        a.innerText = url;
-        el.appendChild(a);
+        var xel = el;
+        var pel = xel.getElementsByTagName('p');
+        if(pel.length > 0){
+          xel = pel[pel.length -1];
+        }
+        if(el.ownerDocument.body.isContentEditable == true && url.direct && type.indexOf('image/') == 0){
+          var img = document.createElement('img');
+          img.src = url.direct;
+          xel.appendChild(img);
+        }else{
+          var a = document.createElement('a');
+          a.href = url.url;
+          a.innerText = url.name || url.url;
+          xel.appendChild(a);
+        }
         el.appendChild(document.createTextNode(' ')); //add a space at the end
         //links dont tend to work as well
         

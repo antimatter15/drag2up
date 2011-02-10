@@ -6,7 +6,11 @@ Hosts.dafk = function uploadDAFK(file, callback){
   xhr.open("POST", "http://up.dafk.net/up.php");  
   xhr.onload = function(){
     var json = JSON.parse(xhr.responseText);
-    callback((json.error?'error:':'')+json.msg);
+    if(json.error){
+      callback('error: '+json.msg);
+    }else{
+      callback({direct: json.msg});
+    }
   }
   xhr.onerror = function(){
     callback('error: dafk uploading failed')
