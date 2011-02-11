@@ -85,16 +85,17 @@
 	}
 	
   
-	.has {
-	  margin-top: 5px;
-	  float:right;
-	}
 	.has span {
 	  display: none; 
 	  border-radius: 4px; 
 	  -moz-border-radius: 4px;
 	  padding: 3px;
 	
+  }
+  
+  .has .binary {
+    
+		border: 1px solid hsl(48, 100%, 50%);
   }
 	.binary .binary { display: inline; }
 	.text .text { display: inline; }
@@ -107,16 +108,16 @@
 	
 	.directions, .filehost {
 		float: left;
-		width: 150px;
-		padding: 9px;
-		height: 85px;
+		width: 140px;
+		padding: 7px;
+		height: 75px;
 		margin: 6px;
 		border-radius: 10px;
 	  -moz-border-radius: 10px;
 	}
 	
 	.container {
-	  height: 60px;
+	  height: 54px;
 	}
 	
 	.filehost {
@@ -128,7 +129,7 @@
 	.filehost.login, .filehost.twitter {
   
 	  background-repeat: no-repeat;
-	  background-position: 10px 70px;
+	  background-position: 121px 55px;
   }
 	.filehost.login {
 	  background-image: url(icon/user.png);
@@ -463,9 +464,11 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 </p>
 
 <div style="width: 100%;float:left;margin-bottom: 30px">
-<div class="directions">
-<img src="icon/64r.png" style="float:right">
+<div class="directions" style="">
+<img src="icon/64r.png" style="float:right;margin-right: -18px;margin-top: 5px">
 <b>Drag hosts</b> to the slots on the right.
+  
+
 </div>
 
 <!-- image hosts -->
