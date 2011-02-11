@@ -630,6 +630,9 @@ function initialize(){
               //yeah, sure this uses eval. And yes, eval is evil. sure whatever.
               //don't be eval
               //But I still dont think there's any better solution to this
+              //There is seriously no alternative to this.
+              //But it only runs in unprivledged space so there's effectively zero security risk
+              
               frames[l].eval("("+initialize.toString()+")()");
             }
           }catch(err){};
