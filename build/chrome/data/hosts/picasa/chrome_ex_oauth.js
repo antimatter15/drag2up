@@ -30,7 +30,7 @@ function ChromeExOAuth(url_request_token, url_auth_token, url_access_token,
       "ChromeExOAuth Library";
   this.key_token = "oauth_token";
   this.key_token_secret = "oauth_token_secret";
-  this.callback_page = "http://example.com/";
+  this.callback_page = "http://drag2up.appspot.com/static/tpilb.html";
   this.auth_params = {};
   if (opt_args && opt_args['auth_params']) {
     for (key in opt_args['auth_params']) {
@@ -498,7 +498,7 @@ ChromeExOAuth.prototype.getRequestToken = function(callback, opt_args) {
   if (typeof callback !== "function") {
     throw new Error("Specified callback must be a function.");
   }
-  var url = "http://example.com/";
+  var url = "http://drag2up.appspot.com/static/tpilb.html";
 
   var url_param = opt_args && opt_args['url_callback_param'] ||
                   "chromeexoauthcallback";

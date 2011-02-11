@@ -14,7 +14,6 @@
 	}
 	
 	#everything {
-	  height: 100%;
 	  position: absolute;
 	  top: 0;
 	  left: 0;
@@ -26,17 +25,16 @@
 	}
 	
 	body {
-	  background-image: url(icon/settings.png);
 	  background-repeat: no-repeat;
 	  background-position: 10px 10px;
+	  overflow-y: scroll;
   }
 	
 	h1 {
-	  padding-left: 80px;
 	}
 	
 	.panel {
-		width: 200px;
+		width: 170px;
 		position: fixed;		
 		top: 0;
 		z-index: 1;
@@ -46,7 +44,7 @@
     -webkit-transition-duration: 0.5s, 0.5s;
 	}
 	.panel.binary {
-		top: 0%;
+		top: 66%;
 		height: 33%;
 		background-color: hsl(48, 100%, 95%);
 	}
@@ -58,8 +56,9 @@
 	}
 	
 	.panel.image {
-		top: 66%;
+		top: 0%;
 		height: 33%;
+		
 		background-color: hsl(9, 100%, 95%);
 	}
 	
@@ -85,16 +84,17 @@
 	}
 	
   
-	.has {
-	  margin-top: 5px;
-	  float:right;
-	}
 	.has span {
 	  display: none; 
 	  border-radius: 4px; 
 	  -moz-border-radius: 4px;
 	  padding: 3px;
 	
+  }
+  
+  .has .binary {
+    
+		border: 1px solid hsl(48, 100%, 50%);
   }
 	.binary .binary { display: inline; }
 	.text .text { display: inline; }
@@ -107,22 +107,35 @@
 	
 	.directions, .filehost {
 		float: left;
-		width: 150px;
-		padding: 9px;
-		height: 85px;
+		width: 140px;
+		padding: 7px;
+		height: 75px;
 		margin: 6px;
 		border-radius: 10px;
 	  -moz-border-radius: 10px;
 	}
 	
 	.container {
-	  height: 60px;
+	  height: 54px;
 	}
 	
 	.filehost {
 		z-index: 5;
 		background-color: hsl(120, 73%, 90%);
 		border: 1px solid hsl(120, 73%, 70%);
+	}
+	
+	.filehost.login, .filehost.twitter {
+  
+	  background-repeat: no-repeat;
+	  background-position: 121px 55px;
+  }
+	.filehost.login {
+	  background-image: url(icon/user.png);
+	}
+	
+	.filehost.twitter {
+	  background-image: url(icon/twitter2.png);
 	}
 	
 	h3 {
@@ -144,7 +157,23 @@
 		border: 1px solid hsl(0, 0%, 70%);
 	}
 	
+	/*
+		.filehost.text {
+		background-color: hsl(200, 100%, 95%);
+		border: 1px solid hsl(200, 100%, 70%);
+}
 	
+	.filehost.image {
+		background-color: hsl(9, 100%, 95%);
+		border: 1px solid hsl(9, 100%, 70%);
+}
+	.filehost.binary {
+		background-color: hsl(48, 100%, 95%);
+		border: 1px solid hsl(48, 100%, 70%);
+}
+
+
+	*/
 	#not_supported {
   	top:0;
   	padding:10px;
@@ -322,12 +351,12 @@
 		$(".panel.binary").find("p").html('').append($(document.getElementsByName(bname)[0]).clone())
 		$(".panel.text").find("p").html('').append($(document.getElementsByName(tname)[0]).clone())
 		$(".panel.image").find("p").html('').append($(document.getElementsByName(iname)[0]).clone())
-		var instant = (get('instant') || 'on') == 'on'; //woot. its called instant because google made google instant.
+		var instant = get('instant') == 'on'; //woot. its called instant because google made google instant.
     
 		$('#instant').attr('checked', instant);
 		$('#instant').change(function(){
 		  set({instant: $('#instant').attr('checked')?'on':'off'})
-		  instant = (get('instant') || 'on') == 'on';
+		  instant = get('instant') == 'on';
       if(instant) $('.descriptive').show(); else $('.descriptive').hide();
 		})
 		
@@ -381,7 +410,7 @@
 		<span class="binary">All</span>
 		<span class="image">Image</span>
 		
-		<span class="login" title="A login prompt will show the first time you upload a file using this host.">Registration</span>
+		<!--<span class="login" title="A login prompt will show the first time you upload a file using this host.">Registration</span>-->
 	</div>	
 </div>
 <div id="panelcontainer">
@@ -389,41 +418,41 @@
 
 
 
-<div class="binary panel">
-	Current <b>Binary</b> File  Host
-	<p>binary</p>
+<div class="image panel">
+	 <b>Image</b> File Host
+	<p>image</p>
 </div>
 
 <div class="text panel">
-	Current <b>Text</b>  File  Host
+	 <b>Text</b>  File  Host
 	<p>text</p>
 </div>
 
 
-<div class="image panel">
-	Current <b>Image</b> File Host
-	<p>image</p>
+<div class="binary panel">
+	 <b>Binary</b> File  Host
+	<p>binary</p>
 </div>
 
 <div id="not_supported">
-<p>Sorry! This host <b>isn't supported</b> by your browser. You will be able to use this file host <b>when Chrome 9 is stable</b>, or if you switch to a developer channel build.</p>
+<p>Sorry! This host <b>isn't supported</b> by your browser. Please update to the latest version of Chrome (Wrench &rarr; About Google Chrome should do the trick).</p>
 <p>
 To upload certain types of files, chrome needs to upload binary data (that is, ones and zeroes), but before Chrome 9, there was no way to upload them properly (there were certain sequences of ones and zeroes that could not be uploaded).
 </p>
 </div>
 </div>
-<div style="margin-right:240px;">
+<div style="margin-right:200px;">
 
 <p>
   <h3 style="display:inline">Basic</h3>
   
-  <input type="checkbox" id="instant"><label for="instant">Background uploading</label>
+  <input type="checkbox" id="instant"><label for="instant">Background</label>
   
   <span class="descriptive">
     <input type="checkbox" id="descriptive" style="margin-left: 10px;"><label for="descriptive">Descriptive URLs</label>
   </span>
   
-  <input type="checkbox" id="insecure"  style="margin-left: 10px;"><label for="insecure">Prefer insecure HTTP</label>
+  <input type="checkbox" id="insecure"  style="margin-left: 10px;"><label for="insecure">Insecure HTTP</label>
   
   <span class="notify">
   <input type="checkbox" id="notify"  style="margin-left: 10px;"><label for="notify">Notifications</label>
@@ -434,9 +463,11 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 </p>
 
 <div style="width: 100%;float:left;margin-bottom: 30px">
-<div class="directions">
-<img src="icon/64r.png" style="float:right">
+<div class="directions" style="">
+<img src="icon/64r.png" style="float:right;margin-right: -18px;margin-top: 5px">
 <b>Drag hosts</b> to the slots on the right.
+  
+
 </div>
 
 <!-- image hosts -->
@@ -466,9 +497,39 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/picasa.png">
 </div>
 
+
+
 <!--
 <div class="filehost image login" name="photobucket">
 	<img src="hosts/logo/photobucket.png">
+</div>
+-->
+
+
+<div class="filehost image multipart login twitter" name="twitrpix">
+	<img src="hosts/logo/twitrpix.png">
+</div>
+
+<div class="filehost image multipart login twitter" name="twitpic">
+	<img src="hosts/logo/twitpic.png">
+</div>
+
+
+<div class="filehost image multipart login twitter" name="twitgoo">
+	<img src="hosts/logo/twitgoo.png">
+</div>
+
+<div class="filehost image multipart login twitter" name="imgly">
+	<img src="hosts/logo/imgly.png">
+</div>
+
+<div class="filehost image multipart login twitter" name="posterous">
+	<img src="hosts/logo/posterous.png">
+</div>
+
+<!--
+<div class="filehost image multipart login twitter" name="yfrog">
+	<img src="hosts/logo/yfrog.png">
 </div>
 -->
 
@@ -529,13 +590,16 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 	<img src="hosts/logo/box.gif">
 </div>
 
+<div class="filehost binary image text login multipart twitter" name="droplr">
+	<img src="hosts/logo/droplr.png">
+</div>
 
 
 
 
 </div>
 <p>
-  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. A totally irrelevant fact is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now that you are aware of this, you should <b>follow me on twitter</b> and share this extension with all your peers.
+  <h3 style="display:inline">About</h3> drag2up was written by <a href="http://twitter.com/antimatter15">@antimatter15</a>. The <b>source code</b> is available on <a href="https://github.com/antimatter15/drag2up">github</a>. A totally irrelevant fact is that at time of writing I'm 15 years old, but that tends to make people treat this as more of an accomplishment than it really is and thus more inclined to share it. So now that you are aware of this, you should <b>follow me on twitter</b> and share this extension with everyone you know.
 </p>
 
 <p>

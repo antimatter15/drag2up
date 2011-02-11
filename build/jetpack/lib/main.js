@@ -50,12 +50,19 @@ pageMod.PageMod({
     worker.on('message', function(data) {
       console.log('got message on the pagemod');
       console.log(data);
-      
-      handleRequest(JSON.parse(data), 42, function(r){
-        console.log('super done processing stuffs');
-        console.log(r)
-        worker.postMessage(JSON.stringify(r));
-      })
+      var json;
+      try{
+        json = JSON.parse(data);
+      }catch(err){
+        console.log('invalid JSON');
+      }
+      if(json){
+        handleRequest(json, 42, function(r){
+          console.log('super done processing stuffs');
+          console.log(r)
+          worker.postMessage(JSON.stringify(r));
+        })
+      }
       
     });
   }
@@ -70,13 +77,30 @@ function hostName(file){
 	  text: localStorage.texhost || 'gist',
 	  image: localStorage.imghost || 'imgur'
 	}
-	
 	var type = fileType(file);
 	
 	return typehost[type]
 }
 
-
+function supports_binary(){
+  //return false;
+  var xhr = new XMLHttpRequest();
+  if(xhr.sendAsBinary) return true; //firefox uses this instead
+  try{
+    var bb = new BlobBuilder();
+    var ui = new Uint8Array(42);
+    bb.append(ui.buffer);
+    var blob = bb.getBlob();
+    if(blob.size == 42){
+      return true
+    }else{
+      return false
+    }
+  }catch(err){
+    return false
+  }
+}
+	
 function uploadData(file, callback){
   console.log('uploading data');
   var hostname = hostName(file);
@@ -138,24 +162,26 @@ function handleRequest(request, tab, sendResponse){
     //here you apply the shorten methods before sending response
     var shortener = localStorage.url_shortener;
     if(shortSvcList[shortener]){ //if there's a url shortener selected
-      var orig = obj.url;
+      var orig = obj.url.url;
+      
       console.log('quering url shortenr', shortSvcList[shortener], 'for', orig)
       shorten(shortener, orig, function(res){
         if(res.status == 'ok'){
-          obj.url = res.url;
+          obj.url.url = res.url;
         }else{
-          obj.url = 'error: the url shortener '+shortener+' is broken. The original URL was '+orig;
+          obj.url.url = 'error: the url shortener '+shortener+' is broken. The original URL was '+orig;
         }
 		    console.log('sending delayed response', obj);
         sendResponse(obj); //yay returned call! albeit slightly delayed
       })
+      
     }else{
 		  console.log('immediately sent resposne',obj)
       sendResponse(obj); //yay returned call!
     }
   }
   
-  var instant = (localStorage.instant || 'on') == 'on'; //woot. its called instant because google made google instant.
+  var instant = localStorage.instant  == 'on'; //woot. its called instant because google made google instant.
 
   if(instant){
     var car = new racer(2, function(data){
@@ -197,6 +223,7 @@ function handleRequest(request, tab, sendResponse){
   console.log('going to upload');
   uploadData(request, function(url){
   	console.log('done uploading stuff')
+  	
     if(/^error/.test(url) && typeof chrome != 'undefined'){
       var notification = webkitNotifications.createNotification(
         'icon/64sad.png',  // icon url - can be relative
@@ -205,8 +232,13 @@ function handleRequest(request, tab, sendResponse){
       );
       notification.show();
     }
+    if(typeof url == 'string'){
+      url = {url: url}
+    }
+    url.name = request.name;
+    url.url = url.url || url.direct;
     if(instant){
-      car.done({url: url});
+      car.done({url: url.url}); //heh
     }else{ //non-instant
       console.log('non instant callback')
       returned_link({callback: request.id, url: url})
@@ -401,7 +433,7 @@ function fileType(file){
 	if(file.size < 1024 * 300) { //its not as common for there to be 1 meg text files
     console.log('checking for file type');
     var src = getURL('raw', file, function(){}, true); //binary sync xhr.. its baddd.
-    console.log(src);
+    //console.log(src);
     for(var l = src.length, i = 0; i < l; i++){
       var code = src.charCodeAt(i) & 0xff;
       if(code <= 8 || (code >= 14 && code <= 31) || code == 127 || code >= 240){
@@ -1166,7 +1198,7 @@ var Keys = (function(r,q,a,s,t){
   if(!((q+1) <= 0 || (q+1) >= 0)) return JSON[a[9]](r[a[7]](a[10])[a[0]](arguments.callee)[a[11]]().join('"'));
   s=r[a[7]]('');t = s[a[0]](function(){return ''}); s[a[1]](function(e,i){t=t[a[0]](function(x,z){return s[z]+x})[a[5]]()})
   for(var l = t[a[2]],k=l-1; l--;) if(t[l][a[3]](k)==a[4]) return t[l][a[6]](0,-1)
-})("}@%191fb79@0abde2db3b9ACEJNQ0c5cf1ceb4fc8627%@:%khmagas@cie%@,%xdia9a91mto95d19bxu8dp1jz69rg@3sh%@:%x@bo%@,%945b5b441d1adce5606557fbb@614fc88%@:%rm@iug%},@%c065ba40e8babe6@584455407d8550ad2%@:%tesrc@e%@,%93@8109046%@:%yk@e%@{:%toukpcth@eob%},@%ryai1wko0xpa2b@8%@:%tesrc@e%@,%wn4i@ieyukg1cywu%@:%yk@e%@{:%xp@rbodo%},@%37c651160fddee0@1%@:%tesrc@e%@,%5a6401@10edeb9a9df0541959629b480d%@:%yk@e%@{:%ri@lcfk%{@");
+})("}@%9Tp3qcQjDr+1Hw7G4H@uJZE%@:%rkcpi@uh%@,%bfda485e4abc--da41b@11bb46-55-a00bc56%@:%ixlp@i%@,%a9accfabeaba8639ac4a292a28de@43f9%@:%xwprti@ti%@,%191fb79@0abde2db3b9ACEJNQ0c5cf1ceb4fc8627%@:%khmagas@cie%@,%xdia9a91mto95d19bxu8dp1jz69rg@3sh%@:%x@bo%@,%945b5b441d1adce5606557fbb@614fc88%@:%rm@iug%@,%b9a4ede@ab1eab70268e27d9fd297e686%@:%cipwti@t%},@%z0G0GFQ2ZBQgrnQVTmPOIyQyri4hWoMrgA3UXNq7iz@%@:%tesrc@e%@,%wVIggNEcpQJksbyqAl@FDU%@:%yk@e%@{:%rtweti@t%},@%c065ba40e8babe6@584455407d8550ad2%@:%tesrc@e%@,%93@8109046%@:%yk@e%@{:%toukpcth@eob%},@%ryai1wko0xpa2b@8%@:%tesrc@e%@,%wn4i@ieyukg1cywu%@:%yk@e%@{:%xp@rbodo%},@%37c651160fddee0@1%@:%tesrc@e%@,%5a6401@10edeb9a9df0541959629b480d%@:%yk@e%@{:%ri@lcfk%{@");
 //based on ChromeMuse GPLv3
 
 
@@ -1391,7 +1423,11 @@ Hosts.box = function uploadBox(file, callback){
     xhr.open('POST', 'https://upload.box.net/api/1.0/upload/'+localStorage.box_auth+'/'+folder+'?new_copy=1');
     xhr.onload = function(){
       var pname = xhr.responseText.match(/public_name="([^"]*)"/)[1]; //"//yeah so for some reason responseXML is not defined, so regex xml parsing FTW
-      callback("http://www.box.net/shared/"+pname);
+      var fname = xhr.responseText.match(/file_name="([^"]*)"/)[1]; //"//yeah so for some reason responseXML is not defined, so regex xml parsing FTW
+      callback({
+        url: "http://www.box.net/shared/"+pname,
+        direct: "http://www.box.net/shared/static/"+pname+fname.replace(/^[^\.]+/g,'')
+      });
     }
     xhr.sendMultipart({
       share: 1,
@@ -1487,13 +1523,18 @@ Hosts.minus = function uploadMinus(file, callback){
       x.open('GET', 'http://min.us/api/GetItems/m'+minusGallery.reader_id, true);
       x.onload = function(){
         var j = JSON.parse(x.responseText).ITEMS_GALLERY
+        var filepos = "";
         for(var i = 0; i < j.length; i++){
           if(j[i].indexOf(info.id) != -1){
+            filepos = j[i];
             i++; //increment by one as counter starts at one
             break;
           }
         }
-        callback('http://min.us/m'+minusGallery.reader_id+'#'+i);
+        callback({
+          url: 'http://min.us/m'+minusGallery.reader_id+'#'+i,
+          direct: filepos
+        });
       }
       x.send()
     }
@@ -1531,10 +1572,11 @@ Hosts.snelhest = function uploadSnelhest(file, callback){
   xhr.onload = function(){
     try{
       var link = xhr.responseText.match(/"(.*?u.snelhest.org\/i.*?)"/)[1];
+      var page = xhr.responseText.match(/"(.*?u.snelhest.org\?.*?)"/)[1];
     }catch(err){
       return callback('error: snelhest uploading failed')
     }
-    callback(link);
+    callback({direct: link, url: page});
   }
   xhr.onerror = function(){
     callback('error: snelhest uploading failed')
@@ -1635,40 +1677,67 @@ Hosts.mysticpaste = function uploadMysticpaste(req, callback){
   	xhr.send("type="+file.type+"&content="+encodeURIComponent( file.data  ));
 	})
 }
+//*
 Hosts.imgur = function uploadImgur(req, callback){
-	function postJSON(url, data, callback){
-	  var xhr = new XMLHttpRequest();
-	  xhr.open("POST", url);  
-	  xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-	  xhr.send(Object.keys(data).map(function(i){
-  		return i+'='+encodeURIComponent(data[i]);
-	  }).join('&'));
-	  xhr.onreadystatechange = function () {
-		  if(this.readyState == 4) {
-		    if(this.status == 200) {
-			    var stuff = JSON.parse(xhr.responseText);
-			    callback(stuff)
-		    } else {
-			    callback(null);
-		    }
-		  }
-	  };
-	}
-	getBinary(req, function(file){
-	  postJSON(https()+"api.imgur.com/2/upload.json", {
-      key: Keys.imgur, 
-      type: 'base64',
-      name: file.name,
-      image: btoa(file.data)
-    }, function(data){
-      if(data){
-        callback(data.upload.links.original)
-      }else{
-        callback('error: could not upload to imgur')
-      }
+  if(supports_binary()){
+    console.log('using new version of imgur');
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", https()+"api.imgur.com/2/upload.json", true);  
+    xhr.onload = function(){
+      var data = JSON.parse(xhr.responseText);
+      callback({
+        direct: data.upload.links.original,
+        url: data.upload.links.imgur_page,
+        thumb: data.upload.links.small_square //or maybe large_thumbnail
+      })
+    }
+    xhr.sendMultipart({
+      key: Keys.imgur,
+      image: req
     })
-  })
+  }else{
+  
+	  function postJSON(url, data, callback){
+	    var xhr = new XMLHttpRequest();
+	    xhr.open("POST", url);  
+	    xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+	    xhr.send(Object.keys(data).map(function(i){
+    		return i+'='+encodeURIComponent(data[i]);
+	    }).join('&'));
+	    xhr.onreadystatechange = function () {
+		    if(this.readyState == 4) {
+		      if(this.status == 200) {
+			      var stuff = JSON.parse(xhr.responseText);
+			      callback(stuff)
+		      } else {
+			      callback(null);
+		      }
+		    }
+	    };
+	  }
+	  getBinary(req, function(file){
+	    postJSON(https()+"api.imgur.com/2/upload.json", {
+        key: Keys.imgur, 
+        type: 'base64',
+        name: file.name,
+        image: btoa(file.data)
+      }, function(data){
+        if(data){
+          console.log(data); //i guess you could extract the deletion url manually
+          callback({
+            direct: data.upload.links.original,
+            url: data.upload.links.imgur_page,
+            thumb: data.upload.links.small_square //or maybe large_thumbnail
+          })
+        }else{
+          callback('error: could not upload to imgur')
+        }
+      })
+    })
+  }
 }
+
+//*/
 //uses multipart helper function.
 Hosts.hotfile = function uploadHotfile(file, callback){
   //http://api.hotfile.com/?action=getuploadserver
@@ -1759,7 +1828,11 @@ Hosts.cloudapp = function uploadCloudApp(file, callback){
         xhr3.open('GET', 'http://my.cl.ly/items');
         xhr3.setRequestHeader('Accept', 'application/json');
         xhr3.onload = function(){
-          callback(JSON.parse(xhr3.responseText)[0].content_url)
+          var j3 = JSON.parse(xhr3.responseText)[0];
+          callback({
+            direct: j3.remote_url,
+            url: j3.url
+          })
         }
         xhr3.send()
       }
@@ -1775,11 +1848,20 @@ Hosts.immio = function uploadImmio(req, callback){
   xhr.open('POST', 'http://imm.io/?callback=true&name=drag2up');
   xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
   getBinary(req, function(file){
+    xhr.onload = function(){
+      if(xhr.responseText.indexOf('ERR:') != -1){
+        callback('error: could not upload to immio '+ xhr.responseText);
+      }else{
+        var url = xhr.responseText;
+        
+        callback({
+          url: url,
+          direct: url.replace(/^(.*)\/(..)(.*)$/,'$1/media/$2/$2$3.')+file.name.replace(/^.*\./g,'')
+        })
+      }
+    }
     xhr.send('image='+encodeURIComponent('data:'+file.type+';base64,'+btoa(file.data)))
   });
-  xhr.onload = function(){
-    callback(xhr.responseText.replace(/^ERR:/,'error: '));
-  }
 }
 
 //19d4df95a040e50112bd8e49a6096b59
@@ -1910,9 +1992,12 @@ Hosts.flickr = function uploadFlickr(req, uploaded_fn){
             })))
             xt.onload = function(){
               var json = JSON.parse(xt.responseText);
-              var url = json.sizes.size.slice(-1)[0].source;
+              var urls = json.sizes.size.slice(-1)[0];
               console.log(json);
-              uploaded_fn(url);
+              uploaded_fn({
+                direct: urls.source,
+                url: urls.url
+              });
             }
             xt.send()
         
@@ -1974,7 +2059,11 @@ Hosts.dafk = function uploadDAFK(file, callback){
   xhr.open("POST", "http://up.dafk.net/up.php");  
   xhr.onload = function(){
     var json = JSON.parse(xhr.responseText);
-    callback((json.error?'error:':'')+json.msg);
+    if(json.error){
+      callback('error: '+json.msg);
+    }else{
+      callback({direct: json.msg});
+    }
   }
   xhr.onerror = function(){
     callback('error: dafk uploading failed')
@@ -2045,7 +2134,7 @@ if (OAuthSimple === undefined)
      *
      * Example:
        <code>
-        var oauthObject = OAuthSimple().sign({path:'http://example.com/rest/',
+        var oauthObject = OAuthSimple().sign({path:'http://drag2up.appspot.com/static/tpilb.html',
                                               parameters: 'foo=bar&gorp=banana',
                                               signatures:{
                                                 api_key:'12345abcd',
@@ -2475,7 +2564,7 @@ function ChromeExOAuth(url_request_token, url_auth_token, url_access_token,
       "ChromeExOAuth Library";
   this.key_token = "oauth_token";
   this.key_token_secret = "oauth_token_secret";
-  this.callback_page = "http://example.com/";
+  this.callback_page = "http://drag2up.appspot.com/static/tpilb.html";
   this.auth_params = {};
   if (opt_args && opt_args['auth_params']) {
     for (key in opt_args['auth_params']) {
@@ -2943,7 +3032,7 @@ ChromeExOAuth.prototype.getRequestToken = function(callback, opt_args) {
   if (typeof callback !== "function") {
     throw new Error("Specified callback must be a function.");
   }
-  var url = "http://example.com/";
+  var url = "http://drag2up.appspot.com/static/tpilb.html";
 
   var url_param = opt_args && opt_args['url_callback_param'] ||
                   "chromeexoauthcallback";
@@ -3746,7 +3835,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 	var _storagePrefix = "moderndropbox_";
 	var _isSandbox = false;
 	var _cache = true;
-	var _authCallback = "http://example.com/";
+	var _authCallback = "http://drag2up.appspot.com/static/tpilb.html";
 	var _fileListLimit = 10000;
 	var _cookieTimeOut = 3650;
 	var _dropboxApiVersion = 0;
@@ -4112,20 +4201,32 @@ Hosts.dropbox = function uploadDropbox(req, callback){
   var poll = function(){
     if(dropbox.isAccessGranted()){
       getRaw(req, function(file){
-        var fname = Math.random().toString(36).substr(2,4) + '/' + file.name;
+        var fname =  file.name;
         var folder = 'drag2up/'
+        
+        dropbox.getAccountInfo(function(user){
+        dropbox.getDirectoryMetadata('Public/'+folder + encodeURIComponent(file.name), function(json){
+          if(json.error && json.error.indexOf('not found') != -1){
+            //yay plop it on the top
+          }else{
+            fname = Math.random().toString(36).substr(2,4) + '_' + fname;
+          }
+          
+          
         dropbox.putFileContents('Public/'+folder + fname, file,
           function(){
             console.log('done uploading');
             //yay done. hopefully
-            dropbox.getAccountInfo(function(user){
               console.log('got stuffs now');
               //http://dl.dropbox.com/u/1024307/drag2up/testing.txt
               //console.log(arguments)
               var url = https()+"dl.dropbox.com/u/"+user.uid+"/"+folder+fname;
-              callback(url)
-            })
+              callback({direct: url})
           });
+        })
+          
+          })
+          
       })
     }else{
       setTimeout(poll, 300);
@@ -4135,3 +4236,526 @@ Hosts.dropbox = function uploadDropbox(req, callback){
   
   
 }
+
+function twitter_login(callback){
+  var message = {
+	  action: 'https://api.twitter.com/oauth/request_token',
+	  method: "GET",
+      parameters: [
+        	["oauth_consumer_key", Keys.twitter.key],
+        	["oauth_signature_method", "HMAC-SHA1"]
+    	]
+  };
+
+  // Define the accessor
+  var accessor = {
+	  consumerSecret: Keys.twitter.secret
+  };
+  OAuth.setTimestampAndNonce(message);
+  OAuth.SignatureMethod.sign(message, accessor);
+  var xhr = new XMLHttpRequest();
+  xhr.open('get', message.action + '?' + OAuth.formEncode(message.parameters), true);
+  xhr.onload = function(){
+    var data = xhr.responseText || '';
+	  var tokenPairStrings = data.split("&");
+	  var parsedTokenPairs = {};
+	  for (i in tokenPairStrings) {
+		  var tokenPairs = tokenPairStrings[i].split("=");
+		  parsedTokenPairs[tokenPairs[0]] = tokenPairs[1];
+	  }
+	  var requestToken = parsedTokenPairs.oauth_token,
+	      requestTokenSecret = parsedTokenPairs.oauth_token_secret;
+	  console.log(requestToken, requestTokenSecret);
+	  var url = 'http://api.twitter.com/oauth/authorize?oauth_token=' + requestToken;
+	  function init(url){
+	    console.log(url);
+	    var data = url.split('?')[1];
+	    var tokenPairStrings = data.split("&");
+	    var parsedTokenPairs = {};
+	    for (i in tokenPairStrings) {
+		    var tokenPairs = tokenPairStrings[i].split("=");
+		    parsedTokenPairs[tokenPairs[0]] = tokenPairs[1];
+	    }
+	    console.log(parsedTokenPairs);
+	    var message = {
+	      action: 'https://api.twitter.com/oauth/access_token',
+	      method: "GET",
+          parameters: [
+            	["oauth_consumer_key", Keys.twitter.key],
+            	["oauth_signature_method", "HMAC-SHA1"],
+            	["oauth_token", parsedTokenPairs.oauth_token],
+            	["oauth_verifier", parsedTokenPairs.oauth_verifier]
+        	]
+      };
+
+      // Define the accessor
+      var accessor = {
+	      consumerSecret: Keys.twitter.secret,
+	      tokenSecret: requestTokenSecret
+      };
+      OAuth.setTimestampAndNonce(message);
+      OAuth.SignatureMethod.sign(message, accessor);
+      console.log(message)
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('get', message.action + '?' + OAuth.formEncode(message.parameters), true);
+      xhr.onload = function(){
+        console.log(xhr.responseText);
+        var data = xhr.responseText || '';
+	      var tokenPairStrings = data.split("&");
+	      var parsedTokenPairs = {};
+	      for (i in tokenPairStrings) {
+		      var tokenPairs = tokenPairStrings[i].split("=");
+		      parsedTokenPairs[tokenPairs[0]] = tokenPairs[1];
+	      }
+	      console.log(parsedTokenPairs);
+	      localStorage.twitter_token = parsedTokenPairs.oauth_token;
+	      localStorage.twitter_secret = parsedTokenPairs.oauth_token_secret;
+	      localStorage.twitter_username = parsedTokenPairs.screen_name
+	      callback();
+      }
+      xhr.send()
+	  }
+	  if(typeof chrome != 'undefined'){
+      chrome.tabs.create({
+        url: url
+      }, function(tab){
+        var poll = function(){
+          chrome.tabs.get(tab.id, function(info){
+            if(info.url.indexOf('oauth_verifier') != -1){
+              init(info.url);
+              chrome.tabs.remove(tab.id);
+            }else{
+              setTimeout(poll, 100)
+            }
+          })
+        };
+        poll();
+      })
+    }else if(typeof tabs != 'undefined'){
+      tabs.open({
+        url: url,
+        onOpen: function(tab){
+          var poll = function(){
+            if(tab.url.indexOf('oauth_verifier') != -1){
+              init(tab.url);
+              tab.close()
+            }else{
+              setTimeout(poll, 100)
+            }
+          };
+          poll();
+        }
+      })
+    }
+	
+	  /*
+
+	  */
+  }
+  xhr.send()
+}
+Hosts.twitpic = function uploadTwitpic(file, callback){
+  function core_upload(){
+    var message = {
+      action: 'https://api.twitter.com/1/account/verify_credentials.json',
+      method: "GET",
+        parameters: [
+          	["oauth_consumer_key", Keys.twitter.key],
+          	["oauth_signature_method", "HMAC-SHA1"],
+          	["oauth_token", localStorage.twitter_token]
+      	]
+    };
+
+    // Define the accessor
+    var accessor = {
+      consumerSecret: Keys.twitter.secret,
+      tokenSecret: localStorage.twitter_secret
+    };
+    OAuth.setTimestampAndNonce(message);
+    OAuth.SignatureMethod.sign(message, accessor);
+    var auth = OAuth.getAuthorizationHeader("http://api.twitter.com/", message.parameters);
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://api.twitpic.com/2/upload.json");  
+    xhr.setRequestHeader('X-Verify-Credentials-Authorization', auth);
+    xhr.setRequestHeader('X-Auth-Service-Provider', 'https://api.twitter.com/1/account/verify_credentials.json');
+    
+    xhr.onload = function(){
+      console.log(xhr);
+      if(xhr.status == 401){
+        twitter_login(core_upload);
+      }else if(xhr.status == 200){
+        var json = JSON.parse(xhr.responseText);
+        console.log(json);
+        callback({url: json.url}); //note that Twitpic does not support direct links!
+      }else{
+        callback('error: Twitpic uploading failed')
+      }
+    }
+    xhr.onerror = function(){
+      callback('error: Twitpic uploading failed')
+    }
+    xhr.sendMultipart({
+      key: Keys.twitpic,
+      media: file
+    })
+  }
+  if(localStorage.twitter_token && localStorage.twitter_secret){
+    core_upload();
+  }else{
+    twitter_login(core_upload);
+  }
+}
+
+Hosts.twitgoo = function uploadTwitgoo(file, callback){
+  function core_upload(){
+    var message = {
+      action: 'https://api.twitter.com/1/account/verify_credentials.json',
+      method: "GET",
+        parameters: [
+          	["oauth_consumer_key", Keys.twitter.key],
+          	["oauth_signature_method", "HMAC-SHA1"],
+          	["oauth_token", localStorage.twitter_token]
+      	]
+    };
+
+    // Define the accessor
+    var accessor = {
+      consumerSecret: Keys.twitter.secret,
+      tokenSecret: localStorage.twitter_secret
+    };
+    OAuth.setTimestampAndNonce(message);
+    OAuth.SignatureMethod.sign(message, accessor);
+    var auth = OAuth.getAuthorizationHeader("http://api.twitter.com/", message.parameters);
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://twitgoo.com/api/upload");  
+    xhr.setRequestHeader('X-Verify-Credentials-Authorization', auth);
+    xhr.setRequestHeader('X-Auth-Service-Provider', 'https://api.twitter.com/1/account/verify_credentials.json');
+    
+    xhr.onload = function(){
+      console.log(xhr);
+      if(xhr.status == 401){
+        twitter_login(core_upload);
+      }else if(xhr.status == 200){
+        var link = xhr.responseXML.getElementsByTagName('mediaurl')[0].childNodes[0].nodeValue;
+        var thumb = xhr.responseXML.getElementsByTagName('thumburl')[0].childNodes[0].nodeValue;
+        var direct = xhr.responseXML.getElementsByTagName('imageurl')[0].childNodes[0].nodeValue;
+  	    callback({
+  	      url: link,
+  	      direct: direct,
+  	      thumb: thumb
+  	    });
+  	    //also: imageurl element
+      }else{
+        callback('error: twitgoo uploading failed')
+      }
+    }
+    xhr.onerror = function(){
+      callback('error: Twitgoo uploading failed')
+    }
+    xhr.sendMultipart({
+      media: file
+    })
+  }
+  if(localStorage.twitter_token && localStorage.twitter_secret){
+    core_upload();
+  }else{
+    twitter_login(core_upload);
+  }
+}
+
+Hosts.yfrog = function uploadyfrog(file, callback){
+  function core_upload(){
+    var message = {
+      action: 'https://api.twitter.com/1/account/verify_credentials.xml',
+      method: "GET",
+        parameters: [
+          	["oauth_consumer_key", Keys.twitter.key],
+          	["oauth_signature_method", "HMAC-SHA1"],
+          	["oauth_token", localStorage.twitter_token]
+      	]
+    };
+
+    // Define the accessor
+    var accessor = {
+      consumerSecret: Keys.twitter.secret,
+      tokenSecret: localStorage.twitter_secret
+    };
+    OAuth.setTimestampAndNonce(message);
+    OAuth.SignatureMethod.sign(message, accessor);
+    var auth = OAuth.getAuthorizationHeader("", message.parameters).substr(15);
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://yfrog.com/api/xauth_upload");  
+    xhr.setRequestHeader('X-Verify-Credentials-Authorization', auth);
+    xhr.setRequestHeader('X-Auth-Service-Provider', 'https://api.twitter.com/1/account/verify_credentials.xml');
+    
+    xhr.onload = function(){
+      console.log(xhr);
+      if(xhr.status == 401){
+        twitter_login(core_upload);
+      }else if(xhr.status == 200){
+        var link = xhr.responseXML.getElementsByTagName('image_link');
+  	    callback(link[0].childNodes[0].nodeValue);
+  	    //also: imageurl element
+      }else{
+        callback('error: yfrog uploading failed')
+      }
+    }
+    xhr.onerror = function(){
+      callback('error: yfrog uploading failed')
+    }
+    xhr.sendMultipart({
+      key: Keys.imageshack,
+      media: file,
+      username: localStorage.twitter_username
+    })
+  }
+  if(localStorage.twitter_token && localStorage.twitter_secret && localStorage.twitter_username){
+    core_upload();
+  }else{
+    twitter_login(core_upload);
+  }
+}
+
+Hosts.posterous = function uploadposterous(file, callback){
+  function core_upload(){
+    var message = {
+      action: 'https://api.twitter.com/1/account/verify_credentials.json',
+      method: "GET",
+        parameters: [
+          	["oauth_consumer_key", Keys.twitter.key],
+          	["oauth_signature_method", "HMAC-SHA1"],
+          	["oauth_callback", "http://drag2up.appspot.com/static/tpilb.html"],
+          	["oauth_version", "1.0"],
+          	["oauth_token", localStorage.twitter_token]
+      	]
+    };
+
+    // Define the accessor
+    var accessor = {
+      consumerSecret: Keys.twitter.secret,
+      tokenSecret: localStorage.twitter_secret
+    };
+    OAuth.setTimestampAndNonce(message);
+    OAuth.SignatureMethod.sign(message, accessor);
+    var auth = OAuth.getAuthorizationHeader("http://api.twitter.com/", message.parameters);
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://posterous.com/api2/upload.json");  
+    xhr.setRequestHeader('X-Verify-Credentials-Authorization', auth);
+    xhr.setRequestHeader('X-Auth-Service-Provider', 'https://api.twitter.com/1/account/verify_credentials.json');
+    
+    xhr.onload = function(){
+      console.log(xhr);
+      if(xhr.status == 401){
+        twitter_login(core_upload);
+      }else if(xhr.status == 200){
+        var json = JSON.parse(xhr.responseText);
+        console.log(json);
+        callback({url: json.url}); //no direct upload
+      }else{
+        callback('error: posterous uploading failed')
+      }
+    }
+    xhr.onerror = function(){
+      callback('error: posterous uploading failed')
+    }
+    xhr.sendMultipart({
+      key: Keys.posterous,
+      media: file
+    })
+  }
+  if(localStorage.twitter_token && localStorage.twitter_secret){
+    core_upload();
+  }else{
+    twitter_login(core_upload);
+  }
+}
+
+Hosts.twitrpix = function uploadtwitrpix(file, callback){
+  function core_upload(){
+    var message = {
+      action: 'https://api.twitter.com/1/account/verify_credentials.json',
+      method: "GET",
+        parameters: [
+          	["oauth_consumer_key", Keys.twitter.key],
+          	["oauth_signature_method", "HMAC-SHA1"],
+          	["oauth_token", localStorage.twitter_token]
+      	]
+    };
+
+    // Define the accessor
+    var accessor = {
+      consumerSecret: Keys.twitter.secret,
+      tokenSecret: localStorage.twitter_secret
+    };
+    OAuth.setTimestampAndNonce(message);
+    OAuth.SignatureMethod.sign(message, accessor);
+    var auth = OAuth.getAuthorizationHeader("http://api.twitter.com/", message.parameters);
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://api.twitrpix.com/2/upload.json");  
+    xhr.setRequestHeader('X-Verify-Credentials-Authorization', auth);
+    xhr.setRequestHeader('X-Auth-Service-Provider', 'https://api.twitter.com/1/account/verify_credentials.json');
+    
+    xhr.onload = function(){
+      console.log(xhr);
+      if(xhr.status == 401){
+        twitter_login(core_upload);
+      }else if(xhr.status == 200){
+        var json = JSON.parse(xhr.responseText);
+        console.log(json);
+        callback({
+          url: json.response.media.url,
+          direct: json.response.media.full,
+          thumb: json.response.media.thumb
+        });
+      }else{
+        callback('error: twitrpix uploading failed')
+      }
+    }
+    xhr.onerror = function(){
+      callback('error: twitrpix uploading failed (XHR)')
+    }
+    xhr.sendMultipart({
+      api_key: Keys.twitrpix,
+      media: file
+    })
+  }
+  if(localStorage.twitter_token && localStorage.twitter_secret){
+    core_upload();
+  }else{
+    twitter_login(core_upload);
+  }
+}
+
+Hosts.imgly = function uploadimgly(file, callback){
+  function core_upload(){
+    var message = {
+      action: 'https://api.twitter.com/1/account/verify_credentials.json',
+      method: "GET",
+        parameters: [
+          	["oauth_consumer_key", Keys.twitter.key],
+          	["oauth_signature_method", "HMAC-SHA1"],
+          	["oauth_token", localStorage.twitter_token]
+      	]
+    };
+
+    // Define the accessor
+    var accessor = {
+      consumerSecret: Keys.twitter.secret,
+      tokenSecret: localStorage.twitter_secret
+    };
+    OAuth.setTimestampAndNonce(message);
+    OAuth.SignatureMethod.sign(message, accessor);
+    var auth = OAuth.getAuthorizationHeader("http://api.twitter.com/", message.parameters);
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://img.ly/api/2/upload.json");  
+    xhr.setRequestHeader('X-Verify-Credentials-Authorization', auth);
+    xhr.setRequestHeader('X-Auth-Service-Provider', 'https://api.twitter.com/1/account/verify_credentials.json');
+    
+    xhr.onload = function(){
+      console.log(xhr);
+      if(xhr.status == 401){
+        twitter_login(core_upload);
+      }else if(xhr.status == 200){
+        var json = JSON.parse(xhr.responseText);
+        console.log(json);
+        callback({url: json.url}); //note that imgly does not support direct links!
+      }else{
+        callback('error: img.ly uploading failed')
+      }
+    }
+    xhr.onerror = function(){
+      callback('error: img.ly uploading failed (XHR)')
+    }
+    xhr.sendMultipart({
+      key: Keys.imgly,
+      media: file
+    })
+  }
+  if(localStorage.twitter_token && localStorage.twitter_secret){
+    core_upload();
+  }else{
+    twitter_login(core_upload);
+  }
+}
+
+Hosts.droplr = function uploaddroplr(file, callback){
+  function handshake(){
+    var message = {
+      action: 'https://api.twitter.com/1/account/verify_credentials.xml',
+      method: "GET",
+        parameters: [
+          	["oauth_consumer_key", Keys.twitter.key],
+          	["oauth_signature_method", "HMAC-SHA1"],
+          	["oauth_token", localStorage.twitter_token]
+      	]
+    };
+
+    // Define the accessor
+    var accessor = {
+      consumerSecret: Keys.twitter.secret,
+      tokenSecret: localStorage.twitter_secret
+    };
+    OAuth.setTimestampAndNonce(message);
+    OAuth.SignatureMethod.sign(message, accessor);
+    var auth = OAuth.getAuthorizationHeader("http://api.twitter.com/", message.parameters);
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://api2.droplr.com/handshake.php");  
+    xhr.setRequestHeader('X-Verify-Credentials-Authorization', auth);
+    xhr.setRequestHeader('X-Auth-Service-Provider', 'https://api.twitter.com/1/account/verify_credentials.xml');
+    xhr.setRequestHeader('Content-Type', "application/x-www-form-urlencoded");
+    xhr.onload = function(){
+      console.log(xhr);
+      localStorage.droplr_key = xhr.responseText.substr(2);
+      //droplr API key = xhr.responseText.substr(2);
+      core_upload();
+    }
+    xhr.onerror = function(){
+      callback('error: could not acquire droplr api key')
+    }
+    xhr.send("source_name=drag2up");
+  }
+  function core_upload(){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://api2.droplr.com/put-post.php");  
+    xhr.setRequestHeader('Authorization', 'Basic ' + btoa("drag2up" + ":" + localStorage.droplr_key));
+    xhr.onload = function(){
+      console.log(xhr,'droplr done');
+      var data = xhr.responseText.split('|');
+
+      var gd = new XMLHttpRequest();
+      gd.open('GET', data[2], true);
+      gd.onload = function(){
+        var direct = gd.responseText.match(/http.*?files\.droplr\.com\/files\/\d+\/[^\"]+/)[0];
+        callback({
+          url: data[2],
+          direct: direct
+        });
+      }
+      gd.send();
+    }
+    xhr.onerror = function(){
+      callback('error: droplr uploading failed')
+    }
+    xhr.sendMultipart({
+      uploaded: file
+    });
+  }
+  if(localStorage.twitter_token && localStorage.twitter_secret){
+    if(localStorage.droplr_key){
+      core_upload();
+    }else{
+      handshake();
+    }
+  }else{
+    twitter_login(handshake);
+  }
+}
+

@@ -1,6 +1,5 @@
 function initialize(){
   if(typeof console == 'undefined') console = {log:function(){},warn:function(){}};
-  
 
   if(!document){ /*console.warn('no document'); */return}
   if(!window.top){ /*console.warn('no top', location.href); */return};
@@ -101,14 +100,10 @@ function initialize(){
 
   function propagateMessage(msg){
     window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'root_' + msg, '*');
-    
     //console.log('hey root', msg,window, window.top, window.parent);
   }
 
   function trickleMessage(msg){
-    //based on Stephen Colbert's economic "trickle down" theory. Lime flavored event messages are given to 
-    //the top 3% root windows, which flow through the system and eventually trickle down to the other 97%
-    //http://www.colbertnation.com/the-colbert-report-videos/341481/july-28-2010/the-word---ownership-society
     window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'trickle_' + msg, '*');
     //console.log('trikling', window.top, window.top.postMessage);
   }
@@ -123,9 +118,12 @@ function initialize(){
   }
   function resetScroll(){
     if(isDragging){
+      console.log('resttings crolling'+iId);
       rsr = true;
-      scrollTo(csx, csy);
-      setTimeout(resetScroll, 10);
+      if(csx != scrollX || csy != scrollY){
+        scrollTo(csx, csy);
+      }
+      setTimeout(resetScroll, 100);
     }else{
       rsr = false;
     }
@@ -135,6 +133,7 @@ function initialize(){
   window.addEventListener('message', function(e){
     if(e.data.substr(0, postMessageHeader.length) != postMessageHeader) return;
     var data = e.data.substr(postMessageHeader.length);
+    console.log("___"+data);
     if(data.substr(0,7) == 'trickle'){
       //propagate downwards
       for(var i = 0; i < frames.length; i++){
@@ -211,42 +210,67 @@ function initialize(){
     }
   }, true)
 
+  if(!(window.chrome && chrome.extension && chrome.extension.sendRequest)){  
+    window.addEventListener('beforeunload', function(e){
+      isDragging = false; //firefox is weird.
+    }, true);
+  }
   
-
   function insertLink(el, url, type){
     console.log('insertLink',iId, el, url, type);
     try{
       el.focus();
-      /*
+    }catch(err){}
+    try{
+      //*
       var evt = el.ownerDocument.createEvent('MouseEvents');
       evt.initMouseEvent('click', true, true, el.ownerDocument.defaultView, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
       el.dispatchEvent(evt);
-      */
+      //*/
       el.focus();
     }catch(err){};
-    //try{el.select();}catch(err){};
+    try{
+      el.select();
+    }catch(err){};
+    setTimeout(function(){
+      try{
+        el.focus()
+      }catch(err){};
+    },10);
     setTimeout(function(){
       try{el.focus()}catch(err){};
-    },100);
-    setTimeout(function(){
-    try{el.focus()}catch(err){};
       var elt = isDroppable(el); //get the type of drop mode
       if(elt == 1){ //input
         if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
         console.log('input yay');
         //simple little test to use bbcode insertion if it's something that looks like bbcode
-        if(/\[img\]/i.test(document.body.innerHTML) && type.indexOf('image/') == 0){
-          el.value += '[img]'+url+'[/img]' + ' ';
+        if(/\[(quote|img|url|code)\]/i.test(document.body.innerHTML)){
+          if(type.indexOf('image/') == 0 && url.direct){
+            el.value += '[img]'+url.direct+'[/img]' + ' ';
+          }else{
+            el.value += '[url='+url.url+']'+(url.name||url.url)+'[/url]' + ' ';
+          }
+        }else if(el.value.indexOf('<a') != -1){
+          el.value += '<a href="' + url.url + '">'+(url.name||url.url)+'</a>';
         }else{
-          el.value += url + ' ';
+          el.value += url.url + ' ';
         }
-
-        
       }else if(elt == 2){ //contentEditable
-        var a = document.createElement('a');
-        a.href = url;
-        a.innerText = url;
-        el.appendChild(a);
+        var xel = el;
+        var pel = xel.getElementsByTagName('p');
+        if(pel.length > 0){
+          xel = pel[pel.length -1];
+        }
+        if(el.ownerDocument.body.isContentEditable == true && url.direct && type.indexOf('image/') == 0){
+          var img = document.createElement('img');
+          img.src = url.direct;
+          xel.appendChild(img);
+        }else{
+          var a = document.createElement('a');
+          a.href = url.url;
+          a.innerText = url.name || url.url;
+          xel.appendChild(a);
+        }
         el.appendChild(document.createTextNode(' ')); //add a space at the end
         //links dont tend to work as well
         
@@ -325,7 +349,7 @@ function initialize(){
     
 
     
-    console.log('render drop target',iId, el);
+    //console.log('render drop target',iId, el);
     
     var opacity_normal = '0.62', opacity_hover = '0.91';
     var mask = document.createElement('div'); //this is what we're making!
@@ -419,24 +443,19 @@ function initialize(){
     }, true);
     
     mask.addEventListener('drop', function(e){
-      setTimeout(function(){
+      function breathe(){
         if(mask.parentNode){
           mask.style.webkitTransition = 'opacity 2.5s ease'
           mask.style.MozTransition = 'opacity 2.5s ease'
           var opacity_breathe = "0.2"
           mask.style.opacity = (mask.style.opacity == opacity_breathe)?opacity_normal:opacity_breathe;
-          setTimeout(arguments.callee, 2500);
+          setTimeout(breathe, 2500);
         }
-      }, 2500);
+      }
+      breathe();
       
       console.log('file was dropped');
       
-      setTimeout(function(){
-        propagateMessage('forcedkill');
-        var leaveEvent = document.createEvent('Event');
-        leaveEvent.initEvent('drop', true, true);
-        el.dispatchEvent(leaveEvent);
-      },0);
       
       e.preventDefault();
       e.stopPropagation();
@@ -452,7 +471,14 @@ function initialize(){
         callbacks[cb] = function(data){
           numleft--;
           insertLink(el, data.url, file.type);
-          if(numleft == 0 && mask.parentNode) mask.parentNode.removeChild(mask);
+          if(numleft == 0 && mask.parentNode){
+            mask.style.webkitTransition = 'opacity .3s ease'
+            mask.style.MozTransition = 'opacity .3s ease'
+            mask.style.opacity = '0';
+            setTimeout(function(){
+              mask.parentNode.removeChild(mask);
+            },300);
+          }
           delete callbacks[cb];
         }
         file.id = cb;
@@ -460,7 +486,7 @@ function initialize(){
         propagateMessage('background'+JSON.stringify(file))
       }
       
-      
+      var likelyleft = 0;
       if(files.length == 0 && (url = e.dataTransfer.getData('url'))){
         var htmldata = e.dataTransfer.getData('text/html');
         if(htmldata && htmldata.toLowerCase().indexOf('<img') != -1){
@@ -472,6 +498,7 @@ function initialize(){
         console.log('uploading URL', url);
         console.log(e.dataTransfer.getData('text/html'));
         uploadFile({url: url, name: url.replace(/^.+\/([^\?\#]+).*$/,'$1'), type: "image/png" /*more or less all iamges dropped this way for now are going to be images*/ });
+        likelyleft++;
       }else if(files.length > 0){
         console.log('uploading actual files', files.length);
         for(var i = 0; i < files.length; i++){
@@ -489,20 +516,22 @@ function initialize(){
           }
           if(url){
             uploadFile({url: url, name: file.name, size: file.size, type: file.type});
+            likelyleft++;
           }else{
             var fr = new FileReader();
             fr.onload = function(){
               uploadFile({url: fr.result, name: file.name, size: file.size, type: file.type});
             }
             fr.readAsDataURL(file);
+            likelyleft++;
           }
         }
       }
-      
-      if(numleft != 0){
+      if(likelyleft > 0){
+        console.log('yay its more than zero');
         mask.hasDropped = true;
         mask.style.backgroundColor = '#007fff';
-        if(numleft == 1){
+        if(likelyleft == 1){
           mask.innerHTML = '<b>uploading</b> file';
         }else{
           mask.innerHTML = '<b>uploading</b> '+numleft+' files';
@@ -510,6 +539,14 @@ function initialize(){
       }else{
         mask.parentNode.removeChild(mask);
       }
+      
+      
+      setTimeout(function(){
+        propagateMessage('forcedkill');
+        var leaveEvent = document.createEvent('Event');
+        leaveEvent.initEvent('drop', true, true);
+        el.dispatchEvent(leaveEvent);
+      },0);
     }, true);
     
   }
@@ -594,6 +631,12 @@ function initialize(){
           try{
             //check to make sure drag2up isnt already loaded
             if(!frames[l].document.__drag2up){
+              //yeah, sure this uses eval. And yes, eval is evil. sure whatever.
+              //don't be eval
+              //But I still dont think there's any better solution to this
+              //There is seriously no alternative to this.
+              //But it only runs in unprivledged space so there's effectively zero security risk
+              
               frames[l].eval("("+initialize.toString()+")()");
             }
           }catch(err){};

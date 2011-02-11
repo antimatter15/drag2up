@@ -50,12 +50,19 @@ pageMod.PageMod({
     worker.on('message', function(data) {
       console.log('got message on the pagemod');
       console.log(data);
-      
-      handleRequest(JSON.parse(data), 42, function(r){
-        console.log('super done processing stuffs');
-        console.log(r)
-        worker.postMessage(JSON.stringify(r));
-      })
+      var json;
+      try{
+        json = JSON.parse(data);
+      }catch(err){
+        console.log('invalid JSON');
+      }
+      if(json){
+        handleRequest(json, 42, function(r){
+          console.log('super done processing stuffs');
+          console.log(r)
+          worker.postMessage(JSON.stringify(r));
+        })
+      }
       
     });
   }

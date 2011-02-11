@@ -126,9 +126,12 @@ Hosts.flickr = function uploadFlickr(req, uploaded_fn){
             })))
             xt.onload = function(){
               var json = JSON.parse(xt.responseText);
-              var url = json.sizes.size.slice(-1)[0].source;
+              var urls = json.sizes.size.slice(-1)[0];
               console.log(json);
-              uploaded_fn(url);
+              uploaded_fn({
+                direct: urls.source,
+                url: urls.url
+              });
             }
             xt.send()
         

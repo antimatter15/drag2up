@@ -100,14 +100,10 @@ function initialize(){
 
   function propagateMessage(msg){
     window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'root_' + msg, '*');
-    
     //console.log('hey root', msg,window, window.top, window.parent);
   }
 
   function trickleMessage(msg){
-    //based on Stephen Colbert's economic "trickle down" theory. Lime flavored event messages are given to 
-    //the top 3% root windows, which flow through the system and eventually trickle down to the other 97%
-    //http://www.colbertnation.com/the-colbert-report-videos/341481/july-28-2010/the-word---ownership-society
     window.top && top.postMessage && window.top.postMessage(postMessageHeader + 'trickle_' + msg, '*');
     //console.log('trikling', window.top, window.top.postMessage);
   }
@@ -122,9 +118,12 @@ function initialize(){
   }
   function resetScroll(){
     if(isDragging){
+      console.log('resttings crolling'+iId);
       rsr = true;
-      scrollTo(csx, csy);
-      setTimeout(resetScroll, 10);
+      if(csx != scrollX || csy != scrollY){
+        scrollTo(csx, csy);
+      }
+      setTimeout(resetScroll, 100);
     }else{
       rsr = false;
     }
@@ -134,6 +133,7 @@ function initialize(){
   window.addEventListener('message', function(e){
     if(e.data.substr(0, postMessageHeader.length) != postMessageHeader) return;
     var data = e.data.substr(postMessageHeader.length);
+    console.log("___"+data);
     if(data.substr(0,7) == 'trickle'){
       //propagate downwards
       for(var i = 0; i < frames.length; i++){
@@ -210,8 +210,12 @@ function initialize(){
     }
   }, true)
 
+  if(!(window.chrome && chrome.extension && chrome.extension.sendRequest)){  
+    window.addEventListener('beforeunload', function(e){
+      isDragging = false; //firefox is weird.
+    }, true);
+  }
   
-
   function insertLink(el, url, type){
     console.log('insertLink',iId, el, url, type);
     try{

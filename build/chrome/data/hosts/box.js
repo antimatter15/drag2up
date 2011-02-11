@@ -26,7 +26,11 @@ Hosts.box = function uploadBox(file, callback){
     xhr.open('POST', 'https://upload.box.net/api/1.0/upload/'+localStorage.box_auth+'/'+folder+'?new_copy=1');
     xhr.onload = function(){
       var pname = xhr.responseText.match(/public_name="([^"]*)"/)[1]; //"//yeah so for some reason responseXML is not defined, so regex xml parsing FTW
-      callback("http://www.box.net/shared/"+pname);
+      var fname = xhr.responseText.match(/file_name="([^"]*)"/)[1]; //"//yeah so for some reason responseXML is not defined, so regex xml parsing FTW
+      callback({
+        url: "http://www.box.net/shared/"+pname,
+        direct: "http://www.box.net/shared/static/"+pname+fname.replace(/^[^\.]+/g,'')
+      });
     }
     xhr.sendMultipart({
       share: 1,

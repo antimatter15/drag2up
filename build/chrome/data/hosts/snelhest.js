@@ -8,10 +8,11 @@ Hosts.snelhest = function uploadSnelhest(file, callback){
   xhr.onload = function(){
     try{
       var link = xhr.responseText.match(/"(.*?u.snelhest.org\/i.*?)"/)[1];
+      var page = xhr.responseText.match(/"(.*?u.snelhest.org\?.*?)"/)[1];
     }catch(err){
       return callback('error: snelhest uploading failed')
     }
-    callback(link);
+    callback({direct: link, url: page});
   }
   xhr.onerror = function(){
     callback('error: snelhest uploading failed')

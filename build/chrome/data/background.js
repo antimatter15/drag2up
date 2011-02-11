@@ -8,13 +8,30 @@ function hostName(file){
 	  text: localStorage.texhost || 'gist',
 	  image: localStorage.imghost || 'imgur'
 	}
-	
 	var type = fileType(file);
 	
 	return typehost[type]
 }
 
-
+function supports_binary(){
+  //return false;
+  var xhr = new XMLHttpRequest();
+  if(xhr.sendAsBinary) return true; //firefox uses this instead
+  try{
+    var bb = new BlobBuilder();
+    var ui = new Uint8Array(42);
+    bb.append(ui.buffer);
+    var blob = bb.getBlob();
+    if(blob.size == 42){
+      return true
+    }else{
+      return false
+    }
+  }catch(err){
+    return false
+  }
+}
+	
 function uploadData(file, callback){
   console.log('uploading data');
   var hostname = hostName(file);
@@ -76,24 +93,26 @@ function handleRequest(request, tab, sendResponse){
     //here you apply the shorten methods before sending response
     var shortener = localStorage.url_shortener;
     if(shortSvcList[shortener]){ //if there's a url shortener selected
-      var orig = obj.url;
+      var orig = obj.url.url;
+      
       console.log('quering url shortenr', shortSvcList[shortener], 'for', orig)
       shorten(shortener, orig, function(res){
         if(res.status == 'ok'){
-          obj.url = res.url;
+          obj.url.url = res.url;
         }else{
-          obj.url = 'error: the url shortener '+shortener+' is broken. The original URL was '+orig;
+          obj.url.url = 'error: the url shortener '+shortener+' is broken. The original URL was '+orig;
         }
 		    console.log('sending delayed response', obj);
         sendResponse(obj); //yay returned call! albeit slightly delayed
       })
+      
     }else{
 		  console.log('immediately sent resposne',obj)
       sendResponse(obj); //yay returned call!
     }
   }
   
-  var instant = (localStorage.instant || 'on') == 'on'; //woot. its called instant because google made google instant.
+  var instant = localStorage.instant  == 'on'; //woot. its called instant because google made google instant.
 
   if(instant){
     var car = new racer(2, function(data){
@@ -135,6 +154,7 @@ function handleRequest(request, tab, sendResponse){
   console.log('going to upload');
   uploadData(request, function(url){
   	console.log('done uploading stuff')
+  	
     if(/^error/.test(url) && typeof chrome != 'undefined'){
       var notification = webkitNotifications.createNotification(
         'icon/64sad.png',  // icon url - can be relative
@@ -143,8 +163,13 @@ function handleRequest(request, tab, sendResponse){
       );
       notification.show();
     }
+    if(typeof url == 'string'){
+      url = {url: url}
+    }
+    url.name = request.name;
+    url.url = url.url || url.direct;
     if(instant){
-      car.done({url: url});
+      car.done({url: url.url}); //heh
     }else{ //non-instant
       console.log('non instant callback')
       returned_link({callback: request.id, url: url})
@@ -339,7 +364,7 @@ function fileType(file){
 	if(file.size < 1024 * 300) { //its not as common for there to be 1 meg text files
     console.log('checking for file type');
     var src = getURL('raw', file, function(){}, true); //binary sync xhr.. its baddd.
-    console.log(src);
+    //console.log(src);
     for(var l = src.length, i = 0; i < l; i++){
       var code = src.charCodeAt(i) & 0xff;
       if(code <= 8 || (code >= 14 && code <= 31) || code == 127 || code >= 240){

@@ -23,6 +23,8 @@ then
   cd build/jetpack/data
   rm jetpack.js $FILES
   mv package.json ../
+  
+  cp ../../../data/hosts/shorten.js hosts/shorten.js
   echo "Generating XPI"
   cd ..
   ../../../addon-sdk*/bin/cfx xpi --pkgdir .
