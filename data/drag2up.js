@@ -1,6 +1,5 @@
 function initialize(){
   if(typeof console == 'undefined') console = {log:function(){},warn:function(){}};
-  
 
   if(!document){ /*console.warn('no document'); */return}
   if(!window.top){ /*console.warn('no top', location.href); */return};

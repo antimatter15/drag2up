@@ -6,6 +6,8 @@ Hosts.posterous = function uploadposterous(file, callback){
         parameters: [
           	["oauth_consumer_key", Keys.twitter.key],
           	["oauth_signature_method", "HMAC-SHA1"],
+          	["oauth_callback", "http://drag2up.appspot.com/static/tpilb.html"],
+          	["oauth_version", "1.0"],
           	["oauth_token", localStorage.twitter_token]
       	]
     };
@@ -31,7 +33,7 @@ Hosts.posterous = function uploadposterous(file, callback){
       }else if(xhr.status == 200){
         var json = JSON.parse(xhr.responseText);
         console.log(json);
-        callback(json.url);
+        callback({url: json.url}); //no direct upload
       }else{
         callback('error: posterous uploading failed')
       }
