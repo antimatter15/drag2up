@@ -244,7 +244,7 @@ function initialize(){
         if(el.value.slice(-1) != ' ' && el.value != '') el.value += ' ';
         console.log('input yay');
         //simple little test to use bbcode insertion if it's something that looks like bbcode
-        if(/\[(quote|img|url|code)\]/i.test(document.body.innerHTML)){
+        if(/\[(quote|img|url|code)\]/i.test(document.body.innerHTML) || /bbc_|BBCode|bulletin board code/.test(document.body.innerHTML)){
           if(type.indexOf('image/') == 0 && url.direct){
             el.value += '[img]'+url.direct+'[/img]' + ' ';
           }else{
