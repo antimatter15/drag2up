@@ -534,7 +534,7 @@ function initialize(){
         if(likelyleft == 1){
           mask.innerHTML = '<b>uploading</b> file';
         }else{
-          mask.innerHTML = '<b>uploading</b> '+numleft+' files';
+          mask.innerHTML = '<b>uploading</b> '+likelyleft+' files';
         }
       }else{
         mask.parentNode.removeChild(mask);
