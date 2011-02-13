@@ -1856,24 +1856,44 @@ Hosts.cloudapp = function uploadCloudApp(file, callback){
 
 
 Hosts.immio = function uploadImmio(req, callback){
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'http://imm.io/?callback=true&name=drag2up');
-  xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-  getBinary(req, function(file){
+  if(supports_binary()){
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'http://imm.io/?callback=true&name=drag2up');
     xhr.onload = function(){
       if(xhr.responseText.indexOf('ERR:') != -1){
-        callback('error: could not upload to immio '+ xhr.responseText);
+        callback('error: could not upload to immio (multipart) '+ xhr.responseText);
       }else{
         var url = xhr.responseText;
         
         callback({
           url: url,
-          direct: url.replace(/^(.*)\/(..)(.*)$/,'$1/media/$2/$2$3.')+file.name.replace(/^.*\./g,'')
+          direct: url.replace(/^(.*)\/(..)(.*)$/,'$1/media/$2/$2$3.')+req.name.replace(/^.*\./g,'')
         })
       }
     }
-    xhr.send('image='+encodeURIComponent('data:'+file.type+';base64,'+btoa(file.data)))
-  });
+    xhr.sendMultipart({
+      image: req
+    })
+  }else{
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'http://imm.io/?callback=true&name=drag2up');
+    xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+    getBinary(req, function(file){
+      xhr.onload = function(){
+        if(xhr.responseText.indexOf('ERR:') != -1){
+          callback('error: could not upload to immio (b64) '+ xhr.responseText);
+        }else{
+          var url = xhr.responseText;
+          
+          callback({
+            url: url,
+            direct: url.replace(/^(.*)\/(..)(.*)$/,'$1/media/$2/$2$3.')+file.name.replace(/^.*\./g,'')
+          })
+        }
+      }
+      xhr.send('image='+encodeURIComponent('data:'+file.type+';base64,'+btoa(file.data)))
+    });
+  }
 }
 
 //19d4df95a040e50112bd8e49a6096b59
