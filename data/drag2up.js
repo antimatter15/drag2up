@@ -118,7 +118,7 @@ function initialize(){
   }
   function resetScroll(){
     if(isDragging){
-      console.log('resttings crolling'+iId);
+      //console.log('resttings crolling'+iId);
       rsr = true;
       if(csx != scrollX || csy != scrollY){
         scrollTo(csx, csy);
@@ -133,7 +133,7 @@ function initialize(){
   window.addEventListener('message', function(e){
     if(e.data.substr(0, postMessageHeader.length) != postMessageHeader) return;
     var data = e.data.substr(postMessageHeader.length);
-    console.log("___"+data);
+    //console.log("___"+data);
     if(data.substr(0,7) == 'trickle'){
       //propagate downwards
       for(var i = 0; i < frames.length; i++){
