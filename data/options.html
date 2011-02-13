@@ -96,9 +96,15 @@
   }
   
   .has .binary {
-    
 		border: 1px solid hsl(48, 100%, 50%);
   }
+  .has .text{
+		border: 1px solid hsl(200, 100%, 70%);
+	}
+	.has .image {
+		border: 1px solid hsl(9, 100%, 70%);
+	}
+	
 	.binary .binary { display: inline; }
 	.text .text { display: inline; }
 	.image .image { display: inline;}
@@ -108,7 +114,7 @@
     display:none
   }
 	
-	.directions, .filehost {
+	.filehost {
 		float: left;
 		width: 140px;
 		padding: 7px;
@@ -146,8 +152,19 @@
 	}
 	
 	.directions {
+		/*
 		background-color: hsl(240, 73%, 90%);
 		border: 1px solid hsl(240, 73%, 70%);
+		*/
+		border: 1px solid transparent;
+		background-color: hsl(240, 73%, 95%);
+float: left;
+		width: 140px;
+		padding: 7px;
+		height: 75px;
+		margin: 6px;
+		border-radius: 10px;
+	  -moz-border-radius: 10px;
 	}
 	
 	.filehost img {
@@ -177,6 +194,16 @@
 
 
 	*/
+	
+	.directions div {
+		background-color: hsl(240, 73%, 90%);
+		border: 1px solid hsl(240, 73%, 70%);
+		width: 100px;
+		padding: 7px;
+		height: 58px;
+		border-radius: 10px;
+	  -moz-border-radius: 10px;
+	}
 	#not_supported {
   	top:0;
   	padding:10px;
@@ -468,9 +495,9 @@ To upload certain types of files, chrome needs to upload binary data (that is, o
 <div style="width: 100%;float:left;margin-bottom: 30px">
 <div class="directions" style="">
 <img src="icon/64r.png" style="float:right;margin-right: -18px;margin-top: 5px">
-<b>Drag hosts</b> to the slots on the right.
-  
-
+<div>
+  <b>Drag hosts</b> to the slots on the right.
+</div>
 </div>
 
 <!-- image hosts -->
