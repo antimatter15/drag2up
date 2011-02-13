@@ -447,7 +447,7 @@ function initialize(){
         if(mask.parentNode){
           mask.style.webkitTransition = 'opacity 2.5s ease'
           mask.style.MozTransition = 'opacity 2.5s ease'
-          var opacity_breathe = "0.2"
+          var opacity_breathe = "0.3"
           mask.style.opacity = (mask.style.opacity == opacity_breathe)?opacity_normal:opacity_breathe;
           setTimeout(breathe, 2500);
         }
@@ -460,7 +460,8 @@ function initialize(){
       e.preventDefault();
       e.stopPropagation();
       console.log('drop event', +new Date);
-      var files = e.dataTransfer.files;
+      var files = e.dataTransfer ? e.dataTransfer.files: [];
+      
       
       console.log(files.length);
       var url, numleft = 0;
@@ -478,6 +479,9 @@ function initialize(){
             setTimeout(function(){
               mask.parentNode.removeChild(mask);
             },300);
+          }
+          if(likelyleft > 1){ //this never gets updated
+            mask.innerHTML = '<b>uploading</b> '+numleft+' files';
           }
           delete callbacks[cb];
         }
@@ -513,16 +517,20 @@ function initialize(){
             url = window.createBlobURL(file)
           }else if(window.URL && window.URL.createObjectURL){
             url = window.URL.createObjectURL(file)
+          }else if(window.webkitURL && window.webkitURL.createObjectURL){
+            url = window.webkitURL.createObjectURL(file)
           }
           if(url){
             uploadFile({url: url, name: file.name, size: file.size, type: file.type});
             likelyleft++;
           }else{
-            var fr = new FileReader();
-            fr.onload = function(){
-              uploadFile({url: fr.result, name: file.name, size: file.size, type: file.type});
-            }
-            fr.readAsDataURL(file);
+            (function(file){
+              var fr = new FileReader();
+              fr.onload = function(){
+                uploadFile({url: fr.result, name: file.name, size: file.size, type: file.type});
+              }
+              fr.readAsDataURL(file);
+            })(file)
             likelyleft++;
           }
         }
