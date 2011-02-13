@@ -356,7 +356,17 @@ function getURL(type, request, callback, sync){
         
           var bb = new BlobBuilder();//this webworker is totally overkill
           bb.append("onmessage = function(e) { for(var raw = e.data, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff); postMessage(data) }");
-          var worker = new Worker(createObjectURL(bb.getBlob()));
+          var url;
+          if(window.createObjectURL){
+            url = window.createObjectURL(bb.getBlob())
+          }else if(window.createBlobURL){
+            url = window.createBlobURL(bb.getBlob())
+          }else if(window.URL && window.URL.createObjectURL){
+            url = window.URL.createObjectURL(bb.getBlob())
+          }else if(window.webkitURL && window.webkitURL.createObjectURL){
+            url = window.webkitURL.createObjectURL(bb.getBlob())
+          }
+          var worker = new Worker(url);
           worker.onmessage = function(e) {
             var data = e.data;
             callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
@@ -1515,7 +1525,7 @@ Hosts.minus = function uploadMinus(file, callback){
   function upload(){
     minusGallery.time = +new Date;
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://min.us/api/UploadItem?editor_id="+minusGallery.editor_id+"&key="+minusGallery.key+"&filename="+(file.name||'unknown.file'));  
+    xhr.open("POST", "http://min.us/api/UploadItem?editor_id="+minusGallery.editor_id+"&filename="+(file.name||'unknown.file'));  
     xhr.onload = function(){
       var info = JSON.parse(xhr.responseText);
       //console.log(xhr.responseText);
@@ -1536,7 +1546,9 @@ Hosts.minus = function uploadMinus(file, callback){
           direct: filepos
         });
       }
-      x.send()
+      setTimeout(function(){
+        x.send()
+      }, 100);
     }
     xhr.onerror = function(){
       callback('error: min.us uploading failed')

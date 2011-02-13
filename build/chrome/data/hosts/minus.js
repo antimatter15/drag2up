@@ -24,7 +24,7 @@ Hosts.minus = function uploadMinus(file, callback){
   function upload(){
     minusGallery.time = +new Date;
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://min.us/api/UploadItem?editor_id="+minusGallery.editor_id+"&key="+minusGallery.key+"&filename="+(file.name||'unknown.file'));  
+    xhr.open("POST", "http://min.us/api/UploadItem?editor_id="+minusGallery.editor_id+"&filename="+(file.name||'unknown.file'));  
     xhr.onload = function(){
       var info = JSON.parse(xhr.responseText);
       //console.log(xhr.responseText);
@@ -45,7 +45,9 @@ Hosts.minus = function uploadMinus(file, callback){
           direct: filepos
         });
       }
-      x.send()
+      setTimeout(function(){
+        x.send()
+      }, 100);
     }
     xhr.onerror = function(){
       callback('error: min.us uploading failed')
