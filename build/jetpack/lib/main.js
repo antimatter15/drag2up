@@ -201,14 +201,17 @@ function handleRequest(request, tab, sendResponse){
         url: request.url
       }, function(parts){
       car.done();
-      console.log('finished initializing instant', +new Date);
+      console.log('finished initializing instant', +new Date, parts);
       var shorturl = https()+instant_host+''+parts[0];
       if(localStorage.descriptive == 'on' && request.name){
         shorturl += '?'+request.name;
       }
+      console.log(shorturl);
       returned_link({
         callback: request.id,
-        url: shorturl
+        url: {
+          url: shorturl
+        }
       })
     })
   }
@@ -290,7 +293,7 @@ function instantInit(file, callback){
   }
 
   xhr.send();
-    console.log('sent');
+  console.log('sent');
 }
 
 
@@ -1831,6 +1834,9 @@ Hosts.cloudapp = function uploadCloudApp(file, callback){
       var json = JSON.parse(xhr.responseText);
       var xhr2 = new XMLHttpRequest();
       xhr2.open('POST', json.url);
+      if(json.uploads_remaining == 0){
+        return callback('error: You have exceeded your maximum number of uploads today for CloudApp. You may need to upgrade your account.');      
+      }
       json.params.key = json.params.key.replace('${filename}', file.name);
       json.params.file = file;
       xhr2.sendMultipart(json.params);

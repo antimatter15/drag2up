@@ -132,14 +132,17 @@ function handleRequest(request, tab, sendResponse){
         url: request.url
       }, function(parts){
       car.done();
-      console.log('finished initializing instant', +new Date);
+      console.log('finished initializing instant', +new Date, parts);
       var shorturl = https()+instant_host+''+parts[0];
       if(localStorage.descriptive == 'on' && request.name){
         shorturl += '?'+request.name;
       }
+      console.log(shorturl);
       returned_link({
         callback: request.id,
-        url: shorturl
+        url: {
+          url: shorturl
+        }
       })
     })
   }
@@ -221,7 +224,7 @@ function instantInit(file, callback){
   }
 
   xhr.send();
-    console.log('sent');
+  console.log('sent');
 }
 
 
