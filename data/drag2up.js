@@ -250,6 +250,12 @@ function initialize(){
           }else{
             el.value += '[url='+url.url+']'+(url.name||url.url)+'[/url]' + ' ';
           }
+        }else if(/Markdown/i.test(document.body.innerHTML)){
+          if(type.indexOf('image/') == 0 && url.direct){
+            el.value += '!['+(url.name||url.url)+']('+url.direct+')' + ' ';
+          }else{
+            el.value += '['+(url.name||url.url)+']('+url.url+')' + ' ';
+          }
         }else if(el.value.indexOf('<a') != -1){
           el.value += '<a href="' + url.url + '">'+(url.name||url.url)+'</a>';
         }else{

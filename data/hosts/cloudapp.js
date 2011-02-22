@@ -47,6 +47,9 @@ Hosts.cloudapp = function uploadCloudApp(file, callback){
       var json = JSON.parse(xhr.responseText);
       var xhr2 = new XMLHttpRequest();
       xhr2.open('POST', json.url);
+      if(json.uploads_remaining == 0){
+        return callback('error: You have exceeded your maximum number of uploads today for CloudApp. You may need to upgrade your account.');      
+      }
       json.params.key = json.params.key.replace('${filename}', file.name);
       json.params.file = file;
       xhr2.sendMultipart(json.params);
