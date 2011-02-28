@@ -33,7 +33,7 @@ Hosts.immio = function uploadImmio(req, callback){
           
           callback({
             url: url,
-            direct: url.replace(/^(.*)\/(..)(.*)$/,'$1/media/$2/$2$3.')+file.name.replace(/^.*\./g,'')
+            direct: url.replace(/^(.*)\/(..)(.*)$/,'$1/media/$2/$2$3.')+file.name.replace(/^.*\./g,'').toLowerCase().replace('jpg','jpeg')
           })
         }
       }
